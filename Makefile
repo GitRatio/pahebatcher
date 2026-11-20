@@ -1,0 +1,109 @@
+# WSL one-command setup idea + initial Makefile_HellHar/setup-wsl.sh by u/HellHarbinger on Reddit
+VENV := venv
+PYTHON := $(VENV)/bin/python
+
+.PHONY: help install run config-show watchlist-list watchlist-check test lint typecheck benchmark clean
+
+help:
+	@echo "Usage: make <target>"
+	@echo ""
+	@echo "Run:"
+	@echo "  make run                                interactive wizard (fully automated setup)"
+	@echo "  make run https://animepahe.pw/anime/<uuid>               with URL"
+	@echo '  make run URL="https://..." ARGS="--all -q 720"           with flags'
+	@echo "  make config-show                        display current settings"
+	@echo "  make watchlist-list                     list watchlist entries"
+	@echo "  make watchlist-check                    check watchlist for new episodes"
+	@echo ""
+	@echo "Config (set once, reused every session):"
+	@echo "  $(PYTHON) -m pahebatcher config set quality 720"
+	@echo "  $(PYTHON) -m pahebatcher config set audio_lang eng"
+	@echo "  $(PYTHON) -m pahebatcher config set max_parallel 4"
+	@echo "  $(PYTHON) -m pahebatcher config reset"
+	@echo ""
+	@echo "Watchlist (auto-download ongoing series):"
+	@echo '  make run ARGS="watchlist add https://animepahe.pw/anime/<uuid> -q 720 --audio eng -o ~/anime"'
+	@echo "  make watchlist-list"
+	@echo "  make watchlist-check"
+	@echo '  $(PYTHON) -m pahebatcher watchlist show 1'
+	@echo '  $(PYTHON) -m pahebatcher watchlist remove 1 --yes'
+	@echo ""
+	@echo "Dev:"
+	@echo "  make test         run the test suite"
+	@echo "  make lint         ruff check (0 errors)"
+	@echo "  make typecheck    mypy strict (0 errors)"
+	@echo "  make benchmark    full coherence benchmark"
+	@echo "  make clean        remove venv + caches"
+
+# 1. Python Application Layer
+$(VENV):
+	@echo "==> [Python] Preparing virtual environment..."
+	@if [ ! -d "$(VENV)" ]; then \
+		if ! python3 -m venv $(VENV) 2>&1; then \
+			echo "ERROR: python3 -m venv failed."; \
+			echo "  Fix: sudo apt update && sudo apt install -y python3-venv"; \
+			echo "  Then re-run: make run"; \
+			exit 1; \
+		fi; \
+		echo "    Installing package dependencies..."; \
+		if ! $(PYTHON) -m pip install --upgrade pip; then \
+			echo "ERROR: pip upgrade failed. Check network/proxy."; \
+			exit 1; \
+		fi; \
+		if ! $(PYTHON) -m pip install -e ".[dev,browser]"; then \
+			echo "ERROR: pip install -e .[dev,browser] failed. See output above."; \
+			exit 1; \
+		fi; \
+		echo "    Environment ready."; \
+	fi
+
+install: $(VENV)
+
+# 2. Execution Layer
+run: install
+	@if [ -f pahebatcher.toml ]; then \
+		$(PYTHON) -c "from pahebatcher.config_manager import ConfigManager; c=ConfigManager(); c.load(); a='SUB' if c.get('audio_lang')=='jpn' else 'DUB'; print(f'  Config: {a}  {c.get(\"quality\")}p  ({c.get(\"max_parallel\")} concurrent)')"; \
+	else \
+		echo "  First run — settings will be saved after the wizard."; \
+	fi
+	@echo ""
+	@$(PYTHON) -m pahebatcher $(URL) $(ARGS) $(wordlist 2,99,$(MAKECMDGOALS))
+
+config-show: install
+	@$(PYTHON) -m pahebatcher config show
+
+watchlist-list: install
+	@$(PYTHON) -m pahebatcher watchlist list
+
+watchlist-check: install
+	@$(PYTHON) -m pahebatcher watchlist check
+
+test: install
+	@$(PYTHON) -m pytest tests/ -v
+
+lint: install
+	@$(PYTHON) -m ruff check src/
+
+typecheck: install
+	@$(PYTHON) -m mypy src/
+
+benchmark: install
+	@echo "=== Benchmark: Coherence Pass ==="
+	@echo "--- ruff ---"
+	@$(PYTHON) -m ruff check src/ && echo "ruff: OK (0 errors)"
+	@echo "--- mypy ---"
+	@$(PYTHON) -m mypy src/ && echo "mypy: OK (0 errors)"
+	@echo "--- pytest ---"
+	@$(PYTHON) -m pytest tests/ -q
+	@echo "--- coverage ---"
+	@$(PYTHON) -m pytest tests/ --cov=pahebatcher --cov-report=term-missing --cov-report=html -q || echo "coverage: install pytest-cov for report"
+	@echo "=== Benchmark Complete ==="
+
+clean:
+	rm -rf $(VENV) __pycache__ .pytest_cache .mypy_cache src/pahebatcher.egg-info dist build
+	find src tests -type d -name "__pycache__" -exec rm -rf {} + 2>/dev/null || true
+	find . -name "*.pyc" -delete 2>/dev/null || true
+
+# Catch-all prevents make from treating URL as a build target
+%::
+	@true

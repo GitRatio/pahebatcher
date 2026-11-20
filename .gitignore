@@ -1,0 +1,42 @@
+# Virtual Environment
+venv/
+ENV/
+.env
+
+# Python Cache
+__pycache__/
+*.py[cod]
+*$py.class
+.mypy_cache/
+.ruff_cache/
+
+# Testing
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Project Output
+downloads/
+
+# Config — local file is git-ignored (see pahebatcher.toml.example for defaults)
+pahebatcher.toml
+!pahebatcher.toml.example
+watchlist.json
+
+# Session Cache
+pahe_cache/
+
+# Build Artifacts
+src/*.egg-info/
+*.egg-info/
+dist/
+build/
+
+# IDEs
+.vscode/
+.idea/
+
+# Swap files
+*.swp
+*.swo
+*~
