@@ -196,3 +196,36 @@ jobs:
         with:
           files: dist/*
           generate_release_notes: true
+
+  preview-release:
+    # A stable, sign-in-free download URL for each unsigned platform preview.
+    # Only publish after every build and test succeeds on main.
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    needs: [build, build-gui, build-gui-unix]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          path: dist
+          merge-multiple: true
+      - uses: softprops/action-gh-release@v2
+        with:
+          tag_name: preview
+          target_commitish: ${{ github.sha }}
+          name: PaheBatcher GitRatio Edition · v3.10.0 Preview (unsigned)
+          body: |
+            Rolling development preview built automatically from the tested main branch.
+            These downloads are NOT digitally signed or macOS notarized.
+            For Windows SmartScreen or macOS Gatekeeper warnings, review the source or build locally.
+            Test playback and download behavior on your own device before treating it as production ready.
+            Source code and attribution: https://github.com/GitRatio/pahebatcher
+          prerelease: true
+          make_latest: false
+          overwrite_files: true
+          files: |
+            dist/pahebatcher-gui-windows-x64.exe
+            dist/PaheBatcher-macos-arm64.zip
+            dist/PaheBatcher-macos-x64.zip
+            dist/PaheBatcher-linux-x64.tar.gz
