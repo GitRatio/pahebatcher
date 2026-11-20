@@ -4,9 +4,9 @@ This GitRatio edition shares one Python/Tkinter desktop interface and download b
 
 ## Download builds by operating system
 
-[**Windows 11**](https://github.com/GitRatio/pahebatcher/actions/workflows/build-exe.yml) · [**macOS Apple Silicon**](https://github.com/GitRatio/pahebatcher/actions/workflows/build-exe.yml) · [**macOS Intel**](https://github.com/GitRatio/pahebatcher/actions/workflows/build-exe.yml) · [**Linux x64**](https://github.com/GitRatio/pahebatcher/actions/workflows/build-exe.yml)
+[**Windows 11**](https://github.com/GitRatio/pahebatcher/releases/download/preview/pahebatcher-gui-windows-x64.exe) · [**macOS Apple Silicon**](https://github.com/GitRatio/pahebatcher/releases/download/preview/PaheBatcher-macos-arm64.zip) · [**macOS Intel**](https://github.com/GitRatio/pahebatcher/releases/download/preview/PaheBatcher-macos-x64.zip) · [**Linux x64**](https://github.com/GitRatio/pahebatcher/releases/download/preview/PaheBatcher-linux-x64.tar.gz)
 
-Choose the latest successful main-branch run and open its Artifacts list. See README for exact package names.
+These are direct file links from the rolling **unsigned preview** release, published only after all platform builds succeed. If a preview is not available yet, use the latest successful main-branch [build artifacts](https://github.com/GitRatio/pahebatcher/actions/workflows/build-exe.yml). See README for package names.
 
 ## Prebuilt desktop packages
 
@@ -68,6 +68,6 @@ For privacy, playback uses a randomized URL served only on 127.0.0.1, has no dir
 
 ## CI / release engineering
 
-The repository's Build executables workflow runs the unit tests and builds platform-specific desktop packages. Mac archives contain an .app; Linux archives contain PyInstaller's portable onedir bundle, icon and install.sh. Artifacts are attached to a GitHub release only when a version tag triggers the workflow and the required jobs pass.
+The repository's Build executables workflow runs the unit tests and builds platform-specific desktop packages. Mac archives contain an .app; Linux archives contain PyInstaller's portable onedir bundle, icon and install.sh. A rolling unsigned prerelease is published at the fixed `preview` tag after successful main-branch builds. Formal versioned releases are published only when a `v*` tag triggers the workflow and the required jobs pass.
 
 The packages still need real-device QA, macOS code signing/notarization and broader Linux-distribution verification before being called production-ready.
