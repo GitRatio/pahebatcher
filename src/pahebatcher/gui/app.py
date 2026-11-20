@@ -299,7 +299,10 @@ class EpisodesView(tk.Frame):
         self.eps = [by_num[n] for n in sorted(by_num)]
         self.sel = set()
         self.title.configure(text=anime.title)
-        self.description.configure(text=anime.description or "Synopsis unavailable for this title.")
+        synopsis = anime.description.strip()
+        if len(synopsis) > 350:
+            synopsis = synopsis[:347].rsplit(" ", 1)[0] + "…"
+        self.description.configure(text=synopsis or "Synopsis unavailable for this title.")
         first, last = (self.eps[0].ep_str, self.eps[-1].ep_str) if self.eps else ("-", "-")
         self.sub.configure(text=f"{len(self.eps)} episodes · {first} to {last}")
         self.lb.delete(0, "end")
