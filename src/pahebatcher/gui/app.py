@@ -591,10 +591,15 @@ class App(tk.Tk):
             ("Mac (Intel)", "https://github.com/GitRatio/pahebatcher/actions/workflows/build-exe.yml"),
             ("Linux x64", "https://github.com/GitRatio/pahebatcher/actions/workflows/build-exe.yml"),
         ]
+        def open_url(url: str) -> Callable[[], None]:
+            def handler() -> None:
+                webbrowser.open(url)
+            return handler
+
         controls = tk.Frame(container, bg=BG)
         controls.pack(fill="x", pady=(0, 18))
         for label, url in choices:
-            Button(controls, label, lambda link=url: webbrowser.open(link), f).pack(
+            Button(controls, label, open_url(url), f).pack(
                 side="left", padx=(0, 8), pady=4,
             )
         tk.Label(container, text=(
@@ -604,9 +609,9 @@ class App(tk.Tk):
                  anchor="nw", wraplength=570).pack(fill="x", pady=(0, 16))
         links = tk.Frame(container, bg=BG)
         links.pack(fill="x")
-        Link(links, "View releases", lambda: webbrowser.open(
+        Link(links, "View releases", open_url(
             "https://github.com/GitRatio/pahebatcher/releases"), f).pack(side="left")
-        Link(links, "Source and license", lambda: webbrowser.open(
+        Link(links, "Source and license", open_url(
             "https://github.com/GitRatio/pahebatcher"), f).pack(side="left", padx=20)
         Button(container, "Close", dlg.destroy, f, primary=True).pack(side="bottom", anchor="e")
 
