@@ -43,7 +43,11 @@ def test_player_metadata_and_csp(player: PlayerSession) -> None:
     assert "Sample Series" in data.decode("utf-8")
     assert "A Test Episode" in data.decode("utf-8")
     assert "video" in data.decode("utf-8")
-    assert "https://" not in data.decode("utf-8")
+    assert "@videojs/cdn@10.5.0/video-neutral.js" in data.decode("utf-8")
+    assert "https://cdn.jsdelivr.net" in headers["Content-Security-Policy"]
+    assert "connect-src 'self'" in headers["Content-Security-Policy"]
+    assert "video-neutral-skin" in data.decode("utf-8")
+    assert "v3.10.0" in data.decode("utf-8")
 
 
 def test_range_and_seek(player: PlayerSession) -> None:
@@ -112,3 +116,42 @@ def test_no_external_browser_dependency(player: PlayerSession, monkeypatch: pyte
     monkeypatch.setattr("pahebatcher.gui.player.webbrowser.open", lambda url, new: urls.append(url) or True)
     assert player.open()
     assert urls == [player.url]
+
+
+def test_series_synopsis_from_download(tmp_path: Path) -> None:
+    video = tmp_path / "Ep 001.mp4"
+    video.write_bytes(b"movie")
+    session = PlayerSession([
+        PlaybackItem(video, "Test Anime", "1", "Pilot", "jpn", "A story about heroes."),
+    ])
+    try:
+        status, _headers, html = request(session, f"/watch/{session.token}/")
+        text = html.decode("utf-8")
+        assert status == 200
+        assert "A story about heroes." in text
+        assert "About this anime" in text
+    finally:
+        session.close()
+
+
+def test_synopsis_extraction() -> None:
+    from pahebatcher.extract.scanner import AnimePaheScanner
+
+    doc = (
+        '<meta property="og:description" content="A short preview">'
+        '<div class="anime-synopsis"><p>A hero &amp; friend</p> faces danger.</div>'
+    )
+    assert AnimePaheScanner._extract_description(doc) == "A hero & friend faces danger."
+    assert AnimePaheScanner._extract_description(
+        '<meta name="description" content="A standalone movie">'
+    ) == "A standalone movie"
+    assert AnimePaheScanner._extract_description("<html><body></body></html>") == ""
+
+
+def test_player_csp_avoids_unrestricted_remote_requests(player: PlayerSession) -> None:
+    status, headers, _ = request(player, f"/watch/{player.token}/")
+    assert status == 200
+    csp = headers["Content-Security-Policy"]
+    assert "connect-src 'self'" in csp
+    assert "media-src 'self'" in csp
+    assert "unsafe-inline" not in csp
