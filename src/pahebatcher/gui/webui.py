@@ -246,10 +246,13 @@ class TakeoverApi:
         if not isinstance(url, str):
             raise ValueError("External link must be a URL.")
         parsed = urlsplit(url)
+        permitted = (
+            parsed.path == "/GitRatio/pahebatcher"
+            or parsed.path.startswith("/GitRatio/pahebatcher/")
+            or parsed.path == "/abdullahkhfb/pahebatcher"
+        )
         if (parsed.scheme != "https" or parsed.hostname != "github.com" or
-                parsed.username or parsed.password or parsed.port or
-                not (parsed.path == "/GitRatio/pahebatcher" or
-                     parsed.path.startswith("/GitRatio/pahebatcher/"))):
+                parsed.username or parsed.password or parsed.port or not permitted):
             raise ValueError("This external link is not permitted.")
         return {"ok": bool(webbrowser.open(url))}
 
