@@ -256,7 +256,7 @@ class TakeoverApi:
 def main() -> None:
     """Launch the real HTML-powered desktop UI, not the previous Tk facsimile."""
     try:
-        import webview  # type: ignore[import-not-found]
+        import webview
     except ImportError as exc:
         raise RuntimeError(
             'The new desktop UI needs pywebview. Install using: pip install "pahebatcher[gui,browser]"'
