@@ -121,16 +121,85 @@ kbd { display: inline-block; min-width: 18px; padding: 1px 5px; border: 1px soli
 @media (prefers-reduced-motion: no-preference) {
   .control, .queue button { transition: background-color .16s, border-color .16s, color .16s; }
 }
+
+/* v3.11: approved GR Bunny Takeover graffiti theme. */
+:root {
+  --bg:#0c101b; --panel:#191c2c; --raised:#22243a; --border:#444260;
+  --accent:#ff4c9f; --accent-strong:#e32a7e; --focus:#42eff1; --text:#f9f6ff;
+}
+body{background:#0c101b;}
+.desktop-window{display:grid;grid-template-columns:216px minmax(0,1fr);min-height:100vh;min-width:0;}
+.app-rail{z-index:2;display:flex;flex-direction:column;min-width:0;padding:24px 15px 10px;border-right:1px solid #4b3453;background:#111522;position:sticky;top:0;max-height:100vh;}
+.rail-logo{margin:3px 4px 29px;transform:rotate(-7deg);font-size:52px;line-height:1;font-weight:950;font-style:italic;letter-spacing:-.12em;color:#40eefa;text-shadow:4px 4px #e42c8e,0 6px 20px #f8398d40;}
+.rail-logo small{display:block;margin-top:13px;font-size:11px;letter-spacing:.12em;color:#eab9ce;font-style:normal;text-shadow:none;transform:rotate(7deg);}
+.rail-menu{display:flex;flex-direction:column;gap:7px;}
+.rail-menu a{display:block;padding:14px 14px;text-decoration:none;color:#e7dfe8;border:1px solid transparent;border-radius:12px;font-weight:700;font-size:14px;}
+.rail-menu a:hover,.rail-menu a:focus-visible{border-color:#3bdeeb;background:#18313f;color:#6af6f7;outline:none;}
+.rail-menu a.active{border-color:#2ddde9;background:#17404b;color:#c4ffff;}
+.rail-spacer{flex:1;min-height:15px;}
+.rail-bunny{display:block;width:min(100%,177px);height:auto;margin:0 auto 6px;filter:drop-shadow(0 4px 9px #f1398d55);}
+.rail-bottom{text-align:center;color:#ff87bc;font-size:11px;font-weight:850;letter-spacing:.12em;margin:8px 0 4px;}
+.main-pane{min-width:0;}
+.graffiti-banner{height:150px;overflow:hidden;position:relative;isolation:isolate;background:repeating-linear-gradient(0deg,transparent 0px,transparent 24px,#ffffff09 25px,#ffffff09 26px),radial-gradient(circle at 82% 30%,#4c224b,#1d1c2b 60%,#161825);border-bottom:1px solid #633759;}
+.graffiti-banner:before{position:absolute;content:"";inset:0;background:linear-gradient(120deg,transparent 54%,#ff3b8c15 55%,transparent 56%),radial-gradient(circle at 74% 63%,#fe2e8d1f,transparent 38%);pointer-events:none;}
+.graffiti-banner img{position:absolute;right:6%;top:-54px;width:270px;max-width:38%;opacity:.25;filter:grayscale(.1) contrast(1.28) drop-shadow(0 0 20px #ee3c8e);transform:rotate(-8deg);pointer-events:none;}
+.graffiti-banner .mural{position:absolute;right:27px;bottom:13px;color:#fa4fa6;font-size:45px;font-weight:1000;font-style:italic;opacity:.36;transform:rotate(-9deg);}
+.banner-title{position:absolute;left:clamp(22px,3.4vw,60px);top:23px;font-size:clamp(35px,4vw,60px);font-style:italic;line-height:1;font-weight:950;letter-spacing:-.065em;color:#fff;text-shadow:4px 3px #8e254f;}
+.banner-title b{color:#ff65b1;}
+.banner-caption{position:absolute;left:clamp(24px,3.7vw,65px);bottom:25px;font-size:12px;font-weight:700;color:#6ff7f7;letter-spacing:.19em;}
+.shell{max-width:1530px;padding:22px clamp(18px,2.5vw,39px) 55px;}
+header{padding-bottom:16px;}
+.brand .mark{background:#182330;border:1px solid #48eff3;box-shadow:0 0 22px #24f1f42a;}
+.layout{gap:24px;margin-top:23px;grid-template-columns:minmax(0,1fr) minmax(260px,325px);}
+.player-frame{border-color:#826190;box-shadow:0 0 0 1px #ff4c9f30,0 18px 50px #0008;}
+.control.primary,.big-download{background:linear-gradient(135deg,#fa5aaa,#d31b79);border:1px solid #42eff1;color:#fff;box-shadow:0 0 0 2px #44eaf321,0 5px 22px #f6399840;}
+.big-download{display:inline-flex;justify-content:center;align-items:center;min-height:56px;text-align:center;text-decoration:none;font-weight:850;font-size:17px;padding:13px 26px;border-radius:13px;white-space:nowrap;}
+.big-download:hover,.big-download:focus-visible{background:linear-gradient(135deg,#ff84c0,#e53092);outline:2px solid #5cfbff;outline-offset:3px;}
+.episode-heading{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:20px;margin:27px 0 8px;}
+.episode-heading .heading-copy{min-width:0;flex:1 1 260px;}
+.episode-heading .eyebrow{margin:0 0 10px;}
+.episode-heading h1{margin:0 0 7px;}
+.episode-heading .subtitle{margin:0;}
+.sidebar{background:linear-gradient(180deg,#201c2f,#161928);border-color:#565070;}
+.queue button[aria-current="true"]{background:#4c243e;border-color:#ed4d9a;}
+.ep-index{background:#312536;color:#ff91c1;}
+.synopsis{background:#191c2a;border-color:#51435e;}
+.synopsis h2{color:#ff76b6;}
+.pill{border-color:#396e7e;background:#172b35;color:#8effff;}
+@media(max-width:1100px){.desktop-window{grid-template-columns:175px minmax(0,1fr);}.app-rail{padding:18px 10px}.rail-menu a{font-size:12px;padding:12px 10px}.rail-logo{font-size:42px}.graffiti-banner{height:122px}.layout{grid-template-columns:1fr;}.sidebar{position:static;}}
+@media(max-width:750px){.desktop-window{display:block;}.app-rail{position:static;max-height:none;display:block;padding:10px 14px;border-right:0;border-bottom:1px solid #4b3453;}.rail-logo{display:none}.rail-menu{flex-direction:row;flex-wrap:wrap;gap:5px}.rail-menu a{font-size:11px;padding:9px 10px}.rail-spacer,.rail-bunny,.rail-bottom{display:none}.graffiti-banner{height:104px}.graffiti-banner img{width:155px;top:-25px}.banner-title{font-size:37px}.banner-caption{font-size:9px}.shell{padding:18px 14px 35px}.big-download{width:100%;}.episode-heading{gap:14px}.queue{max-height:245px}}
+@media(max-width:410px){.rail-menu a{padding:8px 7px}.graffiti-banner .mural{display:none}.brand{font-size:18px}.pill{font-size:10px}.big-download{font-size:15px}}
+
 </style>
 </head>
 <body>
+<div class="desktop-window">
+<aside class="app-rail" aria-label="Player navigation">
+  <div class="rail-logo">GR<small>GITRATIO TAKEOVER</small></div>
+  <nav class="rail-menu">
+    <a class="active" href="#player">▷  Player</a>
+    <a href="#episodes">☷  Episodes</a>
+    <a href="#series-details">ⓘ  About</a>
+    <a id="rail-download" href="#download-video">↓  Download</a>
+  </nav>
+  <div class="rail-spacer"></div>
+  <img class="rail-bunny" src="data:image/png;base64,__TAKEOVER_BUNNY__" alt="GitRatio pink-haired bunny mascot">
+  <div class="rail-bottom">BUNNY TAKEOVER · v__APP_VERSION__</div>
+</aside>
+<div class="main-pane">
+<div class="graffiti-banner" aria-label="GitRatio graffiti brand banner">
+  <div class="banner-title">Git<b>Ratio</b></div>
+  <div class="banner-caption">ANIME DOWNLOADER // BUNNY TAKEOVER</div>
+  <img src="data:image/png;base64,__TAKEOVER_BUNNY__" alt="" aria-hidden="true">
+  <span class="mural" aria-hidden="true">GR</span>
+</div>
 <div class="shell">
 <header>
 <div class="brand"><span class="mark" aria-hidden="true">🐰</span><span class="brand-name">PaheBatcher <span class="edition">GitRatio Edition · v__APP_VERSION__</span></span></div>
 <span class="pill">LOCAL · PRIVATE PLAYBACK</span>
 </header>
 <main class="layout">
-<section class="stage" aria-label="Video player">
+<section class="stage" id="player" aria-label="Video player">
 <div class="player-frame">
 <video-player>
   <video-neutral-skin>
@@ -143,9 +212,14 @@ kbd { display: inline-block; min-width: 18px; padding: 1px 5px; border: 1px soli
 <div class="step-buttons"><button id="prev" class="control" type="button">← Previous</button><button id="next" class="control primary" type="button">Next episode →</button></div>
 <button id="full" class="control" type="button">⛶ Full screen</button>
 </div>
-<p class="eyebrow">Now watching · <span id="series-count">1 of 1</span></p>
-<h1 id="series-name">Loading series…</h1>
-<p id="episode-title" class="subtitle"></p>
+<div class="episode-heading" id="series-details">
+  <div class="heading-copy">
+    <p class="eyebrow">Now watching · <span id="series-count">1 of 1</span></p>
+    <h1 id="series-name">Loading series…</h1>
+    <p id="episode-title" class="subtitle"></p>
+  </div>
+  <a id="download-video" class="big-download" download href="#">↓ Download video</a>
+</div>
 <div class="meta-row"><div class="meta">Episode <strong id="episode-num">—</strong></div><div class="meta">Audio <strong id="episode-audio">Unknown</strong></div><div class="meta">Format <strong id="episode-format">—</strong></div><div class="meta">Source <strong>Local downloaded file</strong></div></div>
 <section class="synopsis" aria-labelledby="synopsis-heading">
   <h2 id="synopsis-heading">About this anime</h2>
@@ -154,11 +228,13 @@ kbd { display: inline-block; min-width: 18px; padding: 1px 5px; border: 1px soli
 <p class="player-note" role="status" id="engine-status">Native HTML5 controls are available; Video.js 10 loads when online.</p>
 <footer>Video.js 10.5.0 Neutral skin (native HTML5 fallback when offline). <kbd>Space</kbd> play/pause · <kbd>F</kbd> full screen · <kbd>→</kbd> next episode · <kbd>←</kbd> previous episode. Playback stays on your computer. Browser codec support varies.</footer>
 </section>
-<aside class="sidebar" aria-label="Episode playlist">
+<aside class="sidebar" id="episodes" aria-label="Episode playlist">
 <div class="sidebar-top"><h2>Episode queue</h2><p id="queue-summary">Choose a downloaded episode</p></div>
 <div class="queue" id="queue"></div>
 </aside>
 </main>
+</div>
+</div>
 </div>
 <script type="application/json" id="player-data">__PLAYER_DATA__</script>
 <script nonce="__PLAYER_NONCE__">
@@ -190,6 +266,11 @@ function select(index, play) {
   error.hidden = true;
   document.title = ep.series + " · Episode " + ep.episode + " · PaheBatcher";
   document.getElementById("series-name").textContent = ep.series || "Unknown series";
+  const download = document.getElementById("download-video");
+  download.href = ep.src;
+  download.download = ep.filename || "video.mp4";
+  document.getElementById("rail-download").href = ep.src;
+  document.getElementById("rail-download").download = download.download;
   document.getElementById("episode-title").textContent = ep.title || "Episode " + ep.episode;
   document.getElementById("synopsis-heading").textContent = ep.kind === "Standalone video" ? "About this video" : "About this anime";
   document.getElementById("series-description").textContent =
