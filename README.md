@@ -351,8 +351,8 @@ and watchlist in the desktop app, other audio languages.
 - **Original pahebatcher:** [abdullahkhfb](https://github.com/abdullahkhfb/pahebatcher); this is an independent MIT-licensed derivative, not a transfer of upstream ownership.
 - **GitRatio edition:** Windows fixes, fork maintenance, and the tongue-in-cheek bunny-takeover theme.
 
-- **Logo** by [/u/HellHarbinger][hellharbinger]. The app icon is a simplified
-  version of it.
+- **Original logo** by [/u/HellHarbinger][hellharbinger]; retained in `assets/logo/` with upstream attribution.
+- **GitRatio Bunny Takeover mascot:** supplied for this fork and bundled for the native UI, local player and desktop icons.
 - **WSL setup** (`setup-wsl.sh` and the Makefile): idea and first version by
   [/u/HellHarbinger][hellharbinger].
 
