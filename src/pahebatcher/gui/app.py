@@ -283,7 +283,10 @@ class EpisodesView(tk.Frame):
         self.range.pack(side="left", padx=(12, 8))
         self.range.bind("<Return>", lambda _e: self.select_range())
         Button(ctl, "Select range", self.select_range, f).pack(side="left")
-        tk.Label(self, text="Examples: 1-12 · 1,4,7 · 5-", font=f.small, fg=MUTED, bg=BG, anchor="w").pack(fill="x", pady=(0, 12))
+        tk.Label(
+            self, text="Examples: 1-12 · 1,4,7 · 5-",
+            font=f.small, fg=MUTED, bg=BG, anchor="w",
+        ).pack(fill="x", pady=(0, 12))
 
         frame, self.lb = make_listbox(self, f)
         frame.pack(fill="both", expand=True)
