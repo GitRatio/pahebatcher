@@ -222,10 +222,23 @@ class TakeoverApi:
         if path is None or not path.is_file() or not path.resolve().is_relative_to(root):
             raise ValueError("Video is no longer available in your downloads folder.")
         session = PlayerSession([PlaybackItem.from_file(path)])
-        if not session.open():
-            session.close()
-            raise RuntimeError("No browser is available for video playback.")
+        try:
+            import webview
+
+            webview.windows[0].load_url(session.url)
+        except (ImportError, AttributeError, IndexError, RuntimeError):
+            if not session.open():
+                session.close()
+                raise RuntimeError("No native webview or browser is available for playback.")
         self._players.append(session)
+        return {"ok": True}
+
+    def back_to_app(self) -> dict[str, bool]:
+        """Return from the local-video player to the existing native application."""
+        import webview
+
+        page = Path(__file__).resolve().parent / "assets" / "desktop.html"
+        webview.windows[0].load_url(str(page))
         return {"ok": True}
 
     @staticmethod
