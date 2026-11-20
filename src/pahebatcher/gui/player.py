@@ -125,9 +125,9 @@ class _PlayerHandler(BaseHTTPRequestHandler):
         self.send_header(
             "Content-Security-Policy",
             "default-src 'none'; "
-            f"script-src 'nonce-{self.session.nonce}'; "
-            f"style-src 'nonce-{self.session.nonce}'; "
-            "media-src 'self'; img-src 'self' data:; "
+            f"script-src 'nonce-{self.session.nonce}' https://cdn.jsdelivr.net; "
+            f"style-src 'nonce-{self.session.nonce}' https://cdn.jsdelivr.net; "
+            "connect-src 'self'; media-src 'self'; img-src 'self' data:; "
             "base-uri 'none'; form-action 'none'; frame-ancestors 'none'",
         )
         for key, value in (extra or {}).items():
