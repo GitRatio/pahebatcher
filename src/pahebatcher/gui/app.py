@@ -270,6 +270,10 @@ class EpisodesView(tk.Frame):
             anchor="w", wraplength=820,
         )
         self.description.pack(fill="x", pady=(0, 16))
+        self.description.bind(
+            "<Configure>",
+            lambda e: self.description.configure(wraplength=max(240, e.width - 12)),
+        )
 
         ctl = tk.Frame(self, bg=BG)
         ctl.pack(fill="x", pady=(0, 10))
@@ -279,7 +283,7 @@ class EpisodesView(tk.Frame):
         self.range.pack(side="left", padx=(12, 8))
         self.range.bind("<Return>", lambda _e: self.select_range())
         Button(ctl, "Select range", self.select_range, f).pack(side="left")
-        tk.Label(ctl, text="e.g. 1-12 · 1,4,7 · 5-", font=f.small, fg=MUTED, bg=BG).pack(side="left", padx=10)
+        tk.Label(self, text="Examples: 1-12 · 1,4,7 · 5-", font=f.small, fg=MUTED, bg=BG, anchor="w").pack(fill="x", pady=(0, 12))
 
         frame, self.lb = make_listbox(self, f)
         frame.pack(fill="both", expand=True)
@@ -390,8 +394,10 @@ class SearchView(tk.Frame):
         self.lb.bind("<Double-Button-1>", lambda _e: self.open())
         self.lb.bind("<Return>", lambda _e: self.open())
 
-        s = tk.Frame(self, bg=BG, highlightthickness=0)
-        s.pack(fill="x", pady=(16, 0))
+        settings = tk.Frame(self, bg=PANEL, highlightthickness=1, highlightbackground=LINE)
+        settings.pack(fill="x", pady=(18, 0))
+        options = tk.Frame(settings, bg=PANEL)
+        options.pack(fill="x", padx=16, pady=(15, 12))
         cfg = app.cfg
 
         def setter(key: str) -> Callable[[Any], None]:
@@ -400,24 +406,37 @@ class SearchView(tk.Frame):
                 save_settings(cfg)
             return _set
 
-        def group(label: str, widget: tk.Widget) -> None:
-            tk.Label(s, text=label.upper(), font=f.label, fg=MUTED, bg=BG).pack(side="left", padx=(0, 8))
-            widget.pack(side="left", padx=(0, 26))
+        def group(label: str, widget_factory: Callable[[tk.Frame], tk.Widget]) -> None:
+            section = tk.Frame(options, bg=PANEL)
+            section.pack(side="left", padx=(0, 23))
+            tk.Label(section, text=label.upper(), font=f.label, fg=MUTED, bg=PANEL,
+                     anchor="w").pack(fill="x", pady=(0, 8))
+            widget_factory(section).pack(anchor="w")
 
-        group("Quality", Segmented(s, [("360p", 360), ("720p", 720), ("1080p", 1080)],
-                                   int(cfg.get("quality")), setter("quality"), f))
-        group("Audio", Segmented(s, [("SUB", "jpn"), ("DUB", "eng")],
-                                 str(cfg.get("audio_lang")), setter("audio_lang"), f))
-        group("Parallel", Segmented(s, [(str(n), n) for n in (1, 2, 3, 4)],
-                                    int(cfg.get("max_parallel")), setter("max_parallel"), f))
-        self.folder = tk.Label(s, font=f.small, fg=MUTED, bg=BG, anchor="e")
-        Link(s, "change", self.pick_folder, f).pack(side="right")
-        self.folder.pack(side="right", padx=(0, 8))
+        group("Quality", lambda p: Segmented(
+            p, [("360p", 360), ("720p", 720), ("1080p", 1080)],
+            int(cfg.get("quality")), setter("quality"), f,
+        ))
+        group("Audio", lambda p: Segmented(
+            p, [("SUB", "jpn"), ("DUB", "eng")],
+            str(cfg.get("audio_lang")), setter("audio_lang"), f,
+        ))
+        group("Parallel", lambda p: Segmented(
+            p, [(str(n), n) for n in (1, 2, 3, 4)],
+            int(cfg.get("max_parallel")), setter("max_parallel"), f,
+        ))
+
+        folder_row = tk.Frame(settings, bg=PANEL)
+        folder_row.pack(fill="x", padx=16, pady=(0, 14))
+        tk.Label(folder_row, text="SAVE TO", font=f.label, fg=MUTED, bg=PANEL).pack(side="left")
+        Link(folder_row, "Change folder", self.pick_folder, f, bg=PANEL).pack(side="right")
+        self.folder = tk.Label(folder_row, font=f.small, fg=TEXT, bg=PANEL, anchor="w")
+        self.folder.pack(side="left", padx=(14, 12), fill="x", expand=True)
         self._show_folder()
 
     def _show_folder(self) -> None:
         p = str(self.app.cfg.get("output_dir"))
-        self.folder.configure(text=("…" + p[-38:]) if len(p) > 40 else p)
+        self.folder.configure(text=("…" + p[-65:]) if len(p) > 67 else p)
 
     def pick_folder(self) -> None:
         d = filedialog.askdirectory(initialdir=str(self.app.cfg.get("output_dir")), title="Download folder")
@@ -485,8 +504,8 @@ class App(tk.Tk):
     def __init__(self) -> None:
         super().__init__()
         self.title(f"PaheBatcher · GitRatio Edition v{VERSION}")
-        self.geometry("1000x720")
-        self.minsize(860, 600)
+        self.geometry("1120x780")
+        self.minsize(760, 620)
         self.configure(bg=BG)
         self._set_icon()
         self.fonts = Fonts(self)
@@ -510,14 +529,14 @@ class App(tk.Tk):
         dl.Dashboard = factory  # type: ignore[assignment,misc,attr-defined,unused-ignore]
 
         self._fullscreen = False
-        self._pad = 32
+        self._pad = 24
         self._build_header()
         self.notices = tk.Frame(self, bg=BG)
-        self.notices.pack(fill="x", padx=32)
+        self.notices.pack(fill="x", padx=24)
         self._build_ffmpeg_notice()
         self._build_solver_notice()
         self.body = tk.Frame(self, bg=BG)
-        self.body.pack(fill="both", expand=True, padx=32, pady=(18, 24))
+        self.body.pack(fill="both", expand=True, padx=24, pady=(20, 28))
         self.v_search, self.v_eps, self.v_dl = SearchView(self), EpisodesView(self), DownloadView(self)
         self.show_search()
 
@@ -544,23 +563,37 @@ class App(tk.Tk):
 
     # header + status ------------------------------------------------------
     def _build_header(self) -> None:
+        """Two-tier header avoids collisions between the logo, status and actions."""
         f = self.fonts
         hdr = self.hdr = tk.Frame(self, bg=BG)
-        hdr.pack(fill="x", padx=32, pady=(24, 0))
-        try:  # colored anime mascot + pink wordmark (assets/logo, cropped and recoloured)
+        hdr.pack(fill="x", padx=24, pady=(22, 0))
+        top = tk.Frame(hdr, bg=BG)
+        top.pack(fill="x")
+        try:
             self._logo = tk.PhotoImage(file=str(Path(__file__).parent / "assets" / "header_logo.png"))
-            tk.Label(hdr, image=self._logo, bg=BG, bd=0).pack(side="left")
+            tk.Label(top, image=self._logo, bg=BG, bd=0).pack(side="left")
         except Exception:
-            tk.Label(hdr, text="PaheBatcher", font=f.logo, fg=PINK, bg=BG).pack(side="left")
-        self.fs_link = Link(hdr, "Full screen", lambda: self.set_fullscreen(not self._fullscreen), f)
-        self.fs_link.pack(side="right", padx=(16, 0))
-        Link(hdr, "About", self.show_about, f).pack(side="right", padx=(16, 0))
-        Link(hdr, "Open player", self.choose_videos, f).pack(side="right", padx=(16, 0))
-        tk.Label(hdr, text=f"v{VERSION}", font=f.small, fg=MUTED, bg=BG).pack(side="right", padx=(16, 0))
-        self.dot_solver = tk.Label(hdr, text="● Solver", font=f.small, fg=MUTED, bg=BG)
-        self.dot_solver.pack(side="right", padx=(16, 0))
-        self.dot_ffmpeg = tk.Label(hdr, text="● FFmpeg", font=f.small, fg=MUTED, bg=BG)
+            tk.Label(top, text="PaheBatcher", font=f.logo, fg=PINK, bg=BG).pack(side="left")
+        status = tk.Frame(top, bg=BG)
+        status.pack(side="right")
+        tk.Label(status, text=f"v{VERSION}", font=f.small, fg=MUTED, bg=BG).pack(
+            side="right", padx=(12, 0),
+        )
+        self.dot_solver = tk.Label(status, text="● Solver", font=f.small, fg=MUTED, bg=BG)
+        self.dot_solver.pack(side="right", padx=(12, 0))
+        self.dot_ffmpeg = tk.Label(status, text="● FFmpeg", font=f.small, fg=MUTED, bg=BG)
         self.dot_ffmpeg.pack(side="right")
+
+        navigation = tk.Frame(hdr, bg=BG)
+        navigation.pack(fill="x", pady=(14, 14))
+        tk.Label(navigation, text="ANIME DOWNLOADS  /  GITRATIO EDITION",
+                 font=f.label, fg=MUTED, bg=BG).pack(side="left")
+        self.fs_link = Link(navigation, "Full screen", lambda: self.set_fullscreen(
+            not self._fullscreen), f)
+        self.fs_link.pack(side="right", padx=(18, 0))
+        Link(navigation, "About", self.show_about, f).pack(side="right", padx=(18, 0))
+        Link(navigation, "Open player", self.choose_videos, f).pack(side="right")
+        tk.Frame(hdr, height=1, bg=LINE).pack(fill="x")
 
     def show_about(self) -> None:
         """Show the installed version, player capabilities and OS download links."""
@@ -639,7 +672,7 @@ class App(tk.Tk):
         """Keep content centred with a sensible maximum width when the window is very wide."""
         if e.widget is not self:
             return
-        pad = max(32, (e.width - MAX_CONTENT) // 2)
+        pad = max(24, (e.width - MAX_CONTENT) // 2)
         if pad != self._pad:
             self._pad = pad
             for w in (self.hdr, self.notices, self.body):
