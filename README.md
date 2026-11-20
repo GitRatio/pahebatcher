@@ -1,6 +1,16 @@
 # pahebatcher
 
-![pahebatcher logo by u/HellHarbinger](assets/logo/colored_logo.svg)
+![Original pahebatcher logo by u/HellHarbinger](assets/logo/colored_logo.svg)
+
+> **🐰 A friendly GitRatio takeover!** The bunny has taken the download queue hostage. Don't worry—she's only here to fix bugs, steal a few milliseconds, and make the interface cuter. *No maintainers were overthrown in the making of this fork.*
+
+## About this edition
+
+**PaheBatcher — GitRatio Edition** is an independently maintained continuation of the original [pahebatcher by abdullahkhfb](https://github.com/abdullahkhfb/pahebatcher). It keeps the original Python downloading, streaming and watchlist foundation while focusing on Windows 11 compatibility, reliability, diagnostics and a more enjoyable desktop experience.
+
+**The "takeover" is a joke, not a claim of ownership of the original project.** GitRatio maintains this copy; the upstream author retains credit for their original work, and the original mascot/logo credits remain intact. This edition is not affiliated with or endorsed by the upstream maintainer. See [FORK_NOTES.md](FORK_NOTES.md) and [LICENSE](LICENSE).
+
+**Windows 11:** [Installation guide](WINDOWS_11.md) · [Preview builds in Actions](https://github.com/GitRatio/pahebatcher/actions/workflows/windows-preview.yml) · [GitRatio Releases](https://github.com/GitRatio/pahebatcher/releases)
 
 Batch-download and stream anime from [animepahe](https://animepahe.pw), from a
 desktop app or the terminal.
@@ -29,19 +39,17 @@ desktop app or the terminal.
 
 ### Windows (easiest)
 
-1.  Download `pahebatcher-gui-windows-x64.exe` from the Releases page, or
-    [build it yourself](#build-the-executables).
+1.  For a GitRatio preview, download the latest successful artifact from the [Windows preview workflow](https://github.com/GitRatio/pahebatcher/actions/workflows/windows-preview.yml), or consult the [Windows 11 guide](WINDOWS_11.md).
 2.  Make sure **Microsoft Edge** (included with Windows) or **Google Chrome**
     is installed.
 3.  Run it. If FFmpeg is missing, click **Install FFmpeg** once.
 
-The Releases page also has terminal builds: `pahebatcher-windows-x64.exe`,
-`pahebatcher-linux-x64` and `pahebatcher-macos-arm64`.
+Tagged GitRatio releases may offer standalone CLI binaries. Preview builds are test artifacts, not signed production installers.
 
 ### From source (Windows, macOS, Linux)
 
 ```bash
-git clone https://github.com/abdullahkhfb/pahebatcher.git
+git clone https://github.com/GitRatio/pahebatcher.git
 cd pahebatcher
 pip install -e ".[browser]"
 
@@ -328,6 +336,9 @@ and watchlist in the desktop app, other audio languages.
 
 ## Credits
 
+- **Original pahebatcher:** [abdullahkhfb](https://github.com/abdullahkhfb/pahebatcher); this is an independent MIT-licensed derivative, not a transfer of upstream ownership.
+- **GitRatio edition:** Windows fixes, fork maintenance, and the tongue-in-cheek bunny-takeover theme.
+
 - **Logo** by [/u/HellHarbinger][hellharbinger]. The app icon is a simplified
   version of it.
 - **WSL setup** (`setup-wsl.sh` and the Makefile): idea and first version by
@@ -344,5 +355,5 @@ official creators.
 - `pahebatcher.toml.example`: a ready-to-copy configuration file.
 
 [hellharbinger]: https://www.reddit.com/user/HellHarbinger/
-[latest-release]: https://github.com/abdullahkhfb/pahebatcher/releases/latest
+[latest-release]: https://github.com/GitRatio/pahebatcher/releases
 [version-badge]: https://img.shields.io/badge/version-3.9.0-blue
