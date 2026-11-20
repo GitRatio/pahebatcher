@@ -280,9 +280,9 @@ old output, installs everything and writes:
 - `dist\pahebatcher.exe`: the terminal app
 
 Both use the app icon from `src/pahebatcher/gui/assets/` (`icon.ico` for the
-file, `icon.png` for the window; `icon.svg` is the editable source).
+file, `icon.png` for the window; the bundled 650px bunny image is the macOS icon artwork source).
 
-Pushing a tag like `v3.9.1` makes the **Build executables** GitHub workflow run
+Pushing a version tag like `v3.12.0` makes the **Build executables** GitHub workflow run
 the tests, build the binaries and attach them to a Release (the Windows desktop
 app, plus Windows, Linux and macOS terminal apps). You can also run it by hand
 from the Actions tab, which builds the binaries without publishing a Release.
