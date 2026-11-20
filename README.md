@@ -6,7 +6,7 @@
 
 ## About this edition
 
-**PaheBatcher — GitRatio Edition** is an independently maintained, open-source continuation of the original [pahebatcher by abdullahkhfb](https://github.com/abdullahkhfb/pahebatcher). It provides a desktop anime batch downloader for **Windows 11, macOS (Intel and Apple Silicon), and Linux x64**, plus the original Python terminal interface, resume support, streaming tools and watchlist foundation. The GitRatio edition focuses on reliability, efficient downloads, straightforward installation, and the bunny-branded desktop experience. **Application version: 3.11.0** (shown under **About** in the desktop header).
+**PaheBatcher — GitRatio Edition** is an independently maintained, open-source continuation of the original [pahebatcher by abdullahkhfb](https://github.com/abdullahkhfb/pahebatcher). It provides a desktop anime batch downloader for **Windows 11, macOS (Intel and Apple Silicon), and Linux x64**, plus the original Python terminal interface, resume support, streaming tools and watchlist foundation. The GitRatio edition focuses on reliability, efficient downloads, straightforward installation, and the bunny-branded desktop experience. **Application version: 3.12.0** (shown under **About** in the desktop header).
 
 **Video player:** The desktop app now includes an **Open player** action for local MP4, WebM, M4V and MOV files, plus **Watch videos** after successful downloads. A private, locally hosted **Video.js 10.5.0 HTML player** shows the series title, episode number, episode name, audio language and available **anime synopsis**, plus an episode queue, seeking, next/previous controls and fullscreen. The pinned Video.js Neutral skin loads from jsDelivr when online; native HTML5 controls remain available without internet. Media stays on localhost, and remote streaming is not part of this player. The macOS/Linux desktop packages are available as GitHub Actions build artifacts and still need production signing/notarization and wider real-device QA.
 
@@ -19,7 +19,7 @@
 Batch-download and stream anime from [animepahe](https://animepahe.pw), from a
 desktop app or the terminal.
 
-[![Version 3.11.0][version-badge]][latest-release]
+[![Version 3.12.0][version-badge]][latest-release]
 ![Python 3.11+](https://img.shields.io/badge/python-3.11%2B-blue)
 ![License MIT](https://img.shields.io/badge/license-MIT-green)
 
@@ -27,7 +27,13 @@ desktop app or the terminal.
 ![Download dashboard](assets/screenshots/gui-downloading.png)
 
 
-## ⬇ Download PaheBatcher v3.11.0 — Bunny Takeover
+## ⬇ Download PaheBatcher v3.12.0 — Native Bunny Takeover
+
+The previous v3.11.0 interface used standard Tkinter widgets and **did not match** the approved mockups. v3.12.0 replaces the default desktop view with a **native pywebview HTML/CSS interface** that uses the full-resolution bunny asset, graffiti banner, functional navigation, search, episode selection, always-visible download card, download progress, library, settings, and About download links. Source lookups and transfers still use the same Python backend. The local Video.js player remains a separate playback window in your default browser.
+
+**Platform requirements:** Windows uses Edge WebView2 and pywebview; macOS uses WebKit; Linux uses Qt WebEngine. Install from source with `pip install -e ".[browser,gui]"` (and `pip install "pywebview[qt]"` on Linux). The optional legacy Tk interface remains accessible through `pahebatcher-classic-gui` or the bundled EXE's `--classic` switch. See [MACOS_LINUX.md](MACOS_LINUX.md). Preview packages remain unsigned.
+
+ — Bunny Takeover
 
 **Bunny Takeover redesign:** A working desktop shell with persistent navigation, charcoal/pink/cyan street-art branding, your bunny mascot, a permanently visible episode Download action, and a similarly branded browser video player. This is implemented UI, not a static screenshot.
 
@@ -386,4 +392,4 @@ official creators.
 
 [hellharbinger]: https://www.reddit.com/user/HellHarbinger/
 [latest-release]: https://github.com/GitRatio/pahebatcher/releases
-[version-badge]: https://img.shields.io/badge/version-3.11.0-blue
+[version-badge]: https://img.shields.io/badge/version-3.12.0-blue
