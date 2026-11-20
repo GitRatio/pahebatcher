@@ -1,6 +1,12 @@
-# PaheBatcher desktop — macOS and Linux
+# PaheBatcher desktop v3.10.0 — macOS and Linux
 
 This GitRatio edition shares one Python/Tkinter desktop interface and download backend across Windows, macOS and Linux. Builds are created on the corresponding OS with PyInstaller; **do not use Windows executables on macOS/Linux**.
+
+## Download builds by operating system
+
+[**Windows 11**](https://github.com/GitRatio/pahebatcher/actions/workflows/build-exe.yml) · [**macOS Apple Silicon**](https://github.com/GitRatio/pahebatcher/actions/workflows/build-exe.yml) · [**macOS Intel**](https://github.com/GitRatio/pahebatcher/actions/workflows/build-exe.yml) · [**Linux x64**](https://github.com/GitRatio/pahebatcher/actions/workflows/build-exe.yml)
+
+Choose the latest successful main-branch run and open its Artifacts list. See README for exact package names.
 
 ## Prebuilt desktop packages
 
@@ -23,7 +29,7 @@ From the directory containing the extracted PaheBatcher folder and install.sh:
 bash install.sh
 ~~~
 
-This copies the GUI and bundled runtime to your user data directory and registers a desktop launcher without sudo. It respects XDG_DATA_HOME when set. You still need a Chromium-family browser installed for site connectivity and a default browser for the Video.js-style local player.
+This copies the GUI and bundled runtime to your user data directory and registers a desktop launcher without sudo. It respects XDG_DATA_HOME when set. You still need a Chromium-family browser installed for site connectivity and a default browser for the local Video.js 10 player.
 
 ## From source (all platforms)
 
@@ -56,7 +62,7 @@ On Ubuntu/Debian, install system Tk before creating the venv with sudo apt insta
 
 Click **Open player** in the desktop header to choose one or more local MP4, M4V, MOV or WebM videos. After a successful download, click **Watch videos** to populate the playlist automatically from completed files, with series title, selected episode, and SUB/DUB information already known to the app.
 
-The player opens in your **default web browser**. This is intentional: desktop Tkinter has no integrated modern HTML5 engine and the browser supplies cross-platform media decoding. The player has a Video.js-inspired dark/pink UI, episode queue, play/pause, fullscreen, keyboard controls and seekable playback. It is **not** the upstream Video.js JavaScript library, and it does **not** stream remote site links directly yet. Browser media codecs differ; MPV/VLC may be necessary for unusual codecs.
+The player opens in your **default web browser**. This is intentional: desktop Tkinter has no integrated modern HTML5 engine and the browser supplies cross-platform media decoding. The player uses the actual **Video.js 10.5.0 Neutral skin** loaded from a pinned jsDelivr module when online. It retains native HTML5 controls as an offline fallback, and offers a spacious layout, episode queue, source-provided anime synopsis, play/pause, fullscreen, keyboard shortcuts and seekable playback. Descriptions are shown only if supplied by the anime page; no synopsis is invented. It does **not** stream remote site links directly yet. Browser media codecs differ; MPV/VLC may be necessary for unusual codecs.
 
 For privacy, playback uses a randomized URL served only on 127.0.0.1, has no directory listing, requires an unguessable session token, and serves only files explicitly selected by the user. The service stops when PaheBatcher closes. It never makes your video directories public.
 
