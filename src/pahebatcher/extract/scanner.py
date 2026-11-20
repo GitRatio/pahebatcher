@@ -4,11 +4,11 @@ from __future__ import annotations
 
 import asyncio
 import json
-from html.parser import HTMLParser
 import logging
 import os
 import re
 import time
+from html.parser import HTMLParser
 from typing import TYPE_CHECKING, Any
 from urllib.parse import urlparse
 
