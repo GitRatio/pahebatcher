@@ -147,8 +147,8 @@ jobs:
           mkdir -p build/icon.iconset
           for size in 16 32 128 256 512; do
             doubled=$((size * 2))
-            sips -z "$size" "$size" src/pahebatcher/gui/assets/icon.png --out "build/icon.iconset/icon_${size}x${size}.png" >/dev/null
-            sips -z "$doubled" "$doubled" src/pahebatcher/gui/assets/icon.png --out "build/icon.iconset/icon_${size}x${size}@2x.png" >/dev/null
+            sips -z "$size" "$size" src/pahebatcher/gui/assets/bunny.png --out "build/icon.iconset/icon_${size}x${size}.png" >/dev/null
+            sips -z "$doubled" "$doubled" src/pahebatcher/gui/assets/bunny.png --out "build/icon.iconset/icon_${size}x${size}@2x.png" >/dev/null
           done
           iconutil -c icns build/icon.iconset -o build/PaheBatcher.icns
       - name: Build macOS / Linux desktop bundle
