@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "pahebatcher"
-version = "3.11.0"
+version = "3.12.0"
 description = "High-performance animepahe batch downloader with parallel HLS engine"
 readme = "README.md"
 license = { text = "MIT" }
@@ -26,12 +26,15 @@ classifiers = [
 ]
 dependencies = [
     "rich>=13.9.0",
-    "aiohttp>=3.11.0",
+    "aiohttp>=3.12.0",
     "pycryptodomex>=3.21.0",
     "curl-cffi>=0.7.0",
 ]
 
 [project.optional-dependencies]
+gui = [
+    "pywebview>=6.2,<7",
+]
 browser = [
     "patchright>=1.50.0",
 ]
@@ -47,7 +50,8 @@ dev = [
 pahebatcher = "pahebatcher.main:main"
 
 [project.gui-scripts]
-pahebatcher-gui = "pahebatcher.gui.app:main"
+pahebatcher-gui = "pahebatcher.gui.webui:main"
+pahebatcher-classic-gui = "pahebatcher.gui.app:main"
 
 [tool.setuptools.packages.find]
 where = ["src"]

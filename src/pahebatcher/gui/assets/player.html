@@ -136,6 +136,7 @@ body{background:#0c101b;}
 .rail-menu a{display:block;padding:14px 14px;text-decoration:none;color:#e7dfe8;border:1px solid transparent;border-radius:12px;font-weight:700;font-size:14px;}
 .rail-menu a:hover,.rail-menu a:focus-visible{border-color:#3bdeeb;background:#18313f;color:#6af6f7;outline:none;}
 .rail-menu a.active{border-color:#2ddde9;background:#17404b;color:#c4ffff;}
+.rail-menu button{display:block;width:100%;text-align:left;padding:14px;border:1px solid #3fe5ee;background:#173845;color:#d8ffff;border-radius:12px;font-weight:750;font-size:14px;cursor:pointer;margin-bottom:13px}
 .rail-spacer{flex:1;min-height:15px;}
 .rail-bunny{display:block;width:min(100%,177px);height:auto;margin:0 auto 6px;filter:drop-shadow(0 4px 9px #f1398d55);}
 .rail-bottom{text-align:center;color:#ff87bc;font-size:11px;font-weight:850;letter-spacing:.12em;margin:8px 0 4px;}
@@ -177,6 +178,7 @@ header{padding-bottom:16px;}
 <aside class="app-rail" aria-label="Player navigation">
   <div class="rail-logo">GR<small>GITRATIO TAKEOVER</small></div>
   <nav class="rail-menu">
+    <button id="back-to-app" hidden type="button">←  Back to app</button>
     <a class="active" href="#player">▷  Player</a>
     <a href="#episodes">☷  Episodes</a>
     <a href="#series-details">ⓘ  About</a>
@@ -335,6 +337,19 @@ document.addEventListener("keydown", function (event) {
   else if (event.key === "ArrowLeft" && event.target === document.body) select(current - 1, true);
 });
 if (episodes.length) select(0, false);
+const backToApp = document.getElementById("back-to-app");
+function configureNativeReturn() {
+  if (window.pywebview && window.pywebview.api && window.pywebview.api.back_to_app) {
+    backToApp.hidden = false;
+  }
+}
+backToApp.addEventListener("click", function () {
+  if (window.pywebview && window.pywebview.api && window.pywebview.api.back_to_app) {
+    window.pywebview.api.back_to_app().catch(function () {});
+  }
+});
+configureNativeReturn();
+window.addEventListener("pywebviewready", configureNativeReturn);
 })();
 </script>
 </body>

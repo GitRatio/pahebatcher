@@ -1,4 +1,4 @@
-# PaheBatcher desktop v3.11.0 — macOS and Linux
+# PaheBatcher desktop v3.12.0 — macOS and Linux
 
 This GitRatio edition shares one Python/Tkinter desktop interface and download backend across Windows, macOS and Linux. Builds are created on the corresponding OS with PyInstaller; **do not use Windows executables on macOS/Linux**.
 
@@ -71,3 +71,12 @@ For privacy, playback uses a randomized URL served only on 127.0.0.1, has no dir
 The repository's Build executables workflow runs the unit tests and builds platform-specific desktop packages. Mac archives contain an .app; Linux archives contain PyInstaller's portable onedir bundle, icon and install.sh. A rolling unsigned prerelease is published at the fixed `preview` tag after successful main-branch builds. Formal versioned releases are published only when a `v*` tag triggers the workflow and the required jobs pass.
 
 The packages still need real-device QA, macOS code signing/notarization and broader Linux-distribution verification before being called production-ready.
+
+
+## Native Bunny Takeover desktop window (v3.12.0)
+
+The default application now uses **pywebview** rather than standard Tkinter controls. The HTML/CSS artwork and actions are bundled locally; no hosted UI is required. Windows 11 requires Edge WebView2 Runtime; macOS uses system WebKit. On Linux, install an appropriate Qt WebEngine runtime and `pywebview[qt]` if running from source. The Linux preview binary may require additional X11/Qt platform libraries on minimal distributions.
+
+For development: `python -m pip install -e ".[browser,gui]"`, followed by `pahebatcher-gui`. For Linux development: also `python -m pip install "pywebview[qt]"`. The previous Tk GUI remains available as `pahebatcher-classic-gui`. The video player is still a local-only browser page.
+
+The v3.12.0 user interface is implemented and wired to the backend, but **pixel-level/device acceptance testing is still required** across Windows scaling, macOS and Linux.
