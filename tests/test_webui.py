@@ -62,6 +62,13 @@ def test_native_settings_bridge_validates_mutations(monkeypatch: pytest.MonkeyPa
         api.save_settings({"unsafe": "true"})
     with pytest.raises(ValueError):
         api.save_settings({"quality": "1080"})
+    # Reject the whole payload, not only the invalid final setting.
+    before = dict(api.cfg.data)
+    with pytest.raises(ValueError):
+        api.save_settings({"quality": 360, "max_parallel": 99})
+    assert api.cfg.data == before
+    with pytest.raises(ValueError):
+        api.save_settings(None)  # type: ignore[arg-type]
 
 
 def test_external_link_restricted_to_gitratio_repository(monkeypatch: pytest.MonkeyPatch) -> None:
