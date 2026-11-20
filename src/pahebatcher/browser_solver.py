@@ -138,7 +138,7 @@ def _devtools_up(port: int) -> bool:
 def _platform_info() -> tuple[str, str]:
     # Read the runtime platform dynamically: mypy otherwise considers the
     # macOS branch unreachable when checking on Windows CI runners.
-    current_platform = getattr(sys, "platform")
+    current_platform = getattr(sys, "platform")  # noqa: B009 - avoid platform-specific mypy narrowing
     if current_platform.startswith("win"):
         return "Windows", "10.0.0"
     if current_platform == "darwin":
