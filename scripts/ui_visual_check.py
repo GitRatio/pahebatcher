@@ -44,7 +44,9 @@ def main() -> None:
                     `<label class="episode${i<3?' selected':''}"><input type="checkbox" ${i<3?'checked':''}><div class="ep-thumb">${String(i+1).padStart(2,'0')}</div><div class="episode-text"><strong>Ep ${i+1} — Example episode title for layout tests</strong><small>Source audio · Episode ${i+1}</small></div></label>`
                   ).join('');
                   document.querySelector('#download-selected').disabled = false;
+                  document.querySelector('#mobile-download-selected').disabled = false;
                   document.querySelector('#download-selected').textContent = '↓ Download 3 episodes';
+                  document.querySelector('#mobile-download-selected').textContent = '↓ Download 3 episodes';
                   document.querySelector('#selection-summary').textContent =
                      '3 episodes selected · size estimate';
                 }''')
@@ -54,6 +56,9 @@ def main() -> None:
                 bounds = cta.bounding_box()
                 assert bounds is not None and bounds['width'] >= 180
                 assert bounds['x'] >= 0 and bounds['x'] + bounds['width'] <= width + 1
+                action = page.locator('#mobile-download-selected') if width <= 1050 else cta
+                visible = action.bounding_box()
+                assert visible is not None and visible['y'] + visible['height'] <= height + 1, 'Download CTA clipped below viewport'
                 assert page.evaluate('document.documentElement.scrollWidth <= innerWidth + 1'), 'Horizontal overflow'
                 assert not errors, f'Browser JavaScript errors: {errors}'
                 print(f'PASS {width}x{height} — Download CTA bounds {bounds}')
