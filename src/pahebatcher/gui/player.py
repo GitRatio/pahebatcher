@@ -163,6 +163,7 @@ class _PlayerHandler(BaseHTTPRequestHandler):
                     "description": item.description,
                     "kind": "Episode" if item.episode not in {"", "—"} else "Standalone video",
                     "format": item.path.suffix.lower().lstrip(".").upper(),
+                    "filename": item.path.name,
                     "src": f"/media/{self.session.token}/{index}",
                 }
                 for index, item in enumerate(self.session.items)
@@ -170,9 +171,14 @@ class _PlayerHandler(BaseHTTPRequestHandler):
             safe_json = json.dumps(playlist, ensure_ascii=True).replace("<", "\\u003c").replace(
                 ">", "\\u003e"
             ).replace("&", "\\u0026")
+            mascot = (Path(__file__).parent / "assets" / "takeover_bunny.b64").read_text(
+                encoding="ascii",
+            ).strip()
             html = template.replace("__PLAYER_DATA__", safe_json).replace(
                 "__PLAYER_NONCE__", self.session.nonce
-            ).replace("__APP_VERSION__", VERSION)
+            ).replace("__APP_VERSION__", VERSION).replace(
+                "__TAKEOVER_BUNNY__", mascot,
+            )
             data = html.encode("utf-8")
             self._headers("text/html; charset=utf-8", len(data))
             if not head_only:
