@@ -117,7 +117,9 @@
     const estimateMb = n * ({360: 50, 720: 90, 1080: 150}[quality] || 90);
     $('selection-summary').textContent = n ? n + ' episodes selected · ~' + fmtBytes(estimateMb * 1024 * 1024) + ' estimated' : 'Select episodes to enable download';
     $('download-selected').disabled = n === 0 || state.busy;
+    $('mobile-download-selected').disabled = n === 0 || state.busy;
     $('download-selected').textContent = n ? '↓ Download ' + n + ' episode' + (n === 1 ? '' : 's') : '↓ Download';
+    $('mobile-download-selected').textContent = $('download-selected').textContent;
   }
   function selectAll(on) { state.selected = new Set(on ? state.episodes.map((_ep, i) => i) : []); renderEpisodes(); }
   function selectRange() {
@@ -222,6 +224,7 @@
     $('select-none').addEventListener('click', () => selectAll(false));
     $('select-range').addEventListener('click', selectRange);
     $('download-selected').addEventListener('click', downloadSelected);
+    $('mobile-download-selected').addEventListener('click', downloadSelected);
     $('quality').addEventListener('change', updatePrefFromDownload);
     $('audio').addEventListener('change', updatePrefFromDownload);
     $('parallel').addEventListener('change', updatePrefFromDownload);
