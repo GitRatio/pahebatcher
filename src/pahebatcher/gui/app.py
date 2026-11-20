@@ -589,10 +589,10 @@ class App(tk.Tk):
         tk.Label(container, text="DOWNLOAD FOR YOUR DEVICE", font=f.label,
                  bg=BG, fg=MUTED, anchor="w").pack(fill="x", pady=(0, 10))
         choices = [
-            ("Windows 11", "https://github.com/GitRatio/pahebatcher/actions/workflows/windows-preview.yml"),
-            ("Mac (Apple)", "https://github.com/GitRatio/pahebatcher/actions/workflows/build-exe.yml"),
-            ("Mac (Intel)", "https://github.com/GitRatio/pahebatcher/actions/workflows/build-exe.yml"),
-            ("Linux x64", "https://github.com/GitRatio/pahebatcher/actions/workflows/build-exe.yml"),
+            ("Windows 11", "https://github.com/GitRatio/pahebatcher/releases/download/preview/pahebatcher-gui-windows-x64.exe"),
+            ("Mac (Apple)", "https://github.com/GitRatio/pahebatcher/releases/download/preview/PaheBatcher-macos-arm64.zip"),
+            ("Mac (Intel)", "https://github.com/GitRatio/pahebatcher/releases/download/preview/PaheBatcher-macos-x64.zip"),
+            ("Linux x64", "https://github.com/GitRatio/pahebatcher/releases/download/preview/PaheBatcher-linux-x64.tar.gz"),
         ]
         def open_url(url: str) -> Callable[[], None]:
             def handler() -> None:
@@ -606,8 +606,8 @@ class App(tk.Tk):
                 side="left", padx=(0, 8), pady=4,
             )
         tk.Label(container, text=(
-            "Open a successful GitHub Actions run, then download the package under "
-            "Artifacts. GitHub sign-in may be required. Mac builds are not notarized."
+            "Direct unsigned preview files are published after successful builds. "
+            "If unavailable, see the release page. Mac builds are not notarized."
         ), font=f.small, bg=BG, fg=MUTED, justify="left",
                  anchor="nw", wraplength=570).pack(fill="x", pady=(0, 16))
         links = tk.Frame(container, bg=BG)
