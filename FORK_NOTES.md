@@ -10,10 +10,10 @@ The original source code is distributed under the MIT license. The original copy
 - Put reliability and security fixes ahead of cosmetic rewrites.
 - Add regression tests for every confirmed bug.
 - Keep the original source attribution and identify fork-specific changes in versioned release notes.
-- Use the `develop/v4-reliability` branch for initial hardening; merge only when automated tests and smoke tests pass.
+- Develop changes on focused feature branches; merge only when unit, visual and packaging checks pass.
 - Do not send changes or notifications to the upstream maintainer without appropriate permissions. Share optional suggestions respectfully.
 
-## Initial reliability changes (development branch)
+## Early reliability changes
 
 - Use unambiguous episode prefixes when detecting existing MP4 files.
 - Exclude empty cached HLS segments from resume-completed indices.
