@@ -11,11 +11,11 @@ This independent GitRatio edition preserves original attribution in LICENSE and 
 
 The existing build-exe workflow produces the Windows GUI executable when a version tag triggers a release. A development branch is NOT an official downloadable executable. Do not disable Microsoft Defender or blindly bypass SmartScreen.
 
-## Option B: Run development source (recommended for now)
+## Option B: Install from current source (recommended until a packaged preview is verified)
 
 Requirements: Windows 11 x64, 64-bit Python 3.12 with the py launcher, Edge or Chrome, and network access for installing Python dependencies.
 
-1. Visit https://github.com/GitRatio/pahebatcher/tree/develop/v4-reliability
+1. Visit https://github.com/GitRatio/pahebatcher
 2. Choose Code > Download ZIP and extract it to a writable folder, such as Documents\PaheBatcher.
 3. Double-click install-windows.bat. It creates a private .venv and installs the project with the browser extra.
 4. Double-click launch-windows.bat to start the desktop app. Errors remain visible in the console.
