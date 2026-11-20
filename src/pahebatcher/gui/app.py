@@ -17,6 +17,7 @@ from typing import Any
 from pahebatcher import ffmpeg_setup
 from pahebatcher.config import VERSION
 from pahebatcher.gui.bridge import Backend, Bridge, load_settings, save_settings
+from pahebatcher.gui.player import PlaybackItem, PlayerSession
 from pahebatcher.gui.widgets import (
     BG,
     ERR,
@@ -117,6 +118,7 @@ class DownloadView(tk.Frame):
         self.status.pack(side="left")
         self.btn_back = Button(foot, "Back to search", app.show_search, f)
         self.btn_open = Button(foot, "Open folder", self.open_folder, f)
+        self.btn_watch = Button(foot, "Watch videos", self.watch_videos, f, primary=True)
         self.btn_cancel = Button(foot, "Cancel", self.cancel, f)
         self.rows: dict[str, EpRow] = {}
         self._dash_id = 0
@@ -124,6 +126,9 @@ class DownloadView(tk.Frame):
         self.future: Any = None
         self.out_dir = ""
         self._total = 0
+        self._series = ""
+        self._episode_map: dict[str, EpisodeInfo] = {}
+        self._playlist: list[PlaybackItem] = []
 
     def _resize(self, win: int, width: int) -> None:
         self.canvas.itemconfigure(win, width=width)
@@ -139,7 +144,10 @@ class DownloadView(tk.Frame):
         if self.winfo_ismapped() and self._sb.winfo_ismapped():
             self.canvas.yview_scroll(-1 if e.delta > 0 else 1, "units")
 
-    def begin(self, title: str, total: int, out_dir: str) -> None:
+    def begin(self, title: str, total: int, out_dir: str, episodes: list[EpisodeInfo]) -> None:
+        self._series = title
+        self._episode_map = {ep.session: ep for ep in episodes}
+        self._playlist = []
         self.title.configure(text=title)
         self.sub.configure(text=f"0 of {total} · starting")
         self.status.configure(text="")
@@ -149,7 +157,7 @@ class DownloadView(tk.Frame):
             w.destroy()
         self.rows.clear()
         self._dash_id, self._total, self.out_dir, self.active = 0, total, out_dir, True
-        for b in (self.btn_back, self.btn_open, self.btn_cancel):
+        for b in (self.btn_back, self.btn_open, self.btn_watch, self.btn_cancel):
             b.pack_forget()
         self.btn_cancel.pack(side="right")
 
@@ -180,6 +188,17 @@ class DownloadView(tk.Frame):
         self.sub.configure(text=text)
 
     def finished(self, results: dict[str, Path | None]) -> None:
+        self._playlist = []
+        for session, path in results.items():
+            if path is None or not path.is_file():
+                continue
+            ep = self._episode_map.get(session)
+            self._playlist.append(PlaybackItem(
+                path=path, series=self._series,
+                episode=ep.ep_str if ep else "—",
+                title=clean_title(ep.title) if ep else path.stem,
+                audio=ep.audio if ep else "",
+            ))
         self.refresh()
         self.active = False
         ok = sum(1 for v in results.values() if v is not None)
@@ -205,8 +224,15 @@ class DownloadView(tk.Frame):
     def _end_buttons(self, show_open: bool) -> None:
         self.btn_cancel.pack_forget()
         self.btn_back.pack(side="right")
+        self.btn_watch.pack_forget()
         if show_open:
             self.btn_open.pack(side="right", padx=(0, 10))
+            if self._playlist:
+                self.btn_watch.pack(side="right", padx=(0, 10))
+
+    def watch_videos(self) -> None:
+        if self._playlist:
+            self.app.play_items(self._playlist)
 
     def open_folder(self) -> None:
         path = self.out_dir
@@ -458,6 +484,7 @@ class App(tk.Tk):
         self._ff_cancel: threading.Event | None = None
         self._after_ff: list[Callable[[], None]] = []
         self._pinging = False
+        self._players: list[PlayerSession] = []
 
         import pahebatcher.downloader as dl
 
@@ -513,6 +540,7 @@ class App(tk.Tk):
             tk.Label(hdr, text="PaheBatcher", font=f.logo, fg=PINK, bg=BG).pack(side="left")
         self.fs_link = Link(hdr, "Full screen", lambda: self.set_fullscreen(not self._fullscreen), f)
         self.fs_link.pack(side="right", padx=(16, 0))
+        Link(hdr, "Open player", self.choose_videos, f).pack(side="right", padx=(16, 0))
         tk.Label(hdr, text=f"v{VERSION}", font=f.small, fg=MUTED, bg=BG).pack(side="right", padx=(16, 0))
         self.dot_solver = tk.Label(hdr, text="● Solver", font=f.small, fg=MUTED, bg=BG)
         self.dot_solver.pack(side="right", padx=(16, 0))
@@ -689,9 +717,27 @@ class App(tk.Tk):
     def start_download(self, anime: AnimeInfo, episodes: list[EpisodeInfo]) -> None:
         self.backend.current_dash = None
         self._show(self.v_dl)
-        self.v_dl.begin(anime.title, len(episodes), self.backend.context(anime.title).output_dir)
+        self.v_dl.begin(anime.title, len(episodes), self.backend.context(anime.title).output_dir, episodes)
         self.v_dl.future = self.bridge.run(
             self.backend.download(anime, episodes), ok=self.v_dl.finished, err=self.v_dl.failed)
+
+    def choose_videos(self) -> None:
+        paths = filedialog.askopenfilenames(
+            title="Open downloaded videos",
+            filetypes=[("Videos", "*.mp4 *.webm *.m4v *.mov"), ("All files", "*.*")],
+        )
+        if paths:
+            self.play_items([PlaybackItem.from_file(Path(path)) for path in paths])
+
+    def play_items(self, items: list[PlaybackItem]) -> None:
+        try:
+            session = PlayerSession(items)
+            if not session.open():
+                session.close()
+                raise RuntimeError("No web browser opened. Install or configure a default browser.")
+            self._players.append(session)
+        except (OSError, ValueError, RuntimeError) as exc:
+            messagebox.showerror("PaheBatcher player", str(exc))
 
     # loop -----------------------------------------------------------------
     def _pump(self) -> None:
@@ -710,6 +756,8 @@ class App(tk.Tk):
         except Exception:
             pass
         self.bridge.shutdown()
+        for player in self._players:
+            player.close()
         self.destroy()
 
 

@@ -6,11 +6,13 @@
 
 ## About this edition
 
-**PaheBatcher — GitRatio Edition** is an independently maintained continuation of the original [pahebatcher by abdullahkhfb](https://github.com/abdullahkhfb/pahebatcher). It keeps the original Python downloading, streaming and watchlist foundation while focusing on Windows 11 compatibility, reliability, diagnostics and a more enjoyable desktop experience.
+**PaheBatcher — GitRatio Edition** is an independently maintained continuation of the original [pahebatcher by abdullahkhfb](https://github.com/abdullahkhfb/pahebatcher). It keeps the original Python downloading, streaming and watchlist foundation while focusing on cross-platform desktop compatibility, reliability, diagnostics and a more enjoyable download-and-play experience.
 
 **The "takeover" is a joke, not a claim of ownership of the original project.** GitRatio maintains this copy; the upstream author retains credit for their original work, and the original mascot/logo credits remain intact. This edition is not affiliated with or endorsed by the upstream maintainer. See [FORK_NOTES.md](FORK_NOTES.md) and [LICENSE](LICENSE).
 
-**Windows 11:** [Installation guide](WINDOWS_11.md) · [Preview builds in Actions](https://github.com/GitRatio/pahebatcher/actions/workflows/windows-preview.yml) · [GitRatio Releases](https://github.com/GitRatio/pahebatcher/releases)
+**Windows 11:** [Installation guide](WINDOWS_11.md) · [Windows preview builds](https://github.com/GitRatio/pahebatcher/actions/workflows/windows-preview.yml)
+
+**macOS (Intel/Apple Silicon) and Linux x64:** [Installation + player guide](MACOS_LINUX.md) · [Cross-platform builds](https://github.com/GitRatio/pahebatcher/actions/workflows/build-exe.yml) · [GitRatio Releases](https://github.com/GitRatio/pahebatcher/releases)
 
 Batch-download and stream anime from [animepahe](https://animepahe.pw), from a
 desktop app or the terminal.
@@ -34,6 +36,8 @@ desktop app or the terminal.
 - **No Docker, no extra services.** A built-in browser solver gets past
   Cloudflare using the Chrome or Edge you already have.
 - **One-click FFmpeg:** the desktop app installs it for you.
+- **Local episode player:** open finished videos in a private Video.js-inspired browser player with the episode queue, series title, audio language, seeking and fullscreen. No remote-stream playback in this GUI feature yet.
+- **Desktop packaging:** macOS .app archives for Apple Silicon/Intel and a portable Linux x64 app with an app-menu installer.
 
 ## Install
 
@@ -45,6 +49,10 @@ desktop app or the terminal.
 3.  Run it. If FFmpeg is missing, click **Install FFmpeg** once.
 
 Tagged GitRatio releases may offer standalone CLI binaries. Preview builds are test artifacts, not signed production installers.
+
+### macOS and Linux desktop packages
+
+See [MACOS_LINUX.md](MACOS_LINUX.md) for the macOS .app, Linux portable desktop app, installer, FFmpeg prerequisites, build status and Linux desktop requirements. GitHub Actions artifacts are available only after a successful build; packages are not signed/notarized yet.
 
 ### From source (Windows, macOS, Linux)
 
@@ -89,8 +97,9 @@ changes), and the terminal app finds it there too. A copy already on your
 header); `Esc` exits. The window can also be maximized or resized freely, and
 the content stays centered on wide screens.
 
-The desktop app doesn't do streaming or the watchlist yet. Use the terminal for
-those.
+The desktop app opens **downloaded** MP4/WebM/M4V/MOV files using **Open player** in its header, or **Watch videos** after a download. It opens a private browser-backed HTML5 player rather than embedding a browser in Tkinter. Series/episode details are taken from the download selection; local imported files use filename metadata. See [MACOS_LINUX.md](MACOS_LINUX.md).
+
+The desktop app still does not do **remote site streaming** or the watchlist yet. Use the terminal for those.
 
 ## Terminal
 

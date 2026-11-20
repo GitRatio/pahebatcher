@@ -1,0 +1,164 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="dark">
+<title>PaheBatcher · Player</title>
+<style nonce="__PLAYER_NONCE__">
+:root{color-scheme:dark;font-family:Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:#090a10;color:#f3f2f8}
+*{box-sizing:border-box}
+body{margin:0;min-height:100vh;background:radial-gradient(circle at 30% -10%,#322039 0,transparent 35%),#090a10}
+button{font:inherit;cursor:pointer}
+.shell{max-width:1540px;margin:auto;padding:24px clamp(16px,3vw,40px) 48px}
+header{display:flex;gap:18px;align-items:center;justify-content:space-between;padding-bottom:22px;border-bottom:1px solid #302832}
+.brand{display:flex;align-items:center;gap:12px;font-weight:800;letter-spacing:-.035em;font-size:22px}
+.mark{display:grid;place-items:center;width:42px;height:42px;border-radius:15px;background:linear-gradient(140deg,#fe5b9b,#bf185f);box-shadow:0 9px 30px #ff3f9030;font-size:24px}
+.edition{color:#aaa2ae;font-size:13px}
+.pill{padding:8px 13px;border:1px solid #493444;background:#1e1520;color:#ffc6db;border-radius:999px;font-size:12px;font-weight:700}
+.layout{display:grid;grid-template-columns:minmax(0,1fr) 320px;gap:24px;margin-top:26px;align-items:start}
+.stage{min-width:0}
+.player-frame{overflow:hidden;background:#000;border:1px solid #35303b;border-radius:18px;box-shadow:0 28px 80px #0007}
+video{display:block;width:100%;aspect-ratio:16/9;max-height:75vh;background:#000;outline:none}
+.video-error{color:#ffa8bb;background:#3b1621;border-top:1px solid #66303b;padding:12px 18px;font-size:13px}
+.video-error[hidden]{display:none}
+.controls{display:flex;justify-content:space-between;gap:12px;align-items:center;flex-wrap:wrap;margin-top:18px}
+.step-buttons{display:flex;gap:10px}
+.control{border:1px solid #49404e;background:#18151e;color:#f4eaf5;border-radius:11px;padding:10px 16px;font-weight:700}
+.control:hover,.control:focus-visible{border-color:#fe5b9b;color:#ff86b8;outline:none}
+.control:disabled{opacity:.36;cursor:not-allowed}
+.control.primary{border-color:#e02b73;background:#df2d78;color:white}
+.control.primary:hover{background:#f04089;color:white}
+.eyebrow{text-transform:uppercase;letter-spacing:.16em;color:#ff77ad;font-size:11px;font-weight:800;margin-top:28px}
+h1{font-size:clamp(22px,2.4vw,33px);line-height:1.2;letter-spacing:-.04em;margin:10px 0 8px}
+.subtitle{color:#a9a4b0;line-height:1.55;margin:0}
+.meta-row{display:flex;gap:10px;flex-wrap:wrap;margin-top:20px}
+.meta{border:1px solid #39303b;background:#17131b;border-radius:9px;padding:9px 12px;color:#b9b0be;font-size:12px}
+.meta strong{color:#f4eaf5;font-weight:700}
+.sidebar{border:1px solid #38303b;border-radius:16px;background:#15121b;overflow:hidden}
+.sidebar-top{padding:22px;border-bottom:1px solid #37303a}
+.sidebar-top h2{font-size:17px;margin:0 0 7px}
+.sidebar-top p{color:#a7a0ad;font-size:13px;margin:0}
+.queue{display:flex;flex-direction:column;max-height:min(72vh,680px);overflow-y:auto;padding:8px}
+.queue button{text-align:left;display:grid;grid-template-columns:45px 1fr;gap:12px;align-items:center;background:transparent;border:1px solid transparent;color:#e9e4eb;padding:12px 10px;border-radius:11px;min-width:0}
+.queue button:hover,.queue button:focus-visible{background:#261a28;border-color:#604052;outline:none}
+.queue button[aria-current="true"]{background:#341b2b;border-color:#c63676}
+.ep-index{width:42px;height:42px;border-radius:9px;background:#29212e;display:grid;place-items:center;color:#ff85b5;font-size:12px;font-weight:800}
+.queue button[aria-current="true"] .ep-index{background:#d42f78;color:#fff}
+.queue-details{display:flex;flex-direction:column;min-width:0;gap:4px}
+.queue-details strong{font-size:13px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.queue-details small{color:#aaa0ae;font-size:12px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+footer{margin-top:30px;color:#857e8a;font-size:12px;line-height:1.6}
+kbd{border:1px solid #4b4050;padding:2px 5px;border-radius:4px;font:inherit;color:#bca8bf}
+@media(max-width:850px){.layout{grid-template-columns:1fr}.queue{max-height:260px}.edition{display:none}}
+@media(max-width:500px){.shell{padding:16px 12px 32px}.brand{font-size:18px}.pill{padding:7px 8px;font-size:10px}.control{padding:9px 12px}}
+@media(prefers-reduced-motion:no-preference){button{transition:background-color .15s,border-color .15s,color .15s}}
+</style>
+</head>
+<body>
+<div class="shell">
+<header>
+<div class="brand"><span class="mark" aria-hidden="true">🐰</span><span>PaheBatcher <span class="edition">/ GitRatio Edition</span></span></div>
+<span class="pill">LOCAL · PRIVATE PLAYBACK</span>
+</header>
+<main class="layout">
+<section class="stage" aria-label="Video player">
+<div class="player-frame">
+<video id="video" controls preload="metadata" playsinline aria-label="Episode video">Your browser cannot play HTML5 video.</video>
+<div id="video-error" class="video-error" role="status" hidden></div>
+</div>
+<div class="controls">
+<div class="step-buttons"><button id="prev" class="control" type="button">← Previous</button><button id="next" class="control primary" type="button">Next episode →</button></div>
+<button id="full" class="control" type="button">⛶ Full screen</button>
+</div>
+<p class="eyebrow">Now watching · <span id="series-count">1 of 1</span></p>
+<h1 id="series-name">Loading series…</h1>
+<p id="episode-title" class="subtitle"></p>
+<div class="meta-row"><div class="meta">Episode <strong id="episode-num">—</strong></div><div class="meta">Audio <strong id="episode-audio">Unknown</strong></div><div class="meta">Format <strong id="episode-format">—</strong></div><div class="meta">Source <strong>Local downloaded file</strong></div></div>
+<footer>Video.js-inspired presentation, native HTML5 video playback. <kbd>Space</kbd> play/pause · <kbd>F</kbd> full screen · <kbd>→</kbd> next episode · <kbd>←</kbd> previous episode. Playback stays on your computer. Browser codec support varies.</footer>
+</section>
+<aside class="sidebar" aria-label="Episode playlist">
+<div class="sidebar-top"><h2>Episode queue</h2><p id="queue-summary">Choose a downloaded episode</p></div>
+<div class="queue" id="queue"></div>
+</aside>
+</main>
+</div>
+<script type="application/json" id="player-data">__PLAYER_DATA__</script>
+<script nonce="__PLAYER_NONCE__">
+(function () {
+"use strict";
+const episodes = JSON.parse(document.getElementById("player-data").textContent);
+const video = document.getElementById("video");
+const queue = document.getElementById("queue");
+const prev = document.getElementById("prev");
+const next = document.getElementById("next");
+const error = document.getElementById("video-error");
+const items = [];
+let current = -1;
+
+function select(index, play) {
+  if (index < 0 || index >= episodes.length) return;
+  current = index;
+  const ep = episodes[index];
+  video.pause();
+  video.src = ep.src;
+  video.load();
+  error.hidden = true;
+  document.title = ep.series + " · Episode " + ep.episode + " · PaheBatcher";
+  document.getElementById("series-name").textContent = ep.series || "Unknown series";
+  document.getElementById("episode-title").textContent = ep.title || "Episode " + ep.episode;
+  document.getElementById("episode-num").textContent = ep.episode || "—";
+  document.getElementById("episode-audio").textContent = ep.audio === "jpn" ? "Japanese / SUB" : ep.audio === "eng" ? "English / DUB" : (ep.audio || "Unknown");
+  document.getElementById("episode-format").textContent = ep.format || "—";
+  document.getElementById("series-count").textContent = String(index + 1) + " of " + String(episodes.length);
+  prev.disabled = index === 0;
+  next.disabled = index === episodes.length - 1;
+  items.forEach(function (button, i) { button.setAttribute("aria-current", i === index ? "true" : "false"); });
+  if (play) video.play().catch(function () {});
+}
+
+episodes.forEach(function (ep, index) {
+  const button = document.createElement("button");
+  button.type = "button";
+  const indexTag = document.createElement("span");
+  indexTag.className = "ep-index";
+  indexTag.textContent = ep.episode || String(index + 1);
+  const info = document.createElement("span");
+  info.className = "queue-details";
+  const label = document.createElement("strong");
+  label.textContent = "Episode " + (ep.episode || String(index + 1));
+  const sub = document.createElement("small");
+  sub.textContent = ep.title || ep.series || "Local video";
+  info.append(label, sub);
+  button.append(indexTag, info);
+  button.setAttribute("aria-label", "Play " + label.textContent + " · " + sub.textContent);
+  button.addEventListener("click", function () { select(index, true); });
+  queue.append(button);
+  items.push(button);
+});
+document.getElementById("queue-summary").textContent = String(episodes.length) + " downloaded " + (episodes.length === 1 ? "video" : "videos");
+prev.addEventListener("click", function () { select(current - 1, true); });
+next.addEventListener("click", function () { select(current + 1, true); });
+video.addEventListener("ended", function () { if (current + 1 < episodes.length) select(current + 1, true); });
+video.addEventListener("error", function () {
+  if (video.error && video.currentSrc) {
+    error.hidden = false;
+    error.textContent = "This file could not be decoded by your browser. Check the file, or open it using MPV or VLC for broader codec support.";
+  }
+});
+document.getElementById("full").addEventListener("click", function () {
+  if (document.fullscreenElement) document.exitFullscreen();
+  else if (video.requestFullscreen) video.requestFullscreen();
+});
+document.addEventListener("keydown", function (event) {
+  if (event.altKey || event.ctrlKey || event.metaKey || event.target instanceof HTMLInputElement) return;
+  if (event.key === " " && event.target === document.body) { event.preventDefault(); video.paused ? video.play().catch(function () {}) : video.pause(); }
+  else if (event.key.toLowerCase() === "f") { if (document.fullscreenElement) document.exitFullscreen(); else if (video.requestFullscreen) video.requestFullscreen(); }
+  else if (event.key === "ArrowRight" && event.target === document.body) select(current + 1, true);
+  else if (event.key === "ArrowLeft" && event.target === document.body) select(current - 1, true);
+});
+if (episodes.length) select(0, false);
+})();
+</script>
+</body>
+</html>
