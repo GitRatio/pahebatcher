@@ -16,9 +16,9 @@ from typing import Any
 from urllib.parse import urlsplit
 
 from pahebatcher.config import VERSION
-from pahebatcher.gui.bridge import Backend, load_settings, save_settings
-from pahebatcher.gui.player import PlaybackItem, PlayerSession, SUPPORTED_EXTENSIONS
 from pahebatcher.gui.app import GuiDashboard
+from pahebatcher.gui.bridge import Backend, load_settings, save_settings
+from pahebatcher.gui.player import SUPPORTED_EXTENSIONS, PlaybackItem, PlayerSession
 
 
 class TakeoverApi:
@@ -64,15 +64,15 @@ class TakeoverApi:
         }
 
     def search(self, query: str) -> list[dict[str, Any]]:
-        if not isinstance(query, str) or not 1 <= len(query.strip()) <= 160:
-            raise ValueError("Enter a search term of 1–160 characters.")
+        if not 1 <= len(query.strip()) <= 160:
+            raise ValueError("Enter a search term of 1-160 characters.")
         self._ready()
         results = self._submit(self.backend.search(query.strip())).result(timeout=100)
         allowed = ("title", "session", "type", "year", "episodes")
         return [{k: row.get(k) for k in allowed} for row in results[:100]]
 
     def scan(self, session: str) -> dict[str, Any]:
-        if not isinstance(session, str) or not 1 <= len(session) <= 140:
+        if not 1 <= len(session) <= 140:
             raise ValueError("Invalid series identifier.")
         self._ready()
         anime = self._submit(self.backend.scan(session)).result(timeout=100)
@@ -86,23 +86,21 @@ class TakeoverApi:
         }
 
     def save_settings(self, updates: dict[str, Any]) -> dict[str, bool]:
-        if not isinstance(updates, dict) or set(updates) - {"quality", "audio_lang", "max_parallel"}:
+        if set(updates) - {"quality", "audio_lang", "max_parallel"}:
             raise ValueError("Unsupported setting.")
         with self._lock:
             for key, value in updates.items():
-                if key == "quality" and type(value) is int and value in (360, 720, 1080):
-                    self.cfg.set(key, value)
-                elif key == "audio_lang" and value in ("jpn", "eng"):
-                    self.cfg.set(key, value)
-                elif key == "max_parallel" and type(value) is int and 1 <= value <= 4:
-                    self.cfg.set(key, value)
-                else:
+                valid_quality = key == "quality" and type(value) is int and value in (360, 720, 1080)
+                valid_audio = key == "audio_lang" and value in ("jpn", "eng")
+                valid_parallel = key == "max_parallel" and type(value) is int and 1 <= value <= 4
+                if not (valid_quality or valid_audio or valid_parallel):
                     raise ValueError("Invalid setting value.")
+                self.cfg.set(key, value)
             save_settings(self.cfg)
         return {"ok": True}
 
     def choose_folder(self) -> str:
-        import webview
+        import webview  # type: ignore[import-not-found]
         window = webview.windows[0]
         try:
             result = window.create_file_dialog(webview.FOLDER_DIALOG)
@@ -119,7 +117,7 @@ class TakeoverApi:
         return str(selected)
 
     def download(self, indices: list[int]) -> dict[str, Any]:
-        if not isinstance(indices, list) or not indices or len(indices) > 500:
+        if not indices or len(indices) > 500:
             raise ValueError("Select between 1 and 500 episodes.")
         if any(type(index) is not int or index < 0 for index in indices):
             raise ValueError("Invalid episode selection.")
@@ -129,7 +127,8 @@ class TakeoverApi:
         from pahebatcher import ffmpeg_setup
 
         if ffmpeg_setup.find_ffmpeg() is None:
-            return {"started": False, "error": "FFmpeg is required to combine episodes. Install FFmpeg first."}
+            return {"started": False,
+                    "error": "FFmpeg is required to combine episodes. Install FFmpeg first."}
         with self._lock:
             anime = self._anime
             if anime is None or any(index >= len(anime.episodes) for index in indices):
@@ -151,7 +150,7 @@ class TakeoverApi:
                 self.backend.current_dash = dash
                 return dash
 
-            dl.Dashboard = dashboard_factory  # type: ignore[assignment]
+            dl.Dashboard = dashboard_factory  # type: ignore[assignment,misc,attr-defined,unused-ignore]
             self._job = self._submit(self.backend.download(anime, selected))
             self._job.add_done_callback(self._download_done)
         return {"started": True}
@@ -215,7 +214,7 @@ class TakeoverApi:
                  "series": path.parent.name} for index, path in enumerate(files)]
 
     def play(self, id_: str) -> dict[str, bool]:
-        if not isinstance(id_, str) or not id_.isascii() or not id_.isdecimal():
+        if not id_.isascii() or not id_.isdecimal():
             raise ValueError("Choose a saved video from Library.")
         with self._lock:
             path = self._library_paths.get(id_)
@@ -257,7 +256,7 @@ class TakeoverApi:
 def main() -> None:
     """Launch the real HTML-powered desktop UI, not the previous Tk facsimile."""
     try:
-        import webview
+        import webview  # type: ignore[import-not-found]
     except ImportError as exc:
         raise RuntimeError(
             'The new desktop UI needs pywebview. Install using: pip install "pahebatcher[gui,browser]"'
@@ -269,7 +268,7 @@ def main() -> None:
     if not page.is_file():
         raise RuntimeError("Bundled desktop.html is missing. Reinstall the application.")
     try:
-        window = webview.create_window(
+        webview.create_window(
             f"GitRatio Bunny Takeover · v{VERSION}", str(page), js_api=api,
             width=1450, height=920, min_size=(1040, 700),
             background_color="#0d101b", text_select=False,
