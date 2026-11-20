@@ -596,60 +596,101 @@ class App(tk.Tk):
         tk.Frame(hdr, height=1, bg=LINE).pack(fill="x")
 
     def show_about(self) -> None:
-        """Show the installed version, player capabilities and OS download links."""
+        """Scrollable About dialog; download buttons never overflow narrow screens."""
         dlg = tk.Toplevel(self)
         dlg.title(f"About PaheBatcher v{VERSION}")
         dlg.configure(bg=BG)
-        dlg.geometry("680x530")
-        dlg.minsize(590, 475)
+        dlg.geometry("650x560")
+        dlg.minsize(500, 420)
         dlg.transient(self)
-        container = tk.Frame(dlg, bg=BG, padx=30, pady=26)
-        container.pack(fill="both", expand=True)
-        f = self.fonts
-        tk.Label(container, text="🐰  PaheBatcher · GitRatio Edition",
-                 font=f.title, bg=BG, fg=TEXT, anchor="w").pack(fill="x")
-        tk.Label(container, text=f"Version {VERSION}  ·  Windows 11 / macOS / Linux",
-                 font=f.small, bg=BG, fg=PINK, anchor="w").pack(fill="x", pady=(8, 20))
-        details = (
-            "Download anime episodes with resumable transfers, episode selection and "
-            "SUB/DUB options. Watch saved MP4/WebM files in a spacious browser player "
-            "with series/episode information, a synopsis when supplied by the source, "
-            "and a playlist. Video.js 10.5.0 controls load when online; native HTML5 "
-            "controls remain available offline. Remote playback is not included."
+        dlg.bind("<Escape>", lambda _event: dlg.destroy())
+
+        wrapper = tk.Frame(dlg, bg=BG)
+        wrapper.pack(fill="both", expand=True, padx=18, pady=(16, 0))
+        canvas = tk.Canvas(wrapper, bg=BG, borderwidth=0, highlightthickness=0)
+        scroll = tk.Scrollbar(wrapper, orient="vertical", command=canvas.yview,
+                              bg=PANEL, troughcolor=BG, activebackground=PINK)
+        scroll.pack(side="right", fill="y")
+        canvas.pack(side="left", fill="both", expand=True)
+        canvas.configure(yscrollcommand=scroll.set)
+        container = tk.Frame(canvas, bg=BG, padx=14, pady=8)
+        window = canvas.create_window((0, 0), anchor="nw", window=container)
+        canvas.bind("<Configure>", lambda e: canvas.itemconfigure(window, width=e.width))
+        container.bind("<Configure>", lambda _e: canvas.configure(
+            scrollregion=canvas.bbox("all"),
+        ))
+        dlg.bind("<MouseWheel>", lambda e: canvas.yview_scroll(
+            -1 if e.delta > 0 else 1, "units"),
         )
-        tk.Label(container, text=details, font=f.ui, bg=BG, fg=TEXT,
-                 justify="left", anchor="nw", wraplength=570).pack(fill="x", pady=(0, 22))
+        dlg.bind("<Button-4>", lambda _e: canvas.yview_scroll(-1, "units"))
+        dlg.bind("<Button-5>", lambda _e: canvas.yview_scroll(1, "units"))
+        f = self.fonts
+        tk.Label(container, text="🐰  PaheBatcher", font=f.title, bg=BG,
+                 fg=TEXT, anchor="w").pack(fill="x")
+        tk.Label(container, text=f"GitRatio Edition  ·  v{VERSION}",
+                 font=f.small, bg=BG, fg=PINK, anchor="w").pack(
+                     fill="x", pady=(5, 20),
+                 )
+        description = (
+            "Download anime with resumable transfers and SUB/DUB selection. "
+            "Watch finished episodes in the Video.js browser player, with an "
+            "episode queue and source-provided series descriptions. "
+            "Video controls fall back to HTML5 when offline; remote streaming "
+            "is not part of the desktop player."
+        )
+        info = tk.Label(container, text=description, font=f.ui, bg=BG, fg=TEXT,
+                        justify="left", anchor="nw")
+        info.pack(fill="x", pady=(0, 22))
+        info.bind("<Configure>", lambda e: info.configure(
+            wraplength=max(240, e.width - 8),
+        ))
         tk.Label(container, text="DOWNLOAD FOR YOUR DEVICE", font=f.label,
                  bg=BG, fg=MUTED, anchor="w").pack(fill="x", pady=(0, 10))
         choices = [
             ("Windows 11", "https://github.com/GitRatio/pahebatcher/releases/download/preview/pahebatcher-gui-windows-x64.exe"),
-            ("Mac (Apple)", "https://github.com/GitRatio/pahebatcher/releases/download/preview/PaheBatcher-macos-arm64.zip"),
-            ("Mac (Intel)", "https://github.com/GitRatio/pahebatcher/releases/download/preview/PaheBatcher-macos-x64.zip"),
+            ("Mac · Apple Silicon", "https://github.com/GitRatio/pahebatcher/releases/download/preview/PaheBatcher-macos-arm64.zip"),
+            ("Mac · Intel", "https://github.com/GitRatio/pahebatcher/releases/download/preview/PaheBatcher-macos-x64.zip"),
             ("Linux x64", "https://github.com/GitRatio/pahebatcher/releases/download/preview/PaheBatcher-linux-x64.tar.gz"),
         ]
+
         def open_url(url: str) -> Callable[[], None]:
             def handler() -> None:
                 webbrowser.open(url)
             return handler
 
         controls = tk.Frame(container, bg=BG)
-        controls.pack(fill="x", pady=(0, 18))
-        for label, url in choices:
-            Button(controls, label, open_url(url), f).pack(
-                side="left", padx=(0, 8), pady=4,
+        controls.pack(fill="x", pady=(0, 15))
+        controls.grid_columnconfigure(0, weight=1, uniform="downloads")
+        controls.grid_columnconfigure(1, weight=1, uniform="downloads")
+        for index, (label, url) in enumerate(choices):
+            Button(controls, label, open_url(url), f).grid(
+                row=index // 2, column=index % 2, sticky="ew",
+                padx=5, pady=5,
             )
-        tk.Label(container, text=(
-            "Direct unsigned preview files are published after successful builds. "
-            "If unavailable, see the release page. Mac builds are not notarized."
-        ), font=f.small, bg=BG, fg=MUTED, justify="left",
-                 anchor="nw", wraplength=570).pack(fill="x", pady=(0, 16))
+        note = tk.Label(
+            container,
+            text=(
+                "These are unsigned preview builds. macOS packages are not "
+                "notarized; test your download and playback before relying on them."
+            ),
+            font=f.small, bg=BG, fg=MUTED, justify="left", anchor="nw",
+        )
+        note.pack(fill="x", pady=(0, 18))
+        note.bind("<Configure>", lambda e: note.configure(
+            wraplength=max(240, e.width - 8),
+        ))
         links = tk.Frame(container, bg=BG)
-        links.pack(fill="x")
-        Link(links, "View releases", open_url(
+        links.pack(fill="x", pady=(0, 10))
+        Link(links, "All releases", open_url(
             "https://github.com/GitRatio/pahebatcher/releases"), f).pack(side="left")
         Link(links, "Source and license", open_url(
-            "https://github.com/GitRatio/pahebatcher"), f).pack(side="left", padx=20)
-        Button(container, "Close", dlg.destroy, f, primary=True).pack(side="bottom", anchor="e")
+            "https://github.com/GitRatio/pahebatcher"), f).pack(side="left", padx=18)
+
+        footer = tk.Frame(dlg, bg=PANEL)
+        footer.pack(fill="x", side="bottom")
+        Button(footer, "Close", dlg.destroy, f, primary=True).pack(
+            side="right", padx=18, pady=12,
+        )
 
     # full screen ----------------------------------------------------------
     def set_fullscreen(self, on: bool) -> None:
