@@ -127,7 +127,7 @@ class _PlayerHandler(BaseHTTPRequestHandler):
             "default-src 'none'; "
             f"script-src 'nonce-{self.session.nonce}' https://cdn.jsdelivr.net; "
             "style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; "
-            "connect-src 'self'; media-src 'self'; img-src 'self' data:; "
+            "connect-src 'self'; media-src 'self'; img-src 'self'; "
             "base-uri 'none'; form-action 'none'; frame-ancestors 'none'",
         )
         for key, value in (extra or {}).items():
@@ -150,6 +150,14 @@ class _PlayerHandler(BaseHTTPRequestHandler):
         if uri.query or uri.fragment:
             self._error(404)
             return
+        if uri.path == f"/mascot/{self.session.token}/bunny.png":
+            # Serve the full-resolution bundled artwork instead of embedding the
+            # obsolete 120px thumbnail into every player HTML response.
+            mascot = (Path(__file__).parent / "assets" / "bunny.png").read_bytes()
+            self._headers("image/png", len(mascot))
+            if not head_only:
+                self.wfile.write(mascot)
+            return
         if uri.path == f"/watch/{self.session.token}/":
             template = (Path(__file__).parent / "assets" / "player.html").read_text(
                 encoding="utf-8"
@@ -171,13 +179,10 @@ class _PlayerHandler(BaseHTTPRequestHandler):
             safe_json = json.dumps(playlist, ensure_ascii=True).replace("<", "\\u003c").replace(
                 ">", "\\u003e"
             ).replace("&", "\\u0026")
-            mascot = (Path(__file__).parent / "assets" / "takeover_bunny.b64").read_text(
-                encoding="ascii",
-            ).strip()
             html = template.replace("__PLAYER_DATA__", safe_json).replace(
                 "__PLAYER_NONCE__", self.session.nonce
             ).replace("__APP_VERSION__", VERSION).replace(
-                "__TAKEOVER_BUNNY__", mascot,
+                "__PLAYER_TOKEN__", self.session.token,
             )
             data = html.encode("utf-8")
             self._headers("text/html; charset=utf-8", len(data))
