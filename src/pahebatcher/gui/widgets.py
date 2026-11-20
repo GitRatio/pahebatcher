@@ -7,9 +7,9 @@ from collections.abc import Callable
 from tkinter import font as tkfont
 from typing import Any
 
-BG, PANEL, LINE, TEXT = "#000000", "#0b0b0f", "#26262e", "#ececf1"
-MUTED, PINK, BAR, TRACK = "#8a8a96", "#ff3f90", "#d5015a", "#1c1c22"
-OK, WARN, ERR = "#3ddc97", "#ffb020", "#ff5c5c"
+BG, PANEL, LINE, TEXT = "#101018", "#1b1923", "#3b3543", "#f3edf5"
+MUTED, PINK, BAR, TRACK = "#ada5b7", "#ff78b2", "#d92d7c", "#2d2634"
+OK, WARN, ERR = "#55dfa7", "#ffc164", "#ff7986"
 
 STYLE_COLORS = {"brand": PINK, "ok": OK, "warn": WARN, "muted": MUTED, "red": ERR}
 
@@ -39,7 +39,7 @@ class Button(tk.Label):
     def __init__(self, master: tk.Misc, text: str, command: Callable[[], None], fonts: Fonts,
                  primary: bool = False, **kw: Any) -> None:
         self._primary, self._cmd, self._enabled = primary, command, True
-        super().__init__(master, text=text, font=fonts.bold, padx=16, pady=7, cursor="hand2",
+        super().__init__(master, text=text, font=fonts.bold, padx=15, pady=9, cursor="hand2",
                          highlightthickness=1, **kw)
         self._paint(False)
         self.bind("<Enter>", lambda _e: self._paint(True))
