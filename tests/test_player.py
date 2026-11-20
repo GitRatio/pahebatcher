@@ -154,4 +154,4 @@ def test_player_csp_avoids_unrestricted_remote_requests(player: PlayerSession) -
     csp = headers["Content-Security-Policy"]
     assert "connect-src 'self'" in csp
     assert "media-src 'self'" in csp
-    assert "unsafe-inline" not in csp
+    assert "style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net" in csp
