@@ -6,9 +6,9 @@
 
 ## About this edition
 
-**PaheBatcher — GitRatio Edition** is an independently maintained, open-source continuation of the original [pahebatcher by abdullahkhfb](https://github.com/abdullahkhfb/pahebatcher). It provides a desktop anime batch downloader for **Windows 11, macOS (Intel and Apple Silicon), and Linux x64**, plus the original Python terminal interface, resume support, streaming tools and watchlist foundation. The GitRatio edition focuses on reliability, efficient downloads, straightforward installation, and the bunny-branded desktop experience.
+**PaheBatcher — GitRatio Edition** is an independently maintained, open-source continuation of the original [pahebatcher by abdullahkhfb](https://github.com/abdullahkhfb/pahebatcher). It provides a desktop anime batch downloader for **Windows 11, macOS (Intel and Apple Silicon), and Linux x64**, plus the original Python terminal interface, resume support, streaming tools and watchlist foundation. The GitRatio edition focuses on reliability, efficient downloads, straightforward installation, and the bunny-branded desktop experience. **Application version: 3.10.0** (shown under **About** in the desktop header).
 
-**Video player:** The desktop app now includes an **Open player** action for local MP4, WebM, M4V and MOV files, plus **Watch videos** after successful downloads. A private, locally hosted **Video.js-inspired HTML5 player** shows the series title, episode number, episode name and audio language, with an episode queue, seeking, next/previous controls and fullscreen playback. The player opens in your default browser; it is **not** the Video.js library or a remote streaming engine. The macOS/Linux desktop packages are available as GitHub Actions build artifacts and still need production signing/notarization and wider real-device QA.
+**Video player:** The desktop app now includes an **Open player** action for local MP4, WebM, M4V and MOV files, plus **Watch videos** after successful downloads. A private, locally hosted **Video.js 10.5.0 HTML player** shows the series title, episode number, episode name, audio language and available **anime synopsis**, plus an episode queue, seeking, next/previous controls and fullscreen. The pinned Video.js Neutral skin loads from jsDelivr when online; native HTML5 controls remain available without internet. Media stays on localhost, and remote streaming is not part of this player. The macOS/Linux desktop packages are available as GitHub Actions build artifacts and still need production signing/notarization and wider real-device QA.
 
 **The "takeover" is a joke, not a claim of ownership of the original project.** GitRatio maintains this copy; the upstream author retains credit for their original work, and the original mascot/logo credits remain intact. This edition is not affiliated with or endorsed by the upstream maintainer. See [FORK_NOTES.md](FORK_NOTES.md) and [LICENSE](LICENSE).
 
@@ -19,12 +19,25 @@
 Batch-download and stream anime from [animepahe](https://animepahe.pw), from a
 desktop app or the terminal.
 
-[![Version 3.9.0][version-badge]][latest-release]
+[![Version 3.10.0][version-badge]][latest-release]
 ![Python 3.11+](https://img.shields.io/badge/python-3.11%2B-blue)
 ![License MIT](https://img.shields.io/badge/license-MIT-green)
 
 ![Search screen](assets/screenshots/gui-search.png)
 ![Download dashboard](assets/screenshots/gui-downloading.png)
+
+
+## ⬇ Download PaheBatcher v3.10.0
+
+Choose your system below. These buttons link to **direct, unsigned preview downloads** published after the full cross-platform build passes. The preview is not a signed production release.
+
+| Windows | macOS Apple Silicon | macOS Intel | Linux x64 |
+| :---: | :---: | :---: | :---: |
+| [![Download Windows](https://img.shields.io/badge/Download-Windows_11-0078D4?style=for-the-badge&logo=windows11&logoColor=white)](https://github.com/GitRatio/pahebatcher/releases/download/preview/pahebatcher-gui-windows-x64.exe) | [![Download Mac Apple](https://img.shields.io/badge/Download-Mac_Apple_Silicon-333333?style=for-the-badge&logo=apple&logoColor=white)](https://github.com/GitRatio/pahebatcher/releases/download/preview/PaheBatcher-macos-arm64.zip) | [![Download Mac Intel](https://img.shields.io/badge/Download-Mac_Intel-333333?style=for-the-badge&logo=apple&logoColor=white)](https://github.com/GitRatio/pahebatcher/releases/download/preview/PaheBatcher-macos-x64.zip) | [![Download Linux](https://img.shields.io/badge/Download-Linux_x64-FCC624?style=for-the-badge&logo=linux&logoColor=black)](https://github.com/GitRatio/pahebatcher/releases/download/preview/PaheBatcher-linux-x64.tar.gz) |
+
+**How to download:** Click your device button to obtain the file from the [rolling preview release](https://github.com/GitRatio/pahebatcher/releases/tag/preview). If the preview is not yet published, use the [latest successful build](https://github.com/GitRatio/pahebatcher/actions/workflows/build-exe.yml), open **Artifacts**, and choose your OS package; GitHub may require sign-in. Mac downloads contain an `.app`; Linux includes `install.sh`. Previews are unsigned and unnotarized.
+
+**[Preview download page](https://github.com/GitRatio/pahebatcher/releases/tag/preview)** · **[All releases](https://github.com/GitRatio/pahebatcher/releases)** · **[Installation guide for Mac/Linux](MACOS_LINUX.md)** · **[Windows guide](WINDOWS_11.md)**
 
 ## Highlights
 
@@ -38,7 +51,7 @@ desktop app or the terminal.
 - **No Docker, no extra services.** A built-in browser solver gets past
   Cloudflare using the Chrome or Edge you already have.
 - **One-click FFmpeg:** the desktop app installs it for you.
-- **Local episode player:** open finished videos in a private Video.js-inspired browser player with the episode queue, series title, audio language, seeking and fullscreen. No remote-stream playback in this GUI feature yet.
+- **Local episode player:** actual Video.js 10.5.0 Neutral controls (with native offline fallback), episode queue, series/movie details, source-provided synopsis, audio language, seeking and fullscreen. No remote-stream playback in this GUI feature yet.
 - **Desktop packaging:** macOS .app archives for Apple Silicon/Intel and a portable Linux x64 app with an app-menu installer.
 
 ## Install
@@ -367,4 +380,4 @@ official creators.
 
 [hellharbinger]: https://www.reddit.com/user/HellHarbinger/
 [latest-release]: https://github.com/GitRatio/pahebatcher/releases
-[version-badge]: https://img.shields.io/badge/version-3.9.0-blue
+[version-badge]: https://img.shields.io/badge/version-3.10.0-blue

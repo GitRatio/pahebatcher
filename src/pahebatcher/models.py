@@ -37,6 +37,7 @@ class AnimeInfo:
     total: int = 0
     episodes: list[EpisodeInfo] = field(default_factory=list)
     has_session: bool = False
+    description: str = ""
 
     def get_variant(self, number: float, audio: str) -> EpisodeInfo | None:
         for ep in self.episodes:

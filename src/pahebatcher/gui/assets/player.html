@@ -5,6 +5,9 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="color-scheme" content="dark">
 <title>PaheBatcher · Player</title>
+<!-- Pinned Video.js 10 browser bundle; native HTML5 video remains the offline fallback. -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@videojs/cdn@10.5.0/global.css" referrerpolicy="no-referrer">
+<script type="module" src="https://cdn.jsdelivr.net/npm/@videojs/cdn@10.5.0/video-neutral.js" referrerpolicy="no-referrer"></script>
 <style nonce="__PLAYER_NONCE__">
 :root{color-scheme:dark;font-family:Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:#090a10;color:#f3f2f8}
 *{box-sizing:border-box}
@@ -53,18 +56,54 @@ kbd{border:1px solid #4b4050;padding:2px 5px;border-radius:4px;font:inherit;colo
 @media(max-width:850px){.layout{grid-template-columns:1fr}.queue{max-height:260px}.edition{display:none}}
 @media(max-width:500px){.shell{padding:16px 12px 32px}.brand{font-size:18px}.pill{padding:7px 8px;font-size:10px}.control{padding:9px 12px}}
 @media(prefers-reduced-motion:no-preference){button{transition:background-color .15s,border-color .15s,color .15s}}
+
+/* GitRatio v3.10 — spacious layout, accessible video controls. */
+:root{font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+body{background:radial-gradient(ellipse at 25% -10%,#251b32 0%,transparent 43%),#0d0e15}
+.shell{max-width:1660px;padding:36px clamp(20px,4vw,72px) 68px}
+header{padding-bottom:28px}
+.layout{grid-template-columns:minmax(0,1fr) minmax(300px,365px);gap:34px;margin-top:36px}
+.player-frame{border-radius:20px;border-color:#34303c;box-shadow:0 22px 70px #0005}
+video-player,video-neutral-skin{display:block;width:100%;max-width:100%}
+video-neutral-skin{aspect-ratio:16/9;--media-controls-before-start:visible}
+video{width:100%;height:auto;min-height:180px;object-fit:contain;aspect-ratio:16/9;max-height:none}
+.controls{margin-top:22px}
+.control{padding:12px 18px;min-height:44px}
+.eyebrow{margin-top:38px}
+h1{font-size:clamp(27px,2.9vw,42px);line-height:1.15;margin:12px 0 12px}
+.subtitle{font-size:15px}
+.meta-row{margin-top:26px;gap:12px}
+.meta{padding:11px 15px;font-size:13px}
+.synopsis{margin-top:32px;padding:25px 28px;border:1px solid #35313c;border-radius:18px;background:#16151e}
+.synopsis h2{margin:0 0 12px;font-size:18px;letter-spacing:-.02em}
+.synopsis p{margin:0;color:#c0b8c6;font-size:14px;line-height:1.75;white-space:pre-line}
+.sidebar{position:sticky;top:24px;border-radius:18px}
+.sidebar-top{padding:26px}
+.sidebar-top h2{font-size:19px}
+.queue{padding:12px;gap:4px}
+.queue button{padding:14px 12px;gap:14px}
+.queue-details strong{font-size:14px}
+.queue-details small{font-size:12px}
+.player-note{margin-top:18px;color:#aca3b1;font-size:13px;line-height:1.6}
+footer{margin-top:26px}
+@media(max-width:950px){.layout{grid-template-columns:1fr;gap:26px}.sidebar{position:static}.queue{max-height:280px}.edition{display:inline}}
+@media(max-width:500px){.shell{padding:20px 14px 38px}.synopsis{padding:18px}.controls{align-items:stretch}.step-buttons{flex:1}.step-buttons .control{flex:1}.brand{font-size:18px}.edition{display:none}}
 </style>
 </head>
 <body>
 <div class="shell">
 <header>
-<div class="brand"><span class="mark" aria-hidden="true">🐰</span><span>PaheBatcher <span class="edition">/ GitRatio Edition</span></span></div>
+<div class="brand"><span class="mark" aria-hidden="true">🐰</span><span>PaheBatcher <span class="edition">/ GitRatio Edition · v__APP_VERSION__</span></span></div>
 <span class="pill">LOCAL · PRIVATE PLAYBACK</span>
 </header>
 <main class="layout">
 <section class="stage" aria-label="Video player">
 <div class="player-frame">
-<video id="video" controls preload="metadata" playsinline aria-label="Episode video">Your browser cannot play HTML5 video.</video>
+<video-player>
+  <video-neutral-skin>
+    <video id="video" controls preload="metadata" playsinline aria-label="Episode video">Your browser cannot play HTML5 video.</video>
+  </video-neutral-skin>
+</video-player>
 <div id="video-error" class="video-error" role="status" hidden></div>
 </div>
 <div class="controls">
@@ -75,7 +114,12 @@ kbd{border:1px solid #4b4050;padding:2px 5px;border-radius:4px;font:inherit;colo
 <h1 id="series-name">Loading series…</h1>
 <p id="episode-title" class="subtitle"></p>
 <div class="meta-row"><div class="meta">Episode <strong id="episode-num">—</strong></div><div class="meta">Audio <strong id="episode-audio">Unknown</strong></div><div class="meta">Format <strong id="episode-format">—</strong></div><div class="meta">Source <strong>Local downloaded file</strong></div></div>
-<footer>Video.js-inspired presentation, native HTML5 video playback. <kbd>Space</kbd> play/pause · <kbd>F</kbd> full screen · <kbd>→</kbd> next episode · <kbd>←</kbd> previous episode. Playback stays on your computer. Browser codec support varies.</footer>
+<section class="synopsis" aria-labelledby="synopsis-heading">
+  <h2 id="synopsis-heading">About this anime</h2>
+  <p id="series-description">Loading synopsis…</p>
+</section>
+<p class="player-note" role="status" id="engine-status">Native HTML5 controls are available; Video.js 10 loads when online.</p>
+<footer>Video.js 10.5.0 Neutral skin (native HTML5 fallback when offline). <kbd>Space</kbd> play/pause · <kbd>F</kbd> full screen · <kbd>→</kbd> next episode · <kbd>←</kbd> previous episode. Playback stays on your computer. Browser codec support varies.</footer>
 </section>
 <aside class="sidebar" aria-label="Episode playlist">
 <div class="sidebar-top"><h2>Episode queue</h2><p id="queue-summary">Choose a downloaded episode</p></div>
@@ -89,6 +133,13 @@ kbd{border:1px solid #4b4050;padding:2px 5px;border-radius:4px;font:inherit;colo
 "use strict";
 const episodes = JSON.parse(document.getElementById("player-data").textContent);
 const video = document.getElementById("video");
+// Browser controls remain usable when the Video.js module is unavailable.
+if (window.customElements) {
+  customElements.whenDefined("video-neutral-skin").then(function () {
+    video.controls = false;
+    document.getElementById("engine-status").textContent = "Video.js 10.5.0 · Neutral controls loaded.";
+  });
+}
 const queue = document.getElementById("queue");
 const prev = document.getElementById("prev");
 const next = document.getElementById("next");
@@ -107,6 +158,9 @@ function select(index, play) {
   document.title = ep.series + " · Episode " + ep.episode + " · PaheBatcher";
   document.getElementById("series-name").textContent = ep.series || "Unknown series";
   document.getElementById("episode-title").textContent = ep.title || "Episode " + ep.episode;
+  document.getElementById("synopsis-heading").textContent = ep.kind === "Standalone video" ? "About this video" : "About this anime";
+  document.getElementById("series-description").textContent =
+    ep.description || "No synopsis was provided by the source for this title. Episode and file details remain available above.";
   document.getElementById("episode-num").textContent = ep.episode || "—";
   document.getElementById("episode-audio").textContent = ep.audio === "jpn" ? "Japanese / SUB" : ep.audio === "eng" ? "English / DUB" : (ep.audio || "Unknown");
   document.getElementById("episode-format").textContent = ep.format || "—";
@@ -146,14 +200,23 @@ video.addEventListener("error", function () {
     error.textContent = "This file could not be decoded by your browser. Check the file, or open it using MPV or VLC for broader codec support.";
   }
 });
-document.getElementById("full").addEventListener("click", function () {
-  if (document.fullscreenElement) document.exitFullscreen();
-  else if (video.requestFullscreen) video.requestFullscreen();
-});
+function toggleFullscreen() {
+  if (document.fullscreenElement) {
+    Promise.resolve(document.exitFullscreen()).catch(function () {});
+    return;
+  }
+  // Keep the Video.js controls in fullscreen instead of enlarging only the media.
+  const modern = window.customElements && customElements.get("video-neutral-skin");
+  const target = modern ? document.querySelector("video-player") : video;
+  if (target && target.requestFullscreen) {
+    Promise.resolve(target.requestFullscreen()).catch(function () {});
+  }
+}
+document.getElementById("full").addEventListener("click", toggleFullscreen);
 document.addEventListener("keydown", function (event) {
   if (event.altKey || event.ctrlKey || event.metaKey || event.target instanceof HTMLInputElement) return;
   if (event.key === " " && event.target === document.body) { event.preventDefault(); video.paused ? video.play().catch(function () {}) : video.pause(); }
-  else if (event.key.toLowerCase() === "f") { if (document.fullscreenElement) document.exitFullscreen(); else if (video.requestFullscreen) video.requestFullscreen(); }
+  else if (event.key.toLowerCase() === "f") { toggleFullscreen(); }
   else if (event.key === "ArrowRight" && event.target === document.body) select(current + 1, true);
   else if (event.key === "ArrowLeft" && event.target === document.body) select(current - 1, true);
 });

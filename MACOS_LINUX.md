@@ -1,6 +1,12 @@
-# PaheBatcher desktop — macOS and Linux
+# PaheBatcher desktop v3.10.0 — macOS and Linux
 
 This GitRatio edition shares one Python/Tkinter desktop interface and download backend across Windows, macOS and Linux. Builds are created on the corresponding OS with PyInstaller; **do not use Windows executables on macOS/Linux**.
+
+## Download builds by operating system
+
+[**Windows 11**](https://github.com/GitRatio/pahebatcher/releases/download/preview/pahebatcher-gui-windows-x64.exe) · [**macOS Apple Silicon**](https://github.com/GitRatio/pahebatcher/releases/download/preview/PaheBatcher-macos-arm64.zip) · [**macOS Intel**](https://github.com/GitRatio/pahebatcher/releases/download/preview/PaheBatcher-macos-x64.zip) · [**Linux x64**](https://github.com/GitRatio/pahebatcher/releases/download/preview/PaheBatcher-linux-x64.tar.gz)
+
+These are direct file links from the rolling **unsigned preview** release, published only after all platform builds succeed. If a preview is not available yet, use the latest successful main-branch [build artifacts](https://github.com/GitRatio/pahebatcher/actions/workflows/build-exe.yml). See README for package names.
 
 ## Prebuilt desktop packages
 
@@ -23,7 +29,7 @@ From the directory containing the extracted PaheBatcher folder and install.sh:
 bash install.sh
 ~~~
 
-This copies the GUI and bundled runtime to your user data directory and registers a desktop launcher without sudo. It respects XDG_DATA_HOME when set. You still need a Chromium-family browser installed for site connectivity and a default browser for the Video.js-style local player.
+This copies the GUI and bundled runtime to your user data directory and registers a desktop launcher without sudo. It respects XDG_DATA_HOME when set. You still need a Chromium-family browser installed for site connectivity and a default browser for the local Video.js 10 player.
 
 ## From source (all platforms)
 
@@ -56,12 +62,12 @@ On Ubuntu/Debian, install system Tk before creating the venv with sudo apt insta
 
 Click **Open player** in the desktop header to choose one or more local MP4, M4V, MOV or WebM videos. After a successful download, click **Watch videos** to populate the playlist automatically from completed files, with series title, selected episode, and SUB/DUB information already known to the app.
 
-The player opens in your **default web browser**. This is intentional: desktop Tkinter has no integrated modern HTML5 engine and the browser supplies cross-platform media decoding. The player has a Video.js-inspired dark/pink UI, episode queue, play/pause, fullscreen, keyboard controls and seekable playback. It is **not** the upstream Video.js JavaScript library, and it does **not** stream remote site links directly yet. Browser media codecs differ; MPV/VLC may be necessary for unusual codecs.
+The player opens in your **default web browser**. This is intentional: desktop Tkinter has no integrated modern HTML5 engine and the browser supplies cross-platform media decoding. The player uses the actual **Video.js 10.5.0 Neutral skin** loaded from a pinned jsDelivr module when online. It retains native HTML5 controls as an offline fallback, and offers a spacious layout, episode queue, source-provided anime synopsis, play/pause, fullscreen, keyboard shortcuts and seekable playback. Descriptions are shown only if supplied by the anime page; no synopsis is invented. It does **not** stream remote site links directly yet. Browser media codecs differ; MPV/VLC may be necessary for unusual codecs.
 
 For privacy, playback uses a randomized URL served only on 127.0.0.1, has no directory listing, requires an unguessable session token, and serves only files explicitly selected by the user. The service stops when PaheBatcher closes. It never makes your video directories public.
 
 ## CI / release engineering
 
-The repository's Build executables workflow runs the unit tests and builds platform-specific desktop packages. Mac archives contain an .app; Linux archives contain PyInstaller's portable onedir bundle, icon and install.sh. Artifacts are attached to a GitHub release only when a version tag triggers the workflow and the required jobs pass.
+The repository's Build executables workflow runs the unit tests and builds platform-specific desktop packages. Mac archives contain an .app; Linux archives contain PyInstaller's portable onedir bundle, icon and install.sh. A rolling unsigned prerelease is published at the fixed `preview` tag after successful main-branch builds. Formal versioned releases are published only when a `v*` tag triggers the workflow and the required jobs pass.
 
 The packages still need real-device QA, macOS code signing/notarization and broader Linux-distribution verification before being called production-ready.

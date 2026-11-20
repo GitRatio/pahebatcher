@@ -2,10 +2,10 @@
 
 This independent GitRatio edition preserves original attribution in LICENSE and documents changes in FORK_NOTES.md.
 
-## Option A: Standalone EXE (after a GitRatio release is published)
+## Option A: Standalone EXE (development build or published release)
 
-1. Open https://github.com/GitRatio/pahebatcher/releases
-2. Download pahebatcher-gui-windows-x64.exe from a tested release.
+1. For a one-click unsigned development build, [download the Windows 11 application](https://github.com/GitRatio/pahebatcher/releases/download/preview/pahebatcher-gui-windows-x64.exe). Check the [preview release](https://github.com/GitRatio/pahebatcher/releases/tag/preview) or [GitRatio Releases](https://github.com/GitRatio/pahebatcher/releases).
+2. If the preview is not published yet, use the [successful build artifacts](https://github.com/GitRatio/pahebatcher/actions/workflows/build-exe.yml), download `pahebatcher-gui-windows-x64.exe`, and extract it. The preview executable is not code-signed and may trigger SmartScreen.
 3. Keep Microsoft Edge or Chrome installed for the browser-based solver.
 4. Open the app and select Install FFmpeg if the app prompts for it.
 

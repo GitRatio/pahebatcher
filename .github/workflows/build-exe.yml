@@ -2,12 +2,13 @@ name: Build executables
 
 on:
   push:
+    branches: ["main"]
     tags: ["v*"]
   workflow_dispatch:
   pull_request:
 
 permissions:
-  contents: write
+  contents: read
 
 jobs:
   test:
@@ -181,6 +182,8 @@ jobs:
           if-no-files-found: error
 
   release:
+    permissions:
+      contents: write
     if: startsWith(github.ref, 'refs/tags/v')
     needs: [build, build-gui, build-gui-unix]
     runs-on: ubuntu-latest
@@ -193,3 +196,47 @@ jobs:
         with:
           files: dist/*
           generate_release_notes: true
+
+  preview-release:
+    # A stable, sign-in-free download URL for each unsigned platform preview.
+    # Only publish after every build and test succeeds on main.
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    needs: [build, build-gui, build-gui-unix]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          path: dist
+          merge-multiple: true
+      - name: Point rolling preview tag to the tested main commit
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          if gh api "repos/$GITHUB_REPOSITORY/git/ref/tags/preview" >/dev/null 2>&1; then
+            gh api --method PATCH "repos/$GITHUB_REPOSITORY/git/refs/tags/preview" \
+              -f sha="$GITHUB_SHA" -F force=true
+          else
+            gh api --method POST "repos/$GITHUB_REPOSITORY/git/refs" \
+              -f ref=refs/tags/preview -f sha="$GITHUB_SHA"
+          fi
+      - uses: softprops/action-gh-release@v2
+        with:
+          tag_name: preview
+          target_commitish: ${{ github.sha }}
+          name: PaheBatcher GitRatio Edition · v3.10.0 Preview (unsigned)
+          body: |
+            Rolling development preview built automatically from the tested main branch.
+            These downloads are NOT digitally signed or macOS notarized.
+            For Windows SmartScreen or macOS Gatekeeper warnings, review the source or build locally.
+            Test playback and download behavior on your own device before treating it as production ready.
+            Source code and attribution: https://github.com/GitRatio/pahebatcher
+          prerelease: true
+          make_latest: false
+          overwrite_files: true
+          files: |
+            dist/pahebatcher-gui-windows-x64.exe
+            dist/PaheBatcher-macos-arm64.zip
+            dist/PaheBatcher-macos-x64.zip
+            dist/PaheBatcher-linux-x64.tar.gz

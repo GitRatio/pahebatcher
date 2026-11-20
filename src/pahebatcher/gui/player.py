@@ -18,6 +18,8 @@ from pathlib import Path
 from typing import cast
 from urllib.parse import urlsplit
 
+from pahebatcher.config import VERSION
+
 SUPPORTED_EXTENSIONS = frozenset({".mp4", ".webm", ".m4v", ".mov"})
 MIME_TYPES = {
     ".mp4": "video/mp4",
@@ -36,6 +38,7 @@ class PlaybackItem:
     episode: str
     title: str
     audio: str = ""
+    description: str = ""
 
     @classmethod
     def from_file(cls, path: Path) -> PlaybackItem:
@@ -64,7 +67,8 @@ class PlayerSession:
             if not path.is_file() or path.suffix.lower() not in SUPPORTED_EXTENSIONS:
                 raise ValueError(f"Unsupported video file: {item.path}")
             self.items.append(
-                PlaybackItem(path, item.series, item.episode, item.title, item.audio)
+                PlaybackItem(path, item.series, item.episode, item.title,
+                             item.audio, item.description)
             )
         self.token = secrets.token_urlsafe(32)
         self.nonce = secrets.token_urlsafe(24)
@@ -121,9 +125,9 @@ class _PlayerHandler(BaseHTTPRequestHandler):
         self.send_header(
             "Content-Security-Policy",
             "default-src 'none'; "
-            f"script-src 'nonce-{self.session.nonce}'; "
-            f"style-src 'nonce-{self.session.nonce}'; "
-            "media-src 'self'; img-src 'self' data:; "
+            f"script-src 'nonce-{self.session.nonce}' https://cdn.jsdelivr.net; "
+            "style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; "
+            "connect-src 'self'; media-src 'self'; img-src 'self' data:; "
             "base-uri 'none'; form-action 'none'; frame-ancestors 'none'",
         )
         for key, value in (extra or {}).items():
@@ -156,6 +160,8 @@ class _PlayerHandler(BaseHTTPRequestHandler):
                     "episode": item.episode,
                     "title": item.title,
                     "audio": item.audio,
+                    "description": item.description,
+                    "kind": "Episode" if item.episode not in {"", "—"} else "Standalone video",
                     "format": item.path.suffix.lower().lstrip(".").upper(),
                     "src": f"/media/{self.session.token}/{index}",
                 }
@@ -166,7 +172,7 @@ class _PlayerHandler(BaseHTTPRequestHandler):
             ).replace("&", "\\u0026")
             html = template.replace("__PLAYER_DATA__", safe_json).replace(
                 "__PLAYER_NONCE__", self.session.nonce
-            )
+            ).replace("__APP_VERSION__", VERSION)
             data = html.encode("utf-8")
             self._headers("text/html; charset=utf-8", len(data))
             if not head_only:
