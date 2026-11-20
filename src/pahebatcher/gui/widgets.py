@@ -7,8 +7,8 @@ from collections.abc import Callable
 from tkinter import font as tkfont
 from typing import Any
 
-BG, PANEL, LINE, TEXT = "#101018", "#1b1923", "#3b3543", "#f3edf5"
-MUTED, PINK, BAR, TRACK = "#ada5b7", "#ff78b2", "#d92d7c", "#2d2634"
+BG, PANEL, LINE, TEXT = "#0d101b", "#1a1d2d", "#48415e", "#f8f5ff"
+MUTED, PINK, BAR, TRACK = "#aaa9bf", "#ff5eaa", "#e72c84", "#302b3f"
 OK, WARN, ERR = "#55dfa7", "#ffc164", "#ff7986"
 
 STYLE_COLORS = {"brand": PINK, "ok": OK, "warn": WARN, "muted": MUTED, "red": ERR}
@@ -39,19 +39,21 @@ class Button(tk.Label):
     def __init__(self, master: tk.Misc, text: str, command: Callable[[], None], fonts: Fonts,
                  primary: bool = False, **kw: Any) -> None:
         self._primary, self._cmd, self._enabled = primary, command, True
-        super().__init__(master, text=text, font=fonts.bold, padx=15, pady=9, cursor="hand2",
-                         highlightthickness=1, **kw)
+        super().__init__(master, text=text, font=fonts.bold, padx=15, pady=10, cursor="hand2",
+                         highlightthickness=2, takefocus=1, **kw)
         self._paint(False)
         self.bind("<Enter>", lambda _e: self._paint(True))
         self.bind("<Leave>", lambda _e: self._paint(False))
         self.bind("<Button-1>", lambda _e: self._cmd() if self._enabled else None)
+        self.bind("<Return>", lambda _e: self._cmd() if self._enabled else None)
+        self.bind("<space>", lambda _e: self._cmd() if self._enabled else None)
 
     def _paint(self, hover: bool) -> None:
         if not self._enabled:
             self.configure(bg=BG, fg="#55555e", highlightbackground=TRACK, cursor="arrow")
         elif self._primary:
             c = PINK if hover else BAR
-            self.configure(bg=c, fg="#ffffff", highlightbackground=c, cursor="hand2")
+            self.configure(bg=c, fg="#ffffff", highlightbackground="#34edf3", cursor="hand2")
         else:
             self.configure(bg=BG, fg=PINK if hover else TEXT,
                            highlightbackground=PINK if hover else LINE, cursor="hand2")
@@ -75,6 +77,9 @@ class Link(tk.Label):
         self.bind("<Enter>", lambda _e: self.configure(fg=PINK))
         self.bind("<Leave>", lambda _e: self.configure(fg=MUTED))
         self.bind("<Button-1>", lambda _e: command())
+        self.configure(takefocus=1)
+        self.bind("<Return>", lambda _e: command())
+        self.bind("<space>", lambda _e: command())
 
 
 class ThinBar(tk.Canvas):
@@ -123,8 +128,8 @@ class Segmented(tk.Frame):
 
 
 def make_entry(master: tk.Misc, fonts: Fonts, **kw: Any) -> tk.Entry:
-    return tk.Entry(master, font=fonts.ui, bg="#24202b", fg=TEXT, insertbackground=PINK, relief="flat",
-                    highlightthickness=1, highlightbackground=LINE, highlightcolor=BAR, bd=6, **kw)
+    return tk.Entry(master, font=fonts.ui, bg="#1e2432", fg=TEXT, insertbackground=PINK, relief="flat",
+                    highlightthickness=1, highlightbackground=LINE, highlightcolor="#34edf3", bd=6, **kw)
 
 
 class SlimScrollbar(tk.Canvas):
@@ -205,10 +210,10 @@ class SlimScrollbar(tk.Canvas):
 
 
 def make_listbox(master: tk.Misc, fonts: Fonts) -> tuple[tk.Frame, tk.Listbox]:
-    frame = tk.Frame(master, bg=BG)
+    frame = tk.Frame(master, bg=PANEL)
     lb = tk.Listbox(
-        frame, font=fonts.mono, bg=BG, fg=TEXT, bd=0, highlightthickness=0, activestyle="none",
-        selectbackground="#1a0710", selectforeground=PINK, exportselection=False,
+        frame, font=fonts.mono, bg=PANEL, fg=TEXT, bd=0, highlightthickness=0, activestyle="none",
+        selectbackground="#4e2749", selectforeground="#7effff", exportselection=False,
     )
     sb = SlimScrollbar(frame, lb.yview, side="right", fill="y")
     lb.configure(yscrollcommand=sb.set)

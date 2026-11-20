@@ -260,45 +260,114 @@ class EpisodesView(tk.Frame):
         self.anime: AnimeInfo | None = None
         self.eps: list[EpisodeInfo] = []
         self.sel: set[float] = set()
-        Link(self, "← search", app.show_search, f).pack(anchor="w")
+
+        Link(self, "← Back to search", app.show_search, f).pack(anchor="w", pady=(0, 10))
+        tk.Label(self, text="SERIES / DOWNLOADS", font=f.label, fg="#35ecf1",
+                 bg=BG, anchor="w").pack(fill="x", pady=(0, 5))
         self.title = tk.Label(self, font=f.title, fg=TEXT, bg=BG, anchor="w")
-        self.title.pack(fill="x", pady=(8, 0))
-        self.sub = tk.Label(self, font=f.small, fg=MUTED, bg=BG, anchor="w")
-        self.sub.pack(fill="x", pady=(2, 12))
+        self.title.pack(fill="x", pady=(0, 4))
+        self.sub = tk.Label(self, font=f.small, fg=PINK, bg=BG, anchor="w")
+        self.sub.pack(fill="x", pady=(0, 7))
         self.description = tk.Label(
-            self, font=f.small, fg=MUTED, bg=BG, justify="left",
-            anchor="w", wraplength=820,
+            self, font=f.small, fg=MUTED, bg=BG, justify="left", anchor="w",
         )
-        self.description.pack(fill="x", pady=(0, 16))
+        self.description.pack(fill="x", pady=(0, 14))
         self.description.bind(
-            "<Configure>",
-            lambda e: self.description.configure(wraplength=max(240, e.width - 12)),
+            "<Configure>", lambda e: self.description.configure(
+                wraplength=max(220, e.width - 15),
+            ),
         )
 
-        ctl = tk.Frame(self, bg=BG)
-        ctl.pack(fill="x", pady=(0, 10))
-        Button(ctl, "All", self.select_all, f).pack(side="left")
-        Button(ctl, "None", self.select_none, f).pack(side="left", padx=8)
-        self.range = make_entry(ctl, f, width=18)
-        self.range.pack(side="left", padx=(12, 8))
-        self.range.bind("<Return>", lambda _e: self.select_range())
-        Button(ctl, "Select range", self.select_range, f).pack(side="left")
-        tk.Label(
-            self, text="Examples: 1-12 · 1,4,7 · 5-",
-            font=f.small, fg=MUTED, bg=BG, anchor="w",
-        ).pack(fill="x", pady=(0, 12))
+        main = tk.Frame(self, bg=BG)
+        main.pack(fill="both", expand=True)
+        panel = tk.Frame(main, bg=PANEL, width=284, highlightthickness=1,
+                         highlightbackground="#654061")
+        panel.pack(side="right", fill="y", padx=(16, 0))
+        panel.pack_propagate(False)
+        left = tk.Frame(main, bg=PANEL, highlightthickness=1,
+                        highlightbackground=LINE)
+        left.pack(side="left", fill="both", expand=True)
 
-        frame, self.lb = make_listbox(self, f)
-        frame.pack(fill="both", expand=True)
+        tabs = tk.Frame(left, bg=PANEL)
+        tabs.pack(fill="x", padx=16, pady=(15, 10))
+        tk.Label(tabs, text="▷   EPISODES", font=f.bold, fg=PINK,
+                 bg=PANEL).pack(side="left")
+        tk.Label(tabs, text="SELECT TO DOWNLOAD", font=f.label,
+                 fg=MUTED, bg=PANEL).pack(side="right")
+        ctl = tk.Frame(left, bg=PANEL)
+        ctl.pack(fill="x", padx=14, pady=(0, 10))
+        Button(ctl, "All", self.select_all, f).pack(side="left")
+        Button(ctl, "None", self.select_none, f).pack(side="left", padx=(7, 0))
+        row = tk.Frame(left, bg=PANEL)
+        row.pack(fill="x", padx=14, pady=(0, 12))
+        self.range = make_entry(row, f, width=15)
+        self.range.pack(side="left", fill="x", expand=True)
+        self.range.bind("<Return>", lambda _e: self.select_range())
+        Button(row, "Select range", self.select_range, f).pack(side="right", padx=(8, 0))
+        tk.Label(left, text="Examples: 1-12, 1,4,7, or 5-", font=f.small,
+                 fg=MUTED, bg=PANEL, anchor="w").pack(
+                     fill="x", padx=18, pady=(0, 9),
+                 )
+        frame, self.lb = make_listbox(left, f)
+        frame.pack(fill="both", expand=True, padx=12, pady=(0, 14))
         self.lb.bind("<ButtonRelease-1>", self._click)
         self.lb.bind("<space>", lambda _e: self._toggle(self.lb.index("active")))
 
-        foot = tk.Frame(self, bg=BG)
-        foot.pack(fill="x", pady=(14, 0))
-        self.summary = tk.Label(foot, font=f.ui, fg=MUTED, bg=BG)
-        self.summary.pack(side="left")
-        self.go = Button(foot, "Download", self.start, f, primary=True)
-        self.go.pack(side="right")
+        self.go = Button(panel, "↓   DOWNLOAD", self.start, f, primary=True)
+        self.go.pack(side="bottom", fill="x", padx=16, pady=(0, 18), ipady=9)
+        self.summary = tk.Label(panel, font=f.small, fg="#42e8ef", bg=PANEL,
+                                justify="center")
+        self.summary.pack(side="bottom", fill="x", padx=14, pady=(0, 11))
+        top = tk.Frame(panel, bg=PANEL)
+        top.pack(fill="x", padx=17, pady=(20, 16))
+        tk.Label(top, text="↓  DOWNLOAD", font=f.title, fg=TEXT,
+                 bg=PANEL, anchor="w").pack(fill="x")
+        tk.Frame(top, bg=PINK, height=3).pack(fill="x", pady=(9, 0))
+
+        cfg = app.cfg
+        def setting(name: str, choices: list[tuple[str, Any]], key: str) -> None:
+            section = tk.Frame(panel, bg=PANEL)
+            section.pack(fill="x", padx=16, pady=(0, 17))
+            tk.Label(section, text=name, font=f.label, fg=MUTED,
+                     bg=PANEL, anchor="w").pack(fill="x", pady=(0, 6))
+            def changed(value: Any) -> None:
+                cfg.set(key, value)
+                save_settings(cfg)
+                if key == "quality":
+                    self._summary()
+            Segmented(section, choices, cfg.get(key), changed, f).pack(anchor="w")
+        tk.Label(panel, text="FORMAT    MP4 (VIDEO)", font=f.label,
+                 fg=TEXT, bg=PANEL, anchor="w").pack(
+                     fill="x", padx=17, pady=(0, 17),
+                 )
+        setting("QUALITY", [("360p", 360), ("720p", 720), ("1080p", 1080)], "quality")
+        setting("AUDIO", [("SUB", "jpn"), ("DUB", "eng")], "audio_lang")
+        setting("PARALLEL", [(str(n), n) for n in (1, 2, 3, 4)], "max_parallel")
+        folder = tk.Frame(panel, bg=PANEL)
+        folder.pack(fill="x", padx=16, pady=(0, 12))
+        tk.Label(folder, text="SAVE TO", font=f.label, fg=MUTED,
+                 bg=PANEL, anchor="w").pack(fill="x", pady=(0, 6))
+        self.folder_label = tk.Label(folder, font=f.small, fg=TEXT, bg=PANEL,
+                                     anchor="w", justify="left")
+        self.folder_label.pack(fill="x")
+        self.folder_label.bind(
+            "<Configure>", lambda e: self.folder_label.configure(
+                wraplength=max(120, e.width - 10),
+            ),
+        )
+        self._refresh_download_folder()
+        Link(folder, "Change folder", self._pick_download_folder, f,
+             bg=PANEL).pack(anchor="w", pady=(7, 0))
+
+    def _refresh_download_folder(self) -> None:
+        directory = str(self.app.cfg.get("output_dir"))
+        self.folder_label.configure(
+            text=directory if len(directory) <= 46 else "…" + directory[-45:],
+        )
+
+    def _pick_download_folder(self) -> None:
+        self.app.v_search.pick_folder()
+        self._refresh_download_folder()
 
     def load(self, anime: AnimeInfo) -> None:
         self.anime = anime
@@ -382,20 +451,35 @@ class SearchView(tk.Frame):
         self.app = app
         self.results: list[dict[str, Any]] = []
         self._token = 0
+        tk.Label(self, text="SEARCH ANIME", font=f.title, fg=TEXT,
+                 bg=BG, anchor="w").pack(fill="x", pady=(0, 7))
+        tk.Label(self, text="Find a series, open its episodes, and download your selection.",
+                 font=f.small, fg=MUTED, bg=BG, anchor="w").pack(
+                     fill="x", pady=(0, 15),
+                 )
         row = tk.Frame(self, bg=BG)
         row.pack(fill="x")
         self.entry = make_entry(row, f)
         self.entry.pack(side="left", fill="x", expand=True, ipady=4)
         self.entry.bind("<Return>", lambda _e: self.search())
-        self.btn = Button(row, "Search", self.search, f, primary=True)
+        self.btn = Button(row, "⌕  Search", self.search, f, primary=True)
         self.btn.pack(side="left", padx=(10, 0))
         self.status = tk.Label(self, text="Search for an anime, then double-click a result.", font=f.small,
                                fg=MUTED, bg=BG, anchor="w")
-        self.status.pack(fill="x", pady=(10, 8))
+        self.status.pack(fill="x", pady=(14, 11))
+        tk.Label(self, text="SEARCH RESULTS", font=f.label, fg=PINK,
+                 bg=BG, anchor="w").pack(fill="x", pady=(0, 8))
         frame, self.lb = make_listbox(self, f)
-        frame.pack(fill="both", expand=True)
+        frame.pack(fill="both", expand=True, ipadx=8, ipady=9)
         self.lb.bind("<Double-Button-1>", lambda _e: self.open())
         self.lb.bind("<Return>", lambda _e: self.open())
+        footer = tk.Frame(self, bg=BG)
+        footer.pack(fill="x", pady=(12, 0))
+        Button(footer, "Open selected series  →", self.open, f, primary=True).pack(
+            side="right",
+        )
+        tk.Label(footer, text="Double-click a result to choose episodes",
+                 fg=MUTED, bg=BG, font=f.small).pack(side="left")
 
         settings = tk.Frame(self, bg=PANEL, highlightthickness=1, highlightbackground=LINE)
         settings.pack(fill="x", pady=(18, 0))
@@ -506,9 +590,9 @@ class SearchView(tk.Frame):
 class App(tk.Tk):
     def __init__(self) -> None:
         super().__init__()
-        self.title(f"PaheBatcher · GitRatio Edition v{VERSION}")
-        self.geometry("1120x780")
-        self.minsize(760, 620)
+        self.title(f"GitRatio · PaheBatcher Anime Downloader v{VERSION}")
+        self.geometry("1360x880")
+        self.minsize(1030, 700)
         self.configure(bg=BG)
         self._set_icon()
         self.fonts = Fonts(self)
@@ -533,12 +617,20 @@ class App(tk.Tk):
 
         self._fullscreen = False
         self._pad = 24
+        self.shell = tk.Frame(self, bg=BG)
+        self.shell.pack(fill="both", expand=True)
+        self.sidebar = tk.Frame(self.shell, bg="#101421", width=218)
+        self.sidebar.pack(side="left", fill="y")
+        self.sidebar.pack_propagate(False)
+        self.workspace = tk.Frame(self.shell, bg=BG)
+        self.workspace.pack(side="left", fill="both", expand=True)
+        self._build_sidebar()
         self._build_header()
-        self.notices = tk.Frame(self, bg=BG)
+        self.notices = tk.Frame(self.workspace, bg=BG)
         self.notices.pack(fill="x", padx=24)
         self._build_ffmpeg_notice()
         self._build_solver_notice()
-        self.body = tk.Frame(self, bg=BG)
+        self.body = tk.Frame(self.workspace, bg=BG)
         self.body.pack(fill="both", expand=True, padx=24, pady=(20, 28))
         self.v_search, self.v_eps, self.v_dl = SearchView(self), EpisodesView(self), DownloadView(self)
         self.show_search()
@@ -565,38 +657,125 @@ class App(tk.Tk):
 
 
     # header + status ------------------------------------------------------
-    def _build_header(self) -> None:
-        """Two-tier header avoids collisions between the logo, status and actions."""
+    def _build_sidebar(self) -> None:
+        """Persistent navigation and compact user-supplied takeover-bunny artwork."""
+        sidebar = self.sidebar
         f = self.fonts
-        hdr = self.hdr = tk.Frame(self, bg=BG)
-        hdr.pack(fill="x", padx=24, pady=(22, 0))
-        top = tk.Frame(hdr, bg=BG)
-        top.pack(fill="x")
-        try:
-            self._logo = tk.PhotoImage(file=str(Path(__file__).parent / "assets" / "header_logo.png"))
-            tk.Label(top, image=self._logo, bg=BG, bd=0).pack(side="left")
-        except Exception:
-            tk.Label(top, text="PaheBatcher", font=f.logo, fg=PINK, bg=BG).pack(side="left")
-        status = tk.Frame(top, bg=BG)
-        status.pack(side="right")
-        tk.Label(status, text=f"v{VERSION}", font=f.small, fg=MUTED, bg=BG).pack(
-            side="right", padx=(12, 0),
-        )
-        self.dot_solver = tk.Label(status, text="● Solver", font=f.small, fg=MUTED, bg=BG)
-        self.dot_solver.pack(side="right", padx=(12, 0))
-        self.dot_ffmpeg = tk.Label(status, text="● FFmpeg", font=f.small, fg=MUTED, bg=BG)
-        self.dot_ffmpeg.pack(side="right")
+        self._nav_buttons: dict[str, tk.Button] = {}
+        logo = tk.Frame(sidebar, bg="#101421")
+        logo.pack(fill="x", padx=15, pady=(24, 28))
+        tk.Label(logo, text="GR", font=(f.logo[0], 28, "bold"), fg="#25e7f2",
+                 bg="#101421").pack(anchor="w")
+        tk.Label(logo, text="GITRATIO  /  TAKEOVER", font=f.label, fg=PINK,
+                 bg="#101421").pack(anchor="w")
+        tk.Frame(sidebar, bg="#302438", height=1).pack(fill="x", padx=14, pady=(0, 15))
 
-        navigation = tk.Frame(hdr, bg=BG)
-        navigation.pack(fill="x", pady=(14, 14))
-        tk.Label(navigation, text="ANIME DOWNLOADS  /  GITRATIO EDITION",
-                 font=f.label, fg=MUTED, bg=BG).pack(side="left")
-        self.fs_link = Link(navigation, "Full screen", lambda: self.set_fullscreen(
-            not self._fullscreen), f)
-        self.fs_link.pack(side="right", padx=(18, 0))
-        Link(navigation, "About", self.show_about, f).pack(side="right", padx=(18, 0))
-        Link(navigation, "Open player", self.choose_videos, f).pack(side="right")
-        tk.Frame(hdr, height=1, bg=LINE).pack(fill="x")
+        def nav(key: str, label: str, command: Callable[[], None]) -> None:
+            button = tk.Button(
+                sidebar, text=label, command=command, relief="flat", bd=0,
+                cursor="hand2", anchor="w", padx=17, pady=12,
+                font=f.bold, bg="#101421", fg=TEXT,
+                activebackground="#263746", activeforeground="#39e4ed",
+                highlightthickness=0,
+            )
+            button.pack(fill="x", padx=11, pady=3)
+            self._nav_buttons[key] = button
+
+        nav("home", "⌂   Home / Search", self.show_search)
+        nav("episodes", "▤   Episodes", self.open_selected_series)
+        nav("downloads", "↓   Downloads", self.show_downloads)
+        nav("player", "▷   Player", self.choose_videos)
+        nav("library", "▦   Library", self.open_downloads_folder)
+        nav("settings", "⚙   Settings", self.show_settings)
+        nav("about", "ⓘ   About", self.show_about)
+
+        mascot_area = tk.Frame(sidebar, bg="#101421")
+        mascot_area.pack(side="bottom", fill="x", pady=(0, 15))
+        try:
+            png_base64 = (Path(__file__).parent / "assets" / "takeover_bunny.b64").read_text(
+                encoding="ascii",
+            ).strip()
+            self._takeover_mascot = tk.PhotoImage(data=png_base64, format="png")
+            self.iconphoto(True, self._takeover_mascot)
+            tk.Label(mascot_area, image=self._takeover_mascot,
+                     bg="#101421", bd=0).pack(anchor="center")
+        except (OSError, tk.TclError, ValueError):
+            tk.Label(mascot_area, text="🐰", font=(f.logo[0], 28),
+                     fg=PINK, bg="#101421").pack()
+        tk.Label(mascot_area, text="BUNNY TAKEOVER", bg="#101421",
+                 fg=PINK, font=f.label).pack(pady=(6, 0))
+        tk.Label(mascot_area, text=f"GitRatio Edition  ·  v{VERSION}",
+                 bg="#101421", fg=MUTED, font=f.small).pack(pady=(3, 0))
+
+    def _activate_nav(self, key: str) -> None:
+        for name, widget in self._nav_buttons.items():
+            active = name == key
+            widget.configure(
+                bg="#173743" if active else "#101421",
+                fg="#39f3f4" if active else TEXT,
+            )
+
+    def open_selected_series(self) -> None:
+        if self.v_eps.anime is not None:
+            self._show(self.v_eps)
+            self._activate_nav("episodes")
+        else:
+            self.show_search()
+
+    def show_downloads(self) -> None:
+        self._show(self.v_dl)
+        self._activate_nav("downloads")
+
+    def open_downloads_folder(self) -> None:
+        """Library is the actual download folder, not a fake catalog."""
+        path = Path(str(self.cfg.get("output_dir"))).expanduser()
+        if not path.is_dir():
+            messagebox.showinfo("GitRatio Library", "Download a series to create your library folder.")
+            return
+        if sys.platform == "win32":
+            getattr(os, "startfile")(str(path))  # noqa: B009
+        elif sys.platform == "darwin":
+            subprocess.Popen(["open", str(path)])
+        else:
+            subprocess.Popen(["xdg-open", str(path)])
+
+    def show_settings(self) -> None:
+        self.show_search()
+        self._activate_nav("settings")
+
+    def _build_header(self) -> None:
+        """Graffiti-inspired brand banner, compact state and quick player access."""
+        f = self.fonts
+        hdr = self.hdr = tk.Frame(self.workspace, bg=BG)
+        hdr.pack(fill="x", padx=24, pady=(15, 0))
+        banner = tk.Canvas(hdr, height=116, bg="#191421", highlightthickness=1,
+                           highlightbackground="#45304b")
+        banner.pack(fill="x", expand=False)
+        banner.create_line(0, 90, 260, 7, fill="#ed338f", width=11)
+        banner.create_line(470, 0, 340, 118, fill="#27ebf1", width=6)
+        banner.create_line(740, 115, 850, 10, fill="#e43c8d", width=8)
+        banner.create_text(31, 15, text="GITRATIO", font=(f.logo[0], 33, "bold"),
+                           fill=PINK, anchor="nw")
+        banner.create_text(34, 70, text="ANIME DOWNLOADER  //  BUNNY TAKEOVER",
+                           font=f.label, fill="#5ceef6", anchor="nw")
+        banner.create_text(890, 13, text="GR", font=(f.logo[0], 65, "bold"),
+                           fill="#512641", anchor="nw")
+        if hasattr(self, "_takeover_mascot"):
+            art = banner.create_image(0, -9, anchor="ne", image=self._takeover_mascot)
+            banner.bind("<Configure>", lambda e: banner.coords(art, e.width - 32, -9))
+        status = tk.Frame(hdr, bg=BG)
+        status.pack(fill="x", pady=(12, 12))
+        self.dot_solver = tk.Label(status, text="● Solver", font=f.small, fg=MUTED, bg=BG)
+        self.dot_solver.pack(side="left")
+        self.dot_ffmpeg = tk.Label(status, text="● FFmpeg", font=f.small, fg=MUTED, bg=BG)
+        self.dot_ffmpeg.pack(side="left", padx=(18, 0))
+        self.fs_link = Link(
+            status, "Full screen",
+            lambda: self.set_fullscreen(not self._fullscreen), f,
+        )
+        self.fs_link.pack(side="right", padx=(20, 0))
+        Link(status, "Open player", self.choose_videos, f).pack(side="right")
+        tk.Frame(hdr, bg=LINE, height=1).pack(fill="x")
 
     def show_about(self) -> None:
         """Scrollable About dialog; download buttons never overflow narrow screens."""
@@ -716,7 +895,7 @@ class App(tk.Tk):
         """Keep content centred with a sensible maximum width when the window is very wide."""
         if e.widget is not self:
             return
-        pad = max(24, (e.width - MAX_CONTENT) // 2)
+        pad = max(24, (e.width - 218 - MAX_CONTENT) // 2)
         if pad != self._pad:
             self._pad = pad
             for w in (self.hdr, self.notices, self.body):
@@ -856,15 +1035,18 @@ class App(tk.Tk):
 
     def show_search(self) -> None:
         self._show(self.v_search)
+        self._activate_nav("home")
         self.v_search.entry.focus_set()
 
     def show_episodes(self, anime: AnimeInfo) -> None:
         self.v_eps.load(anime)
         self._show(self.v_eps)
+        self._activate_nav("episodes")
 
     def start_download(self, anime: AnimeInfo, episodes: list[EpisodeInfo]) -> None:
         self.backend.current_dash = None
         self._show(self.v_dl)
+        self._activate_nav("downloads")
         self.v_dl.begin(
             anime.title, len(episodes), self.backend.context(anime.title).output_dir,
             episodes, description=anime.description,

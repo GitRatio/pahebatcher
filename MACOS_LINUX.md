@@ -1,4 +1,4 @@
-# PaheBatcher desktop v3.10.1 — macOS and Linux
+# PaheBatcher desktop v3.11.0 — macOS and Linux
 
 This GitRatio edition shares one Python/Tkinter desktop interface and download backend across Windows, macOS and Linux. Builds are created on the corresponding OS with PyInstaller; **do not use Windows executables on macOS/Linux**.
 

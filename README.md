@@ -6,7 +6,7 @@
 
 ## About this edition
 
-**PaheBatcher — GitRatio Edition** is an independently maintained, open-source continuation of the original [pahebatcher by abdullahkhfb](https://github.com/abdullahkhfb/pahebatcher). It provides a desktop anime batch downloader for **Windows 11, macOS (Intel and Apple Silicon), and Linux x64**, plus the original Python terminal interface, resume support, streaming tools and watchlist foundation. The GitRatio edition focuses on reliability, efficient downloads, straightforward installation, and the bunny-branded desktop experience. **Application version: 3.10.1** (shown under **About** in the desktop header).
+**PaheBatcher — GitRatio Edition** is an independently maintained, open-source continuation of the original [pahebatcher by abdullahkhfb](https://github.com/abdullahkhfb/pahebatcher). It provides a desktop anime batch downloader for **Windows 11, macOS (Intel and Apple Silicon), and Linux x64**, plus the original Python terminal interface, resume support, streaming tools and watchlist foundation. The GitRatio edition focuses on reliability, efficient downloads, straightforward installation, and the bunny-branded desktop experience. **Application version: 3.11.0** (shown under **About** in the desktop header).
 
 **Video player:** The desktop app now includes an **Open player** action for local MP4, WebM, M4V and MOV files, plus **Watch videos** after successful downloads. A private, locally hosted **Video.js 10.5.0 HTML player** shows the series title, episode number, episode name, audio language and available **anime synopsis**, plus an episode queue, seeking, next/previous controls and fullscreen. The pinned Video.js Neutral skin loads from jsDelivr when online; native HTML5 controls remain available without internet. Media stays on localhost, and remote streaming is not part of this player. The macOS/Linux desktop packages are available as GitHub Actions build artifacts and still need production signing/notarization and wider real-device QA.
 
@@ -19,7 +19,7 @@
 Batch-download and stream anime from [animepahe](https://animepahe.pw), from a
 desktop app or the terminal.
 
-[![Version 3.10.1][version-badge]][latest-release]
+[![Version 3.11.0][version-badge]][latest-release]
 ![Python 3.11+](https://img.shields.io/badge/python-3.11%2B-blue)
 ![License MIT](https://img.shields.io/badge/license-MIT-green)
 
@@ -27,7 +27,10 @@ desktop app or the terminal.
 ![Download dashboard](assets/screenshots/gui-downloading.png)
 
 
-## ⬇ Download PaheBatcher v3.10.1
+## ⬇ Download PaheBatcher v3.11.0 — Bunny Takeover
+
+**Bunny Takeover redesign:** A working desktop shell with persistent navigation, charcoal/pink/cyan street-art branding, your bunny mascot, a permanently visible episode Download action, and a similarly branded browser video player. This is implemented UI, not a static screenshot.
+
 
 Choose your platform below. This compact, two-column download list works on narrow screens without oversized badges. Links point to **unsigned preview builds** published after cross-platform tests pass.
 
@@ -44,7 +47,7 @@ Choose your platform below. This compact, two-column download list works on narr
 
 ## Highlights
 
-- **Desktop app and terminal UI**, both with a live per-episode download
+- **Redesigned desktop app and terminal UI**, both with live per-episode download
   dashboard.
 - **Fast and safe:** parallel episodes, parallel HLS segments, and downloads
   resume exactly where they stopped.
@@ -54,7 +57,7 @@ Choose your platform below. This compact, two-column download list works on narr
 - **No Docker, no extra services.** A built-in browser solver gets past
   Cloudflare using the Chrome or Edge you already have.
 - **One-click FFmpeg:** the desktop app installs it for you.
-- **Local episode player:** responsive 16:9 layout with Video.js 10.5.0 Neutral controls (with native offline fallback), episode queue, series/movie details, source-provided synopsis, audio language, seeking and fullscreen. No remote-stream playback in this GUI feature yet.
+- **Local episode player:** redesigned graffiti-themed layout, 'Download video' save-copy action, episode playlist and responsive 16:9 Video.js 10.5.0 Neutral controls (with native offline fallback), episode queue, series/movie details, source-provided synopsis, audio language, seeking and fullscreen. No remote-stream playback in this GUI feature yet.
 - **Desktop packaging:** macOS .app archives for Apple Silicon/Intel and a portable Linux x64 app with an app-menu installer.
 
 ## Install
@@ -383,4 +386,4 @@ official creators.
 
 [hellharbinger]: https://www.reddit.com/user/HellHarbinger/
 [latest-release]: https://github.com/GitRatio/pahebatcher/releases
-[version-badge]: https://img.shields.io/badge/version-3.10.1-blue
+[version-badge]: https://img.shields.io/badge/version-3.11.0-blue
