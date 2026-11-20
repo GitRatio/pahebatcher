@@ -1,1 +1,1 @@
-"""Tkinter front-end for pahebatcher (same minimal animepahe look as the terminal UI)."""
+"""PaheBatcher graphical interfaces: native webview and optional classic Tk."""
