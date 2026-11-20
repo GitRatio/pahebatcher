@@ -34,7 +34,7 @@ Choose your platform below. This compact, two-column download list works on narr
 | Your system | Direct download |
 | :--- | :--- |
 | **Windows 11 · x64** | [⬇ Download EXE](https://github.com/GitRatio/pahebatcher/releases/download/preview/pahebatcher-gui-windows-x64.exe) |
-| **macOS · Apple Silicon (M1–M4)** | [⬇ Download Mac ARM64 ZIP](https://github.com/GitRatio/pahebatcher/releases/download/preview/PaheBatcher-macos-arm64.zip) |
+| **macOS · Apple Silicon (M-series)** | [⬇ Download Mac ARM64 ZIP](https://github.com/GitRatio/pahebatcher/releases/download/preview/PaheBatcher-macos-arm64.zip) |
 | **macOS · Intel** | [⬇ Download Mac Intel ZIP](https://github.com/GitRatio/pahebatcher/releases/download/preview/PaheBatcher-macos-x64.zip) |
 | **Linux · x64** | [⬇ Download Linux TAR.GZ](https://github.com/GitRatio/pahebatcher/releases/download/preview/PaheBatcher-linux-x64.tar.gz) |
 
