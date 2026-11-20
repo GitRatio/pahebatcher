@@ -109,7 +109,7 @@ function select(index, play) {
   document.getElementById("episode-title").textContent = ep.title || "Episode " + ep.episode;
   document.getElementById("episode-num").textContent = ep.episode || "—";
   document.getElementById("episode-audio").textContent = ep.audio === "jpn" ? "Japanese / SUB" : ep.audio === "eng" ? "English / DUB" : (ep.audio || "Unknown");
-  document.getElementById("episode-format").textContent = ep.src ? (ep.pathExtension || ep.type || "MP4 / WebM") : "—";
+  document.getElementById("episode-format").textContent = ep.format || "—";
   document.getElementById("series-count").textContent = String(index + 1) + " of " + String(episodes.length);
   prev.disabled = index === 0;
   next.disabled = index === episodes.length - 1;
