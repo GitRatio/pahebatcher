@@ -10,6 +10,23 @@
 @media(max-width:1260px){.frame{grid-template-columns:185px minmax(0,1fr)}.rail-art img{width:196px}.workspace{grid-template-columns:minmax(0,1fr) 290px}.download-card{padding:15px}.form-row{grid-template-columns:75px minmax(0,1fr)}.player-shell{grid-template-columns:minmax(0,1fr) 260px}}
 @media(max-width:1050px){.workspace,.player-shell{grid-template-columns:1fr}.download-card{position:static;min-height:0}.episodes-card{min-height:380px}.download-bottom{margin-top:12px}.hero img{right:4%;opacity:.18}.rail-art img{width:190px}}
 @media(max-width:760px){.frame{display:block}.rail{height:auto;min-height:0;position:static;padding:11px}.graffiti-logo,.rail-art,.rail-footer{display:none}.nav{display:flex;gap:5px;overflow-x:auto}.nav button{white-space:nowrap;padding:10px;font-size:12px}.nav button svg{width:16px;height:16px}.hero{height:116px}.hero-copy{padding:23px}.hero-title{font-size:38px}.hero-sub{font-size:10px}.hero img{height:240px;top:-70px}.work{padding:16px}.search-line{flex-wrap:wrap}.search-input{flex-basis:100%}.search-line .btn{width:100%}.title-row{align-items:flex-start;flex-wrap:wrap}.result-card h3{font-size:18px}.result-card{gap:13px;padding:13px}.poster{width:66px;height:89px}.status-board{margin-top:14px}.setting-item{grid-template-columns:1fr}.setting-item select{max-width:none}}
+
+/* Preserve an immediately visible download action on shorter and narrower windows. */
+#mobile-download-dock{display:none}
+@media(max-height:900px) and (min-width:1051px){
+ .hero{height:125px}.work{padding-top:16px}
+ .download-card{min-height:400px;padding:12px 15px}
+ .download-card h2{margin-bottom:10px;padding-bottom:6px}
+ .form-row{margin-bottom:9px}
+ .download-bottom{padding-top:9px}
+}
+@media(max-width:1050px){
+ .work{padding-bottom:105px}
+ #mobile-download-dock{display:block;position:fixed;left:185px;right:0;bottom:0;padding:10px 18px;
+   z-index:50;background:linear-gradient(0deg,#101322,#1b1d30ed);border-top:1px solid #534060;box-shadow:0 -10px 35px #0009}
+ #mobile-download-selected{width:100%;min-height:54px;font-size:17px}
+}
+@media(max-width:760px){#mobile-download-dock{left:0;padding:9px 12px}}
 </style></head><body>
 <div class="frame"><aside class="rail"><div class="graffiti-logo">GR</div><nav class="nav" aria-label="Main navigation">
 <button data-nav="home" class="active"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="m3 11 9-8 9 8v10h-6v-7H9v7H3z"/></svg>Home</button>
@@ -33,5 +50,5 @@
 <section id="page-library" class="page"><div class="title-row"><h1 class="page-title">▦ My library</h1><button class="btn" id="refresh-library">Refresh ↻</button></div><div id="library-grid" class="tile-grid"><div class="card empty">Saved files will appear here.</div></div></section>
 <section id="page-settings" class="page"><h1 class="page-title">⚙ Settings</h1><div class="card panel"><div class="setting-item"><label for="settings-quality">Preferred quality</label><select id="settings-quality"><option value="360">360p</option><option value="720">720p</option><option value="1080">1080p</option></select></div><div class="setting-item"><label for="settings-audio">Preferred audio</label><select id="settings-audio"><option value="jpn">SUB (Japanese)</option><option value="eng">DUB (English)</option></select></div><div class="setting-item"><label for="settings-parallel">Concurrent episodes</label><select id="settings-parallel"><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option></select></div><p>Preference changes apply to new downloads. The bunny graffiti theme is the active appearance.</p><button class="btn btn-pink" id="settings-save">Save preferences</button></div></section>
 <section id="page-about" class="page"><h1 class="page-title">ⓘ About GitRatio</h1><div class="card panel"><h2 class="banner-copy">Bunny Takeover <span class="eyebrow">v3.12.0</span></h2><p>PaheBatcher GitRatio Edition is an independently maintained anime downloader with episode selection, local playback and resumable downloads. The original Python download engine remains in use.</p><h2>Download for your system</h2><div class="tile-grid"><a class="btn" href="https://github.com/GitRatio/pahebatcher/releases/download/preview/pahebatcher-gui-windows-x64.exe">↓ Windows 11 x64</a><a class="btn" href="https://github.com/GitRatio/pahebatcher/releases/download/preview/PaheBatcher-macos-arm64.zip">↓ Mac Apple Silicon</a><a class="btn" href="https://github.com/GitRatio/pahebatcher/releases/download/preview/PaheBatcher-macos-x64.zip">↓ Mac Intel</a><a class="btn" href="https://github.com/GitRatio/pahebatcher/releases/download/preview/PaheBatcher-linux-x64.tar.gz">↓ Linux x64</a></div><p class="settings-note">These are unsigned previews. macOS builds are not notarized. <a href="https://github.com/GitRatio/pahebatcher">View source and license.</a></p></div></section>
-</div></main></div>
+</div><div id="mobile-download-dock"><button id="mobile-download-selected" class="btn btn-pink big-cta" disabled>↓ Download</button></div></main></div>
 <script src="desktop.js"></script></body></html>
