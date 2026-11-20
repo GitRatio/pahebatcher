@@ -12,17 +12,23 @@ class TestStoreAtomic:
     def test_write_uses_tmp_then_rename(self, tmp_path: Path) -> None:
         cache = tmp_path / "cache"
         store = SegmentStore(cache, "Anime", "sess", "001", "jpn")
-        with patch.object(Path, "write_bytes") as mock_write, patch.object(Path, "rename") as mock_rename:
-            mock_write.return_value = None
-            mock_rename.return_value = None
-            # Actually need to mock seg_path tmp
+        with patch.object(Path, "write_bytes") as mock_write, patch.object(Path, "replace") as mock_replace:
             store.write_seg(5, b"data")
-            # Verify tmp file would be used — check seg_path for 5 exists logic via has_seg after real write
+            mock_write.assert_called_once_with(b"data")
+            mock_replace.assert_called_once_with(store.seg_path(5))
         # Real write test
         store2 = SegmentStore(cache, "Anime", "sess", "002", "jpn")
         store2.write_seg(0, b"hello")
         assert not (store2.dir / "000000.tmp").exists()
         assert (store2.dir / "000000.ts").exists()
+
+    def test_replaces_existing_zero_byte_segment(self, tmp_path: Path) -> None:
+        store = SegmentStore(tmp_path / "cache", "Anime", "sess", "002", "jpn")
+        store.seg_path(0).write_bytes(b"")
+        assert 0 not in store.done_indices()
+        store.write_seg(0, b"complete")
+        assert store.seg_path(0).read_bytes() == b"complete"
+        assert 0 in store.done_indices()
 
     def test_save_metadata_not_overwrite(self, tmp_path: Path) -> None:
         cache = tmp_path / "cache"
