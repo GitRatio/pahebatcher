@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import asyncio
 import json
+from html.parser import HTMLParser
 import logging
 import os
 import re
@@ -86,11 +87,55 @@ class AnimePaheScanner:
             data = await self.solver.fetch_json(alt)
         return data
 
+
+    @staticmethod
+    def _extract_description(page_html: str) -> str:
+        """Extract a supplied synopsis from the anime page without external API calls."""
+
+        class SynopsisParser(HTMLParser):
+            def __init__(self) -> None:
+                super().__init__(convert_charrefs=True)
+                self.meta_description = ""
+                self.parts: list[str] = []
+                self.depth = 0
+
+            def handle_starttag(self, tag: str, attrs: list[tuple[str, str | None]]) -> None:
+                fields = dict(attrs)
+                if tag == "meta":
+                    key = (fields.get("property") or fields.get("name") or "").lower()
+                    if key in {"og:description", "description", "twitter:description"}:
+                        value = (fields.get("content") or "").strip()
+                        if value and not self.meta_description:
+                            self.meta_description = value
+                if self.depth:
+                    if tag not in {"br", "img", "input", "hr"}:
+                        self.depth += 1
+                elif tag in {"div", "section", "p", "article"}:
+                    identity = " ".join(
+                        (fields.get("class") or "", fields.get("id") or "", fields.get("itemprop") or "")
+                    ).lower()
+                    if any(word in identity for word in ("synopsis", "anime-description", "anime-summary")):
+                        self.depth = 1
+
+            def handle_endtag(self, tag: str) -> None:
+                if self.depth and tag not in {"br", "img", "input", "hr"}:
+                    self.depth -= 1
+
+            def handle_data(self, data: str) -> None:
+                if self.depth:
+                    self.parts.append(data)
+
+        parser = SynopsisParser()
+        parser.feed(page_html)
+        found = " ".join(" ".join(parser.parts).split()) or parser.meta_description
+        return " ".join(found.split())[:1400]
+
     async def _fetch_title(self) -> str:
         result = await self.solver.fetch_html(f"https://{self.host}/anime/{self.session}")
         if not result:
             return "Unknown Anime"
         html, _ = result
+        self._description = self._extract_description(html)
         m = re.search(r"<h1[^>]*>\s*(.*?)\s*</h1>", html, re.I | re.S)
         if m:
             t = re.sub(r"<[^>]+>", "", m.group(1)).strip()
@@ -178,6 +223,7 @@ class AnimePaheScanner:
             host=raw["host"],
             total=raw.get("total", len(episodes)),
             episodes=episodes,
+            description=str(raw.get("description") or ""),
         )
 
     @staticmethod
@@ -189,6 +235,7 @@ class AnimePaheScanner:
             "session": anime.session,
             "host": anime.host,
             "total": anime.total,
+            "description": anime.description,
             "episodes": [
                 {"number": e.number, "session": e.session, "title": e.title,
                  "fansub": e.fansub, "audio": e.audio, "play_url": e.play_url}
@@ -251,7 +298,10 @@ class AnimePaheScanner:
                 " Try browser_mode=headed and tick the checkbox yourself."
                 f"{proxy_msg}[/dim]\n"
             )
-        anime = AnimeInfo(session=self.session, title=title, host=self.host)
+        anime = AnimeInfo(
+            session=self.session, title=title, host=self.host,
+            description=getattr(self, "_description", ""),
+        )
 
         safe_title = sanitize(title)
         session_path = cache_dir / f"{safe_title}_{self.session}"
