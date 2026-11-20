@@ -86,15 +86,18 @@ class TakeoverApi:
         }
 
     def save_settings(self, updates: dict[str, Any]) -> dict[str, bool]:
-        if set(updates) - {"quality", "audio_lang", "max_parallel"}:
+        if not isinstance(updates, dict) or set(updates) - {"quality", "audio_lang", "max_parallel"}:
             raise ValueError("Unsupported setting.")
+        # Validate the entire payload before changing any saved preference.
+        # A partially invalid request must never leave a half-updated config.
+        for key, value in updates.items():
+            valid_quality = key == "quality" and type(value) is int and value in (360, 720, 1080)
+            valid_audio = key == "audio_lang" and value in ("jpn", "eng")
+            valid_parallel = key == "max_parallel" and type(value) is int and 1 <= value <= 4
+            if not (valid_quality or valid_audio or valid_parallel):
+                raise ValueError("Invalid setting value.")
         with self._lock:
             for key, value in updates.items():
-                valid_quality = key == "quality" and type(value) is int and value in (360, 720, 1080)
-                valid_audio = key == "audio_lang" and value in ("jpn", "eng")
-                valid_parallel = key == "max_parallel" and type(value) is int and 1 <= value <= 4
-                if not (valid_quality or valid_audio or valid_parallel):
-                    raise ValueError("Invalid setting value.")
                 self.cfg.set(key, value)
             save_settings(self.cfg)
         return {"ok": True}
