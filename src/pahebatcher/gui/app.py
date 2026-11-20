@@ -692,10 +692,12 @@ class App(tk.Tk):
         mascot_area = tk.Frame(sidebar, bg="#101421")
         mascot_area.pack(side="bottom", fill="x", pady=(0, 15))
         try:
-            png_base64 = (Path(__file__).parent / "assets" / "takeover_bunny.b64").read_text(
-                encoding="ascii",
-            ).strip()
-            self._takeover_mascot = tk.PhotoImage(data=png_base64, format="png")
+            # Use the same 650px mascot as the native UI, reduced for the
+            # legacy Tk rail instead of enlarging a 120px embedded thumbnail.
+            self._takeover_source = tk.PhotoImage(
+                file=str(Path(__file__).parent / "assets" / "bunny.png")
+            )
+            self._takeover_mascot = self._takeover_source.subsample(4, 4)
             self.iconphoto(True, self._takeover_mascot)
             tk.Label(mascot_area, image=self._takeover_mascot,
                      bg="#101421", bd=0).pack(anchor="center")
