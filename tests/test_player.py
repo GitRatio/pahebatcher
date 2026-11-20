@@ -169,3 +169,17 @@ def test_responsive_player_styles_are_consolidated(player: PlayerSession) -> Non
     assert "video-player:fullscreen" in html
     assert "video-neutral-skin { aspect-ratio: 16 / 9" in html
     assert "min-height:180px" not in html
+
+
+def test_takeover_branding_download_link_and_local_filename(player: PlayerSession) -> None:
+    status, headers, data = request(player, f"/watch/{player.token}/")
+    html = data.decode("utf-8")
+    assert status == 200
+    assert '<div class="desktop-window">' in html
+    assert 'class="rail-bunny"' in html
+    assert 'class="graffiti-banner"' in html
+    assert 'id="download-video"' in html
+    assert "Ep 003 - Test.mp4" in html
+    assert "__TAKEOVER_BUNNY__" not in html
+    assert "data:image/png;base64,iVBORw0KGgo" in html
+    assert "img-src 'self' data:" in headers["Content-Security-Policy"]
