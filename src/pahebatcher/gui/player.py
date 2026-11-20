@@ -15,6 +15,7 @@ import webbrowser
 from dataclasses import dataclass
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
+from typing import cast
 from urllib.parse import urlsplit
 
 SUPPORTED_EXTENSIONS = frozenset({".mp4", ".webm", ".m4v", ".mov"})
@@ -45,6 +46,10 @@ class PlaybackItem:
         return cls(path=path, series=path.parent.name, episode=episode, title=title)
 
 
+class _PlayerHTTPServer(ThreadingHTTPServer):
+    session: PlayerSession
+
+
 class PlayerSession:
     """One private playback page; the only accessible media are explicitly supplied files."""
 
@@ -65,10 +70,8 @@ class PlayerSession:
         self.nonce = secrets.token_urlsafe(24)
         self._closed = False
 
-        def handler(*args: object, **kwargs: object) -> None:
-            _PlayerHandler(*args, session=self, **kwargs)
-
-        self.server = ThreadingHTTPServer(("127.0.0.1", 0), handler)
+        self.server = _PlayerHTTPServer(("127.0.0.1", 0), _PlayerHandler)
+        self.server.session = self
         self.server.daemon_threads = True
         self.port = self.server.server_address[1]
         self.url = f"http://127.0.0.1:{self.port}/watch/{self.token}/"
@@ -92,9 +95,9 @@ class _PlayerHandler(BaseHTTPRequestHandler):
     server_version = "PaheBatcherPlayer"
     sys_version = ""
 
-    def __init__(self, *args: object, session: PlayerSession, **kwargs: object) -> None:
-        self.session = session
-        super().__init__(*args, **kwargs)
+    @property
+    def session(self) -> PlayerSession:
+        return cast(_PlayerHTTPServer, self.server).session
 
     def log_message(self, _format: str, *args: object) -> None:
         return  # Never disclose signed local playback URLs in logs.
