@@ -180,6 +180,20 @@ def test_takeover_branding_download_link_and_local_filename(player: PlayerSessio
     assert 'class="graffiti-banner"' in html
     assert 'id="download-video"' in html
     assert "Ep 003 - Test.mp4" in html
-    assert "__TAKEOVER_BUNNY__" not in html
-    assert "data:image/png;base64,iVBORw0KGgo" in html
-    assert "img-src 'self' data:" in headers["Content-Security-Policy"]
+    assert "__PLAYER_TOKEN__" not in html
+    assert f'/mascot/{player.token}/bunny.png' in html
+    assert "data:image/png;base64" not in html
+    assert "img-src 'self';" in headers["Content-Security-Policy"]
+
+
+def test_full_resolution_mascot_is_served_locally(player: PlayerSession) -> None:
+    from struct import unpack
+
+    image_url = f"/mascot/{player.token}/bunny.png"
+    status, headers, png = request(player, image_url)
+    assert status == 200
+    assert headers["Content-Type"] == "image/png"
+    assert png.startswith(bytes([137, 80, 78, 71, 13, 10, 26, 10]))
+    assert unpack(">II", png[16:24]) == (650, 650)
+    assert request(player, "/mascot/invalid/bunny.png")[0] == 404
+    assert request(player, image_url, {"Origin": "https://evil.example"})[0] == 403

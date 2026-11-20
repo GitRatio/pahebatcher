@@ -27,11 +27,11 @@ if not exist ".venv\Scripts\python.exe" (
 )
 ".venv\Scripts\python.exe" -m pip install --upgrade pip
 if errorlevel 1 goto :fail
-".venv\Scripts\python.exe" -m pip install -e ".[browser]"
+".venv\Scripts\python.exe" -m pip install -e ".[browser,gui]"
 if errorlevel 1 goto :fail
 echo.
 echo Installation finished. Run launch-windows.bat to start the desktop app.
-echo The app can install FFmpeg when needed. Edge or Chrome is required for the browser solver.
+echo Install FFmpeg separately if it is missing. Edge/WebView2 is required for the GUI; Edge or Chrome is needed for the solver.
 pause
 exit /b 0
 :fail

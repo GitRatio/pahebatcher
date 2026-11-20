@@ -206,6 +206,9 @@
   async function startup() {
     const ready = await call('bootstrap');
     if (ready && ready.settings) {
+      if (typeof ready.version === 'string' && /^\d+\.\d+\.\d+/.test(ready.version)) {
+        $('about-version').textContent = 'v' + ready.version;
+      }
       const s = ready.settings;
       for (const [id, value] of [['quality',s.quality],['audio',s.audio_lang],['parallel',s.max_parallel],['settings-quality',s.quality],['settings-audio',s.audio_lang],['settings-parallel',s.max_parallel]]) {
         $(id).value = String(value);

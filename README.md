@@ -1,55 +1,33 @@
-# pahebatcher
+# PaheBatcher — GitRatio Bunny Takeover
 
-![Original pahebatcher logo by u/HellHarbinger](assets/logo/colored_logo.svg)
+<img src="src/pahebatcher/gui/assets/bunny.png" alt="GitRatio Bunny Takeover mascot" width="180" height="180">
 
-> **🐰 A friendly GitRatio takeover!** The bunny has taken the download queue hostage. Don't worry—she's only here to fix bugs, steal a few milliseconds, and make the interface cuter. *No maintainers were overthrown in the making of this fork.*
+**Independent, open-source desktop edition** of [abdullahkhfb/pahebatcher](https://github.com/abdullahkhfb/pahebatcher), with the GitRatio Bunny Takeover interface. Download anime episodes in batches, resume interrupted transfers, and play downloaded files locally.
 
-## About this edition
+**Current application version:** 3.12.0 · **Platforms:** Windows 11 x64, macOS Intel, macOS Apple Silicon and Linux x64 · **License:** MIT
 
-**PaheBatcher — GitRatio Edition** is an independently maintained, open-source continuation of the original [pahebatcher by abdullahkhfb](https://github.com/abdullahkhfb/pahebatcher). It provides a desktop anime batch downloader for **Windows 11, macOS (Intel and Apple Silicon), and Linux x64**, plus the original Python terminal interface, resume support, streaming tools and watchlist foundation. The GitRatio edition focuses on reliability, efficient downloads, straightforward installation, and the bunny-branded desktop experience. **Application version: 3.12.0** (shown under **About** in the desktop header).
+The default desktop interface is built with **pywebview + local HTML/CSS**; the Python download engine and terminal interface remain available. Windows uses WebView2, macOS uses WebKit and Linux uses Qt WebEngine. The classic Tkinter UI remains available separately.
 
-**Video player:** The desktop app now includes an **Open player** action for local MP4, WebM, M4V and MOV files, plus **Watch videos** after successful downloads. A private, locally hosted **Video.js 10.5.0 HTML player** shows the series title, episode number, episode name, audio language and available **anime synopsis**, plus an episode queue, seeking, next/previous controls and fullscreen. The pinned Video.js Neutral skin loads from jsDelivr when online; native HTML5 controls remain available without internet. Media stays on localhost, and remote streaming is not part of this player. The macOS/Linux desktop packages are available as GitHub Actions build artifacts and still need production signing/notarization and wider real-device QA.
+> **Bunny Takeover** is the theme of this fork, not a transfer of ownership. The original authors retain attribution and license rights. GitRatio is not affiliated with or endorsed by the upstream maintainer. See [fork notes](FORK_NOTES.md) and [LICENSE](LICENSE).
 
-**The "takeover" is a joke, not a claim of ownership of the original project.** GitRatio maintains this copy; the upstream author retains credit for their original work, and the original mascot/logo credits remain intact. This edition is not affiliated with or endorsed by the upstream maintainer. See [FORK_NOTES.md](FORK_NOTES.md) and [LICENSE](LICENSE).
+## Downloads — v3.12.0 preview
 
-**Windows 11:** [Installation guide](WINDOWS_11.md) · [Windows preview builds](https://github.com/GitRatio/pahebatcher/actions/workflows/windows-preview.yml)
+| Operating system | Preview package |
+| --- | --- |
+| **Windows 11 x64** | [Download Windows EXE](https://github.com/GitRatio/pahebatcher/releases/download/preview/pahebatcher-gui-windows-x64.exe) |
+| **macOS Apple Silicon** | [Download ARM64 ZIP](https://github.com/GitRatio/pahebatcher/releases/download/preview/PaheBatcher-macos-arm64.zip) |
+| **macOS Intel** | [Download x64 ZIP](https://github.com/GitRatio/pahebatcher/releases/download/preview/PaheBatcher-macos-x64.zip) |
+| **Linux x64** | [Download TAR.GZ](https://github.com/GitRatio/pahebatcher/releases/download/preview/PaheBatcher-linux-x64.tar.gz) |
 
-**macOS (Intel/Apple Silicon) and Linux x64:** [Installation + player guide](MACOS_LINUX.md) · [Cross-platform builds](https://github.com/GitRatio/pahebatcher/actions/workflows/build-exe.yml) · [GitRatio Releases](https://github.com/GitRatio/pahebatcher/releases)
+These are **unsigned, development-preview** builds. macOS builds are not notarized. Check the [rolling preview release](https://github.com/GitRatio/pahebatcher/releases/tag/preview) for the version of the published assets before installing. For build logs and test screenshots, see [Build executables](https://github.com/GitRatio/pahebatcher/actions/workflows/build-exe.yml) and [visual QA](https://github.com/GitRatio/pahebatcher/actions/workflows/ui-visual.yml). Browser screenshots verify layout, but real-device scaling and playback tests are still necessary.
 
-Batch-download and stream anime from [animepahe](https://animepahe.pw), from a
-desktop app or the terminal.
+**Install guides:** [Windows 11](WINDOWS_11.md) · [macOS & Linux](MACOS_LINUX.md)
 
-[![Version 3.12.0][version-badge]][latest-release]
-![Python 3.11+](https://img.shields.io/badge/python-3.11%2B-blue)
-![License MIT](https://img.shields.io/badge/license-MIT-green)
+## Desktop interface
 
-![Search screen](assets/screenshots/gui-search.png)
-![Download dashboard](assets/screenshots/gui-downloading.png)
+The default interface includes a graffiti-themed header, a full-resolution bunny mascot, search and episode selection, responsive download controls, progress, settings, a local video library and an About screen. The player uses the **same bundled high-resolution mascot**, not the old thumbnail. Artwork is decorative; search results and episodes come from the source rather than fabricated posters.
 
-
-## ⬇ Download PaheBatcher v3.12.0 — Native Bunny Takeover
-
-The previous v3.11.0 interface used standard Tkinter widgets and **did not match** the approved mockups. v3.12.0 replaces the default desktop view with a **native pywebview HTML/CSS interface** that uses the full-resolution bunny asset, graffiti banner, functional navigation, search, episode selection, always-visible download card, download progress, library, settings, and About download links. Source lookups and transfers still use the same Python backend. The local Video.js player remains a separate playback window in your default browser.
-
-**Platform requirements:** Windows uses Edge WebView2 and pywebview; macOS uses WebKit; Linux uses Qt WebEngine. Install from source with `pip install -e ".[browser,gui]"` (and `pip install "pywebview[qt]"` on Linux). The optional legacy Tk interface remains accessible through `pahebatcher-classic-gui` or the bundled EXE's `--classic` switch. See [MACOS_LINUX.md](MACOS_LINUX.md). Preview packages remain unsigned.
-
- — Bunny Takeover
-
-**Bunny Takeover redesign:** A working desktop shell with persistent navigation, charcoal/pink/cyan street-art branding, your bunny mascot, a permanently visible episode Download action, and a similarly branded browser video player. This is implemented UI, not a static screenshot.
-
-
-Choose your platform below. This compact, two-column download list works on narrow screens without oversized badges. Links point to **unsigned preview builds** published after cross-platform tests pass.
-
-| Your system | Direct download |
-| :--- | :--- |
-| **Windows 11 · x64** | [⬇ Download EXE](https://github.com/GitRatio/pahebatcher/releases/download/preview/pahebatcher-gui-windows-x64.exe) |
-| **macOS · Apple Silicon (M-series)** | [⬇ Download Mac ARM64 ZIP](https://github.com/GitRatio/pahebatcher/releases/download/preview/PaheBatcher-macos-arm64.zip) |
-| **macOS · Intel** | [⬇ Download Mac Intel ZIP](https://github.com/GitRatio/pahebatcher/releases/download/preview/PaheBatcher-macos-x64.zip) |
-| **Linux · x64** | [⬇ Download Linux TAR.GZ](https://github.com/GitRatio/pahebatcher/releases/download/preview/PaheBatcher-linux-x64.tar.gz) |
-
-**How to download:** Select your operating-system link to obtain the file from the [rolling preview release](https://github.com/GitRatio/pahebatcher/releases/tag/preview). If the preview is not yet published, use the [latest successful build](https://github.com/GitRatio/pahebatcher/actions/workflows/build-exe.yml), open **Artifacts**, and choose your OS package; GitHub may require sign-in. Mac downloads contain an `.app`; Linux includes `install.sh`. Previews are unsigned and unnotarized.
-
-**[Preview download page](https://github.com/GitRatio/pahebatcher/releases/tag/preview)** · **[All releases](https://github.com/GitRatio/pahebatcher/releases)** · **[Installation guide for Mac/Linux](MACOS_LINUX.md)** · **[Windows guide](WINDOWS_11.md)**
+The downloaded-file player supports MP4, WebM, M4V and MOV where the browser's codecs permit. Playback runs on a private loopback server with a session token and only serves explicitly selected local files. The pinned online Video.js skin has a native HTML5 fallback. This is **not a remote-streaming player**.
 
 ## Highlights
 
@@ -62,7 +40,7 @@ Choose your platform below. This compact, two-column download list works on narr
 - **Watchlist:** follow airing shows and fetch only the new episodes.
 - **No Docker, no extra services.** A built-in browser solver gets past
   Cloudflare using the Chrome or Edge you already have.
-- **One-click FFmpeg:** the desktop app installs it for you.
+- **FFmpeg:** required to combine downloaded segments. Install it with your package manager before downloading with the new desktop UI.
 - **Local episode player:** redesigned graffiti-themed layout, 'Download video' save-copy action, episode playlist and responsive 16:9 Video.js 10.5.0 Neutral controls (with native offline fallback), episode queue, series/movie details, source-provided synopsis, audio language, seeking and fullscreen. No remote-stream playback in this GUI feature yet.
 - **Desktop packaging:** macOS .app archives for Apple Silicon/Intel and a portable Linux x64 app with an app-menu installer.
 
@@ -73,7 +51,7 @@ Choose your platform below. This compact, two-column download list works on narr
 1.  Download the [Windows 11 desktop EXE](https://github.com/GitRatio/pahebatcher/releases/download/preview/pahebatcher-gui-windows-x64.exe), or consult the [Windows 11 guide](WINDOWS_11.md).
 2.  Make sure **Microsoft Edge** (included with Windows) or **Google Chrome**
     is installed.
-3.  Run it. If FFmpeg is missing, click **Install FFmpeg** once.
+3.  Install FFmpeg if necessary (for example, `winget install Gyan.FFmpeg`), then run the application.
 
 Tagged GitRatio releases may offer standalone CLI binaries. Preview builds are test artifacts, not signed production installers.
 
@@ -86,7 +64,7 @@ Use the platform links above for preview packages and see [MACOS_LINUX.md](MACOS
 ```bash
 git clone https://github.com/GitRatio/pahebatcher.git
 cd pahebatcher
-pip install -e ".[browser]"
+pip install -e ".[browser,gui]"
 
 pahebatcher-gui      # desktop app
 pahebatcher          # terminal
@@ -97,34 +75,32 @@ pahebatcher          # terminal
 | Needs          | For                                       | How                                                                                                           |
 | -------------- | ----------------------------------------- | ------------------------------------------------------------------------------------------------------------- |
 | Python 3.11+   | running from source                       | [python.org](https://www.python.org/downloads/)                                                               |
-| Tkinter        | the desktop app, when running from source | included with most Python installs; some Linux distributions package it separately (for example `python3-tk`) |
+| pywebview      | default desktop UI                         | installed by the `gui` extra; on Linux also install `pywebview[qt]`  |
 | Chrome or Edge | the built-in Cloudflare solver            | usually already installed                                                                                     |
-| FFmpeg         | joining downloaded pieces into `.mp4`     | the desktop app installs it; or `winget install Gyan.FFmpeg` / `brew install ffmpeg` / `apt install ffmpeg`   |
+| FFmpeg         | joining downloaded pieces into `.mp4`     | `winget install Gyan.FFmpeg` / `brew install ffmpeg` / `apt install ffmpeg` |
 | MPV            | streaming only                            | `winget install mpv.net` / `brew install mpv` / `apt install mpv`                                             |
 
 ## Desktop app
 
-1.  **Search** for an anime and double-click a result.
+1.  **Search** for an anime and select a result.
 2.  **Pick episodes** by clicking them, or use **All**, **None**, or a range
     like `1-12`, `1,4,7`, `5-`.
-3.  Press **Download**. Watch progress, then **Open folder**.
+3.  Press **Download**. Watch progress in **Downloads**, then find files under **Library**.
 
-Quality, audio (SUB/DUB), parallel downloads and the download folder are along
-the bottom of the search screen. They are saved automatically to `gui.toml` in
-the app data folder (see [Where files live](#where-files-live)). On first run
-the download folder is `Downloads/pahebatcher` in your home folder.
+Quality, audio language and parallel-download preferences are in the episode
+download panel and **Settings**; the save folder can be changed using
+**Choose folder**. Settings are stored in the application data folder. See
+[Where files live](#where-files-live).
 
-**FFmpeg.** A notice appears when FFmpeg is missing. Press **Install FFmpeg**,
-or just press **Download**, and it installs first and then continues. It
-downloads a static build into the app data folder (no admin rights, no `PATH`
-changes), and the terminal app finds it there too. A copy already on your
-`PATH` is used first.
+**FFmpeg:** the current webview UI requires FFmpeg to be installed before
+starting downloads. If it is missing, the app displays a message instead of
+starting the download. Use your platform package manager to install it.
 
-**Full screen.** Press `F11` (or `Alt+Enter`, or click **Full screen** in the
-header); `Esc` exits. The window can also be maximized or resized freely, and
-the content stays centered on wide screens.
+**Window sizing:** resize or maximize the desktop window normally. Download
+controls rearrange on narrow windows and high-DPI displays. The local
+video player offers its own fullscreen control.
 
-The desktop app opens **downloaded** MP4/WebM/M4V/MOV files using **Open player** in its header, or **Watch videos** after a download. It opens a private browser-backed HTML5 player rather than embedding a browser in Tkinter. Series/episode details are taken from the download selection; local imported files use filename metadata. See [MACOS_LINUX.md](MACOS_LINUX.md).
+Select a video from **Library** and press **Play**. In the native desktop UI, the local HTML5 player is loaded into the application's webview where supported; a browser fallback remains available. Local file metadata is inferred from filenames. See [MACOS_LINUX.md](MACOS_LINUX.md).
 
 The desktop app still does not do **remote site streaming** or the watchlist yet. Use the terminal for those.
 
@@ -304,9 +280,9 @@ old output, installs everything and writes:
 - `dist\pahebatcher.exe`: the terminal app
 
 Both use the app icon from `src/pahebatcher/gui/assets/` (`icon.ico` for the
-file, `icon.png` for the window; `icon.svg` is the editable source).
+file, `icon.png` for the window; the bundled 650px bunny image is the macOS icon artwork source).
 
-Pushing a tag like `v3.9.1` makes the **Build executables** GitHub workflow run
+Pushing a version tag like `v3.12.0` makes the **Build executables** GitHub workflow run
 the tests, build the binaries and attach them to a Release (the Windows desktop
 app, plus Windows, Linux and macOS terminal apps). You can also run it by hand
 from the Actions tab, which builds the binaries without publishing a Release.
@@ -319,7 +295,7 @@ FFmpeg, MPV and Chrome/Edge are not bundled.
 | ---------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------- |
 | "No Cloudflare solver"                                     | Install Chrome or Edge and `pip install "pahebatcher[browser]"`. In WSL, install a Linux Chrome or set `PAHEBATCHER_BROWSER`.                      |
 | Solver never gets through                                  | `pahebatcher config set browser_mode headed`, then tick the checkbox in the window. Or try another network, or a proxy via `PAHEBATCHER_PROXY`.    |
-| FFmpeg not found                                           | Press **Install FFmpeg** in the desktop app, or install it and make sure `ffmpeg -version` works.                                                  |
+| FFmpeg not found                                           | Install FFmpeg using your OS package manager and verify `ffmpeg -version` works. |
 | `MPV not found`                                            | Install MPV, or use download mode.                                                                                                                 |
 | Many segment failures or slow downloads                    | Lower `-w` to 8-12 and `-j` to 1 if the CDN is rate limiting; raise `-w` to 24-32 if you are just slow.                                            |
 | `Resolution timed out`                                     | Try `-j 1`. It already retries each episode automatically (see `--retry`).                                                                         |
@@ -333,7 +309,7 @@ FFmpeg, MPV and Chrome/Edge are not bundled.
 ## Development
 
 ```bash
-pip install -e ".[dev,browser]"
+pip install -e ".[dev,browser,gui]"
 pytest                # tests
 ruff check src        # lint
 mypy src              # strict type check
@@ -345,7 +321,7 @@ Linux, macOS and WSL.
 | Path                             | Purpose                                                                  |
 | -------------------------------- | ------------------------------------------------------------------------ |
 | `main.py`                        | command-line parsing and the main flow                                   |
-| `gui/`                           | desktop app (Tkinter): `app.py`, `bridge.py`, `widgets.py`, `assets/`    |
+| `gui/`                           | native webview UI (`webui.py`), classic Tk GUI (`app.py`), player, bridge and bundled assets |
 | `ui/`                            | terminal UI: dashboard, prompts, tables, theme, console                  |
 | `downloader.py`                  | two-stage pipeline: resolve stream URLs ahead, then download in parallel |
 | `store.py`                       | segment cache with atomic writes, resume, and FFmpeg assembly            |
@@ -375,8 +351,8 @@ and watchlist in the desktop app, other audio languages.
 - **Original pahebatcher:** [abdullahkhfb](https://github.com/abdullahkhfb/pahebatcher); this is an independent MIT-licensed derivative, not a transfer of upstream ownership.
 - **GitRatio edition:** Windows fixes, fork maintenance, and the tongue-in-cheek bunny-takeover theme.
 
-- **Logo** by [/u/HellHarbinger][hellharbinger]. The app icon is a simplified
-  version of it.
+- **Original logo** by [/u/HellHarbinger][hellharbinger]; retained in `assets/logo/` with upstream attribution.
+- **GitRatio Bunny Takeover mascot:** supplied for this fork and bundled for the native UI, local player and desktop icons.
 - **WSL setup** (`setup-wsl.sh` and the Makefile): idea and first version by
   [/u/HellHarbinger][hellharbinger].
 
@@ -391,5 +367,3 @@ official creators.
 - `pahebatcher.toml.example`: a ready-to-copy configuration file.
 
 [hellharbinger]: https://www.reddit.com/user/HellHarbinger/
-[latest-release]: https://github.com/GitRatio/pahebatcher/releases
-[version-badge]: https://img.shields.io/badge/version-3.12.0-blue

@@ -1,6 +1,6 @@
 # PaheBatcher desktop v3.12.0 — macOS and Linux
 
-This GitRatio edition shares one Python/Tkinter desktop interface and download backend across Windows, macOS and Linux. Builds are created on the corresponding OS with PyInstaller; **do not use Windows executables on macOS/Linux**.
+This GitRatio edition uses one **native pywebview desktop interface** and the existing Python download backend across Windows, macOS and Linux. A separate classic Tkinter interface remains available. Builds are created per operating system with PyInstaller; **do not use Windows executables on macOS/Linux**.
 
 ## Download builds by operating system
 
@@ -33,17 +33,17 @@ This copies the GUI and bundled runtime to your user data directory and register
 
 ## From source (all platforms)
 
-Requires Python 3.11 or newer, Tkinter, and Chrome, Edge or Chromium. Source installs are easier to debug and update. Run from the checked-out repo:
+Requires Python 3.11 or newer, a supported native webview runtime, and Chrome, Edge or Chromium for source solving. The classic interface additionally requires Tkinter. Run from the checked-out repo:
 
 ~~~bash
 python3 -m venv .venv
 . .venv/bin/activate
 python -m pip install --upgrade pip
-python -m pip install -e ".[browser]"
-python -m pahebatcher.gui
+python -m pip install -e ".[browser,gui]"
+pahebatcher-gui
 ~~~
 
-On Ubuntu/Debian, install system Tk before creating the venv with sudo apt install python3-tk python3-venv. On macOS, a Python build including Tk is required. Check with python3 -m tkinter. For FFmpeg, try the GUI's Install FFmpeg button, or install it via your package manager (Homebrew: brew install ffmpeg; Debian/Ubuntu: sudo apt install ffmpeg). FFmpeg is used for merging downloaded segments.
+On Linux, the default webview UI needs Qt WebEngine: install `pywebview[qt]` and any distribution-specific system Qt libraries. Install Tkinter (`python3-tk`) only if you need the optional classic interface. FFmpeg is required to merge downloaded segments; install it using your package manager (Homebrew: `brew install ffmpeg`; Debian/Ubuntu: `sudo apt install ffmpeg`).
 
 ### Mac package troubleshooting
 
@@ -55,14 +55,14 @@ On Ubuntu/Debian, install system Tk before creating the venv with sudo apt insta
 
 - Keep the entire PaheBatcher directory together; the executable alone will not run without _internal.
 - If the launcher does not appear immediately, log out/in or open the executable from the shell to inspect errors.
-- The GUI needs a graphical desktop session, working Tk/X11 support, and a browser. Install compatible libraries using your Linux distribution's package manager.
+- The default GUI needs a graphical desktop session and compatible Qt WebEngine / X11 or Wayland dependencies. Tk is required only for the classic fallback.
 - Browser solving depends on installed Chromium/Chrome/Edge and live site behavior. Avoid assuming a successful build means every remote site is available.
 
 ## Local video player
 
-Click **Open player** in the desktop header to choose one or more local MP4, M4V, MOV or WebM videos. After a successful download, click **Watch videos** to populate the playlist automatically from completed files, with series title, selected episode, and SUB/DUB information already known to the app.
+Open **Library** in the desktop sidebar, then select **Play** for a downloaded MP4, M4V, MOV or WebM file. Source-downloaded files are listed from the configured download directory; the player uses local filename metadata.
 
-The player opens in your **default web browser**. This is intentional: desktop Tkinter has no integrated modern HTML5 engine and the browser supplies cross-platform media decoding. The player uses the actual **Video.js 10.5.0 Neutral skin** loaded from a pinned jsDelivr module when online. It retains native HTML5 controls as an offline fallback, and offers a spacious layout, episode queue, source-provided anime synopsis, play/pause, fullscreen, keyboard shortcuts and seekable playback. Descriptions are shown only if supplied by the anime page; no synopsis is invented. It does **not** stream remote site links directly yet. Browser media codecs differ; MPV/VLC may be necessary for unusual codecs.
+The local HTML5 player loads in the native application webview when supported, with a browser fallback. Its optional pinned **Video.js 10.5.0 Neutral skin** loads online, while native HTML5 controls remain available offline. The player supports an episode queue, locally available metadata, play/pause, fullscreen, keyboard shortcuts and seekable playback. It does **not** stream remote site links directly. Browser codec availability varies; use MPV/VLC for unusual formats.
 
 For privacy, playback uses a randomized URL served only on 127.0.0.1, has no directory listing, requires an unguessable session token, and serves only files explicitly selected by the user. The service stops when PaheBatcher closes. It never makes your video directories public.
 
@@ -77,6 +77,6 @@ The packages still need real-device QA, macOS code signing/notarization and broa
 
 The default application now uses **pywebview** rather than standard Tkinter controls. The HTML/CSS artwork and actions are bundled locally; no hosted UI is required. Windows 11 requires Edge WebView2 Runtime; macOS uses system WebKit. On Linux, install an appropriate Qt WebEngine runtime and `pywebview[qt]` if running from source. The Linux preview binary may require additional X11/Qt platform libraries on minimal distributions.
 
-For development: `python -m pip install -e ".[browser,gui]"`, followed by `pahebatcher-gui`. For Linux development: also `python -m pip install "pywebview[qt]"`. The previous Tk GUI remains available as `pahebatcher-classic-gui`. The video player is still a local-only browser page.
+For development: `python -m pip install -e ".[browser,gui]"`, followed by `pahebatcher-gui`. For Linux development: also `python -m pip install "pywebview[qt]"`. The previous Tk GUI remains available as `pahebatcher-classic-gui`. The video player remains a private local-only page, shown in the native webview when supported.
 
 The v3.12.0 user interface is implemented and wired to the backend, but **pixel-level/device acceptance testing is still required** across Windows scaling, macOS and Linux.

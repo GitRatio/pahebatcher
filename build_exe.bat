@@ -18,7 +18,7 @@ del /q *.spec 2>nul
 echo Installing dependencies...
 pip uninstall -y pahebatcher >nul 2>&1
 python -m pip install --upgrade pip >nul
-pip install -e ".[browser]" pyinstaller || goto :fail
+pip install -e ".[browser,gui]" pyinstaller || goto :fail
 
 REM The built-in browser solver drives the Edge/Chrome already installed on the PC, so no browser
 REM is bundled. Remove any Chromium left in the package by an earlier build, or it would be packed in.
@@ -29,7 +29,7 @@ if exist "venv\Lib\site-packages\patchright\driver\package\.local-browsers" (
 echo Building desktop app...
 pyinstaller scripts\pyinstaller_gui_entry.py --onefile --windowed --clean --noconfirm ^
   --name pahebatcher-gui --icon %ICON% --paths src ^
-  --collect-all curl_cffi --collect-all Cryptodome --collect-all patchright --add-data "src\pahebatcher\gui\assets;pahebatcher\gui\assets" ^
+  --collect-all curl_cffi --collect-all Cryptodome --collect-all patchright --collect-all webview --add-data "src\pahebatcher\gui\assets;pahebatcher\gui\assets" ^
   --collect-submodules pahebatcher || goto :fail
 
 echo Building command-line app...

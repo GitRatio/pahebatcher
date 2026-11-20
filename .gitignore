@@ -40,3 +40,9 @@ build/
 *.swp
 *.swo
 *~
+
+# Local visual QA captures and isolated development environments
+ui-snapshots/
+.venv/
+*.spec
+*.log
