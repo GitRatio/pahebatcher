@@ -200,14 +200,23 @@ video.addEventListener("error", function () {
     error.textContent = "This file could not be decoded by your browser. Check the file, or open it using MPV or VLC for broader codec support.";
   }
 });
-document.getElementById("full").addEventListener("click", function () {
-  if (document.fullscreenElement) document.exitFullscreen();
-  else if (video.requestFullscreen) video.requestFullscreen();
-});
+function toggleFullscreen() {
+  if (document.fullscreenElement) {
+    Promise.resolve(document.exitFullscreen()).catch(function () {});
+    return;
+  }
+  // Keep the Video.js controls in fullscreen instead of enlarging only the media.
+  const modern = window.customElements && customElements.get("video-neutral-skin");
+  const target = modern ? document.querySelector("video-player") : video;
+  if (target && target.requestFullscreen) {
+    Promise.resolve(target.requestFullscreen()).catch(function () {});
+  }
+}
+document.getElementById("full").addEventListener("click", toggleFullscreen);
 document.addEventListener("keydown", function (event) {
   if (event.altKey || event.ctrlKey || event.metaKey || event.target instanceof HTMLInputElement) return;
   if (event.key === " " && event.target === document.body) { event.preventDefault(); video.paused ? video.play().catch(function () {}) : video.pause(); }
-  else if (event.key.toLowerCase() === "f") { if (document.fullscreenElement) document.exitFullscreen(); else if (video.requestFullscreen) video.requestFullscreen(); }
+  else if (event.key.toLowerCase() === "f") { toggleFullscreen(); }
   else if (event.key === "ArrowRight" && event.target === document.body) select(current + 1, true);
   else if (event.key === "ArrowLeft" && event.target === document.body) select(current - 1, true);
 });
