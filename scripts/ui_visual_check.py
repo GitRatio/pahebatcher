@@ -63,6 +63,44 @@ def main() -> None:
                 assert not errors, f'Browser JavaScript errors: {errors}'
                 print(f'PASS {width}x{height} — Download CTA bounds {bounds}')
                 page.close()
+            # Exercise the real frontend event handlers against a controlled mock
+            # Python bridge. This catches inert controls and navigation regressions.
+            screen = browser.new_page(viewport={'width': 1448, 'height': 1086})
+            screen.add_init_script("""(() => {
+              const episodes = Array.from({length:12}, (_,i)=>({
+                ep_str:String(i+1),title:'Fixture Episode '+String(i+1),
+                number:i+1,session:'ep'+String(i+1),audio:'jpn'}));
+              window.pywebview = {api: {
+                bootstrap: async()=>({solver_ok:true,settings:{quality:720,audio_lang:'jpn',
+                  max_parallel:2,output_dir:'Test Downloads'}}),
+                search: async()=>[{title:'Integration Test Anime',session:'fixture',
+                  type:'TV',year:2026,episodes:12}],
+                scan: async()=>({title:'Integration Test Anime',
+                  description:'Real JavaScript event-handler fixture.',episodes}),
+                save_settings: async()=>({ok:true}),
+                download: async()=>({started:true}),
+                status: async()=>({active:false,title:'Integration Test Anime',
+                  fraction:0,items:[],message:'Download accepted in fixture'}),
+                library: async()=>[],play:async()=>({ok:true})
+              }};
+            })();""")
+            screen.goto(f'http://127.0.0.1:{server.server_port}/desktop.html', wait_until='load')
+            screen.locator('#query').fill('Example')
+            screen.locator('#search-button').click()
+            screen.locator('.result-card').first.wait_for()
+            screen.locator('.result-card').first.click()
+            screen.locator('#page-episodes.current').wait_for()
+            inputs = screen.locator('#episode-list input[type=checkbox]')
+            assert inputs.count() == 12, 'Source episodes must be rendered by JS'
+            for i in range(3):
+                inputs.nth(i).check()
+            cta = screen.locator('#download-selected')
+            assert cta.is_enabled() and '3 episodes' in cta.inner_text()
+            screen.screenshot(path=str(OUT / 'interactive-episodes-1448x1086.png'), full_page=True)
+            cta.click()
+            screen.locator('#page-downloads.current').wait_for()
+            print('PASS real frontend search → scan → select → Download navigation')
+            screen.close()
             browser.close()
     finally:
         server.shutdown()
