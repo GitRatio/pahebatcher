@@ -6,7 +6,9 @@
 
 ## About this edition
 
-**PaheBatcher — GitRatio Edition** is an independently maintained continuation of the original [pahebatcher by abdullahkhfb](https://github.com/abdullahkhfb/pahebatcher). It keeps the original Python downloading, streaming and watchlist foundation while focusing on cross-platform desktop compatibility, reliability, diagnostics and a more enjoyable download-and-play experience.
+**PaheBatcher — GitRatio Edition** is an independently maintained, open-source continuation of the original [pahebatcher by abdullahkhfb](https://github.com/abdullahkhfb/pahebatcher). It provides a desktop anime batch downloader for **Windows 11, macOS (Intel and Apple Silicon), and Linux x64**, plus the original Python terminal interface, resume support, streaming tools and watchlist foundation. The GitRatio edition focuses on reliability, efficient downloads, straightforward installation, and the bunny-branded desktop experience.
+
+**Video player:** The desktop app now includes an **Open player** action for local MP4, WebM, M4V and MOV files, plus **Watch videos** after successful downloads. A private, locally hosted **Video.js-inspired HTML5 player** shows the series title, episode number, episode name and audio language, with an episode queue, seeking, next/previous controls and fullscreen playback. The player opens in your default browser; it is **not** the Video.js library or a remote streaming engine. The macOS/Linux desktop packages are available as GitHub Actions build artifacts and still need production signing/notarization and wider real-device QA.
 
 **The "takeover" is a joke, not a claim of ownership of the original project.** GitRatio maintains this copy; the upstream author retains credit for their original work, and the original mascot/logo credits remain intact. This edition is not affiliated with or endorsed by the upstream maintainer. See [FORK_NOTES.md](FORK_NOTES.md) and [LICENSE](LICENSE).
 
