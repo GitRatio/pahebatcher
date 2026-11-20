@@ -29,15 +29,15 @@ desktop app or the terminal.
 
 ## ⬇ Download PaheBatcher v3.10.0
 
-Choose your system below. These links show **GitHub Actions builds** until a signed release is published.
+Choose your system below. These buttons link to **direct, unsigned preview downloads** published after the full cross-platform build passes. The preview is not a signed production release.
 
 | Windows | macOS Apple Silicon | macOS Intel | Linux x64 |
 | :---: | :---: | :---: | :---: |
-| [![Download Windows](https://img.shields.io/badge/Download-Windows_11-0078D4?style=for-the-badge&logo=windows11&logoColor=white)](https://github.com/GitRatio/pahebatcher/actions/workflows/build-exe.yml) | [![Download Mac Apple](https://img.shields.io/badge/Download-Mac_Apple_Silicon-333333?style=for-the-badge&logo=apple&logoColor=white)](https://github.com/GitRatio/pahebatcher/actions/workflows/build-exe.yml) | [![Download Mac Intel](https://img.shields.io/badge/Download-Mac_Intel-333333?style=for-the-badge&logo=apple&logoColor=white)](https://github.com/GitRatio/pahebatcher/actions/workflows/build-exe.yml) | [![Download Linux](https://img.shields.io/badge/Download-Linux_x64-FCC624?style=for-the-badge&logo=linux&logoColor=black)](https://github.com/GitRatio/pahebatcher/actions/workflows/build-exe.yml) |
+| [![Download Windows](https://img.shields.io/badge/Download-Windows_11-0078D4?style=for-the-badge&logo=windows11&logoColor=white)](https://github.com/GitRatio/pahebatcher/releases/download/preview/pahebatcher-gui-windows-x64.exe) | [![Download Mac Apple](https://img.shields.io/badge/Download-Mac_Apple_Silicon-333333?style=for-the-badge&logo=apple&logoColor=white)](https://github.com/GitRatio/pahebatcher/releases/download/preview/PaheBatcher-macos-arm64.zip) | [![Download Mac Intel](https://img.shields.io/badge/Download-Mac_Intel-333333?style=for-the-badge&logo=apple&logoColor=white)](https://github.com/GitRatio/pahebatcher/releases/download/preview/PaheBatcher-macos-x64.zip) | [![Download Linux](https://img.shields.io/badge/Download-Linux_x64-FCC624?style=for-the-badge&logo=linux&logoColor=black)](https://github.com/GitRatio/pahebatcher/releases/download/preview/PaheBatcher-linux-x64.tar.gz) |
 
-**How to download:** Open the latest **successful run** for `main`, scroll to **Artifacts** and select `pahebatcher-gui-windows-x64.exe`, `PaheBatcher-macos-arm64`, `PaheBatcher-macos-x64` or `PaheBatcher-linux-x64`. Unzip the downloaded GitHub artifact to find the actual application package. GitHub may require sign-in. These are unsigned development builds and may expire.
+**How to download:** Click your device button to obtain the file from the [rolling preview release](https://github.com/GitRatio/pahebatcher/releases/tag/preview). If the preview is not yet published, use the [latest successful build](https://github.com/GitRatio/pahebatcher/actions/workflows/build-exe.yml), open **Artifacts**, and choose your OS package; GitHub may require sign-in. Mac downloads contain an `.app`; Linux includes `install.sh`. Previews are unsigned and unnotarized.
 
-**[All releases](https://github.com/GitRatio/pahebatcher/releases)** · **[Installation guide for Mac/Linux](MACOS_LINUX.md)** · **[Windows guide](WINDOWS_11.md)**
+**[Preview download page](https://github.com/GitRatio/pahebatcher/releases/tag/preview)** · **[All releases](https://github.com/GitRatio/pahebatcher/releases)** · **[Installation guide for Mac/Linux](MACOS_LINUX.md)** · **[Windows guide](WINDOWS_11.md)**
 
 ## Highlights
 
