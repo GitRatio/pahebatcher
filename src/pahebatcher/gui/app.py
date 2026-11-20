@@ -260,45 +260,114 @@ class EpisodesView(tk.Frame):
         self.anime: AnimeInfo | None = None
         self.eps: list[EpisodeInfo] = []
         self.sel: set[float] = set()
-        Link(self, "← search", app.show_search, f).pack(anchor="w")
+
+        Link(self, "← Back to search", app.show_search, f).pack(anchor="w", pady=(0, 10))
+        tk.Label(self, text="SERIES / DOWNLOADS", font=f.label, fg="#35ecf1",
+                 bg=BG, anchor="w").pack(fill="x", pady=(0, 5))
         self.title = tk.Label(self, font=f.title, fg=TEXT, bg=BG, anchor="w")
-        self.title.pack(fill="x", pady=(8, 0))
-        self.sub = tk.Label(self, font=f.small, fg=MUTED, bg=BG, anchor="w")
-        self.sub.pack(fill="x", pady=(2, 12))
+        self.title.pack(fill="x", pady=(0, 4))
+        self.sub = tk.Label(self, font=f.small, fg=PINK, bg=BG, anchor="w")
+        self.sub.pack(fill="x", pady=(0, 7))
         self.description = tk.Label(
-            self, font=f.small, fg=MUTED, bg=BG, justify="left",
-            anchor="w", wraplength=820,
+            self, font=f.small, fg=MUTED, bg=BG, justify="left", anchor="w",
         )
-        self.description.pack(fill="x", pady=(0, 16))
+        self.description.pack(fill="x", pady=(0, 14))
         self.description.bind(
-            "<Configure>",
-            lambda e: self.description.configure(wraplength=max(240, e.width - 12)),
+            "<Configure>", lambda e: self.description.configure(
+                wraplength=max(220, e.width - 15),
+            ),
         )
 
-        ctl = tk.Frame(self, bg=BG)
-        ctl.pack(fill="x", pady=(0, 10))
-        Button(ctl, "All", self.select_all, f).pack(side="left")
-        Button(ctl, "None", self.select_none, f).pack(side="left", padx=8)
-        self.range = make_entry(ctl, f, width=18)
-        self.range.pack(side="left", padx=(12, 8))
-        self.range.bind("<Return>", lambda _e: self.select_range())
-        Button(ctl, "Select range", self.select_range, f).pack(side="left")
-        tk.Label(
-            self, text="Examples: 1-12 · 1,4,7 · 5-",
-            font=f.small, fg=MUTED, bg=BG, anchor="w",
-        ).pack(fill="x", pady=(0, 12))
+        main = tk.Frame(self, bg=BG)
+        main.pack(fill="both", expand=True)
+        panel = tk.Frame(main, bg=PANEL, width=284, highlightthickness=1,
+                         highlightbackground="#654061")
+        panel.pack(side="right", fill="y", padx=(16, 0))
+        panel.pack_propagate(False)
+        left = tk.Frame(main, bg=PANEL, highlightthickness=1,
+                        highlightbackground=LINE)
+        left.pack(side="left", fill="both", expand=True)
 
-        frame, self.lb = make_listbox(self, f)
-        frame.pack(fill="both", expand=True)
+        tabs = tk.Frame(left, bg=PANEL)
+        tabs.pack(fill="x", padx=16, pady=(15, 10))
+        tk.Label(tabs, text="▷   EPISODES", font=f.bold, fg=PINK,
+                 bg=PANEL).pack(side="left")
+        tk.Label(tabs, text="SELECT TO DOWNLOAD", font=f.label,
+                 fg=MUTED, bg=PANEL).pack(side="right")
+        ctl = tk.Frame(left, bg=PANEL)
+        ctl.pack(fill="x", padx=14, pady=(0, 10))
+        Button(ctl, "All", self.select_all, f).pack(side="left")
+        Button(ctl, "None", self.select_none, f).pack(side="left", padx=(7, 0))
+        row = tk.Frame(left, bg=PANEL)
+        row.pack(fill="x", padx=14, pady=(0, 12))
+        self.range = make_entry(row, f, width=15)
+        self.range.pack(side="left", fill="x", expand=True)
+        self.range.bind("<Return>", lambda _e: self.select_range())
+        Button(row, "Select range", self.select_range, f).pack(side="right", padx=(8, 0))
+        tk.Label(left, text="Examples: 1-12, 1,4,7, or 5-", font=f.small,
+                 fg=MUTED, bg=PANEL, anchor="w").pack(
+                     fill="x", padx=18, pady=(0, 9),
+                 )
+        frame, self.lb = make_listbox(left, f)
+        frame.pack(fill="both", expand=True, padx=12, pady=(0, 14))
         self.lb.bind("<ButtonRelease-1>", self._click)
         self.lb.bind("<space>", lambda _e: self._toggle(self.lb.index("active")))
 
-        foot = tk.Frame(self, bg=BG)
-        foot.pack(fill="x", pady=(14, 0))
-        self.summary = tk.Label(foot, font=f.ui, fg=MUTED, bg=BG)
-        self.summary.pack(side="left")
-        self.go = Button(foot, "Download", self.start, f, primary=True)
-        self.go.pack(side="right")
+        self.go = Button(panel, "↓   DOWNLOAD", self.start, f, primary=True)
+        self.go.pack(side="bottom", fill="x", padx=16, pady=(0, 18), ipady=9)
+        self.summary = tk.Label(panel, font=f.small, fg="#42e8ef", bg=PANEL,
+                                justify="center")
+        self.summary.pack(side="bottom", fill="x", padx=14, pady=(0, 11))
+        top = tk.Frame(panel, bg=PANEL)
+        top.pack(fill="x", padx=17, pady=(20, 16))
+        tk.Label(top, text="↓  DOWNLOAD", font=f.title, fg=TEXT,
+                 bg=PANEL, anchor="w").pack(fill="x")
+        tk.Frame(top, bg=PINK, height=3).pack(fill="x", pady=(9, 0))
+
+        cfg = app.cfg
+        def setting(name: str, choices: list[tuple[str, Any]], key: str) -> None:
+            section = tk.Frame(panel, bg=PANEL)
+            section.pack(fill="x", padx=16, pady=(0, 17))
+            tk.Label(section, text=name, font=f.label, fg=MUTED,
+                     bg=PANEL, anchor="w").pack(fill="x", pady=(0, 6))
+            def changed(value: Any) -> None:
+                cfg.set(key, value)
+                save_settings(cfg)
+                if key == "quality":
+                    self._summary()
+            Segmented(section, choices, cfg.get(key), changed, f).pack(anchor="w")
+        tk.Label(panel, text="FORMAT    MP4 (VIDEO)", font=f.label,
+                 fg=TEXT, bg=PANEL, anchor="w").pack(
+                     fill="x", padx=17, pady=(0, 17),
+                 )
+        setting("QUALITY", [("360p", 360), ("720p", 720), ("1080p", 1080)], "quality")
+        setting("AUDIO", [("SUB", "jpn"), ("DUB", "eng")], "audio_lang")
+        setting("PARALLEL", [(str(n), n) for n in (1, 2, 3, 4)], "max_parallel")
+        folder = tk.Frame(panel, bg=PANEL)
+        folder.pack(fill="x", padx=16, pady=(0, 12))
+        tk.Label(folder, text="SAVE TO", font=f.label, fg=MUTED,
+                 bg=PANEL, anchor="w").pack(fill="x", pady=(0, 6))
+        self.folder_label = tk.Label(folder, font=f.small, fg=TEXT, bg=PANEL,
+                                     anchor="w", justify="left")
+        self.folder_label.pack(fill="x")
+        self.folder_label.bind(
+            "<Configure>", lambda e: self.folder_label.configure(
+                wraplength=max(120, e.width - 10),
+            ),
+        )
+        self._refresh_download_folder()
+        Link(folder, "Change folder", self._pick_download_folder, f,
+             bg=PANEL).pack(anchor="w", pady=(7, 0))
+
+    def _refresh_download_folder(self) -> None:
+        directory = str(self.app.cfg.get("output_dir"))
+        self.folder_label.configure(
+            text=directory if len(directory) <= 46 else "…" + directory[-45:],
+        )
+
+    def _pick_download_folder(self) -> None:
+        self.app.v_search.pick_folder()
+        self._refresh_download_folder()
 
     def load(self, anime: AnimeInfo) -> None:
         self.anime = anime
