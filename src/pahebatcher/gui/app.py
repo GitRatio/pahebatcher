@@ -9,6 +9,7 @@ import sys
 import threading
 import time
 import tkinter as tk
+import webbrowser
 from collections.abc import Callable
 from pathlib import Path
 from tkinter import filedialog, messagebox
@@ -127,6 +128,7 @@ class DownloadView(tk.Frame):
         self.out_dir = ""
         self._total = 0
         self._series = ""
+        self._description = ""
         self._episode_map: dict[str, EpisodeInfo] = {}
         self._playlist: list[PlaybackItem] = []
 
@@ -144,8 +146,10 @@ class DownloadView(tk.Frame):
         if self.winfo_ismapped() and self._sb.winfo_ismapped():
             self.canvas.yview_scroll(-1 if e.delta > 0 else 1, "units")
 
-    def begin(self, title: str, total: int, out_dir: str, episodes: list[EpisodeInfo]) -> None:
+    def begin(self, title: str, total: int, out_dir: str, episodes: list[EpisodeInfo],
+              description: str = "") -> None:
         self._series = title
+        self._description = description
         self._episode_map = {ep.session: ep for ep in episodes}
         self._playlist = []
         self.title.configure(text=title)
@@ -198,6 +202,7 @@ class DownloadView(tk.Frame):
                 episode=ep.ep_str if ep else "—",
                 title=clean_title(ep.title) if ep else path.stem,
                 audio=ep.audio if ep else "",
+                description=self._description,
             ))
         self.refresh()
         self.active = False
@@ -260,6 +265,11 @@ class EpisodesView(tk.Frame):
         self.title.pack(fill="x", pady=(8, 0))
         self.sub = tk.Label(self, font=f.small, fg=MUTED, bg=BG, anchor="w")
         self.sub.pack(fill="x", pady=(2, 12))
+        self.description = tk.Label(
+            self, font=f.small, fg=MUTED, bg=BG, justify="left",
+            anchor="w", wraplength=820,
+        )
+        self.description.pack(fill="x", pady=(0, 16))
 
         ctl = tk.Frame(self, bg=BG)
         ctl.pack(fill="x", pady=(0, 10))
@@ -289,6 +299,7 @@ class EpisodesView(tk.Frame):
         self.eps = [by_num[n] for n in sorted(by_num)]
         self.sel = set()
         self.title.configure(text=anime.title)
+        self.description.configure(text=anime.description or "Synopsis unavailable for this title.")
         first, last = (self.eps[0].ep_str, self.eps[-1].ep_str) if self.eps else ("-", "-")
         self.sub.configure(text=f"{len(self.eps)} episodes · {first} to {last}")
         self.lb.delete(0, "end")
@@ -470,7 +481,7 @@ class SearchView(tk.Frame):
 class App(tk.Tk):
     def __init__(self) -> None:
         super().__init__()
-        self.title("pahebatcher")
+        self.title(f"PaheBatcher · GitRatio Edition v{VERSION}")
         self.geometry("1000x720")
         self.minsize(860, 600)
         self.configure(bg=BG)
@@ -540,12 +551,64 @@ class App(tk.Tk):
             tk.Label(hdr, text="PaheBatcher", font=f.logo, fg=PINK, bg=BG).pack(side="left")
         self.fs_link = Link(hdr, "Full screen", lambda: self.set_fullscreen(not self._fullscreen), f)
         self.fs_link.pack(side="right", padx=(16, 0))
+        Link(hdr, "About", self.show_about, f).pack(side="right", padx=(16, 0))
         Link(hdr, "Open player", self.choose_videos, f).pack(side="right", padx=(16, 0))
         tk.Label(hdr, text=f"v{VERSION}", font=f.small, fg=MUTED, bg=BG).pack(side="right", padx=(16, 0))
         self.dot_solver = tk.Label(hdr, text="● Solver", font=f.small, fg=MUTED, bg=BG)
         self.dot_solver.pack(side="right", padx=(16, 0))
         self.dot_ffmpeg = tk.Label(hdr, text="● FFmpeg", font=f.small, fg=MUTED, bg=BG)
         self.dot_ffmpeg.pack(side="right")
+
+    def show_about(self) -> None:
+        """Show the installed version, player capabilities and OS download links."""
+        dlg = tk.Toplevel(self)
+        dlg.title(f"About PaheBatcher v{VERSION}")
+        dlg.configure(bg=BG)
+        dlg.geometry("680x530")
+        dlg.minsize(590, 475)
+        dlg.transient(self)
+        container = tk.Frame(dlg, bg=BG, padx=30, pady=26)
+        container.pack(fill="both", expand=True)
+        f = self.fonts
+        tk.Label(container, text="🐰  PaheBatcher · GitRatio Edition",
+                 font=f.title, bg=BG, fg=TEXT, anchor="w").pack(fill="x")
+        tk.Label(container, text=f"Version {VERSION}  ·  Windows 11 / macOS / Linux",
+                 font=f.small, bg=BG, fg=PINK, anchor="w").pack(fill="x", pady=(8, 20))
+        details = (
+            "Download anime episodes with resumable transfers, episode selection and "
+            "SUB/DUB options. Watch saved MP4/WebM files in a spacious browser player "
+            "with series/episode information, a synopsis when supplied by the source, "
+            "and a playlist. Video.js 10.5.0 controls load when online; native HTML5 "
+            "controls remain available offline. Remote playback is not included."
+        )
+        tk.Label(container, text=details, font=f.ui, bg=BG, fg=TEXT,
+                 justify="left", anchor="nw", wraplength=570).pack(fill="x", pady=(0, 22))
+        tk.Label(container, text="DOWNLOAD FOR YOUR DEVICE", font=f.label,
+                 bg=BG, fg=MUTED, anchor="w").pack(fill="x", pady=(0, 10))
+        choices = [
+            ("Windows 11", "https://github.com/GitRatio/pahebatcher/actions/workflows/windows-preview.yml"),
+            ("Mac (Apple)", "https://github.com/GitRatio/pahebatcher/actions/workflows/build-exe.yml"),
+            ("Mac (Intel)", "https://github.com/GitRatio/pahebatcher/actions/workflows/build-exe.yml"),
+            ("Linux x64", "https://github.com/GitRatio/pahebatcher/actions/workflows/build-exe.yml"),
+        ]
+        controls = tk.Frame(container, bg=BG)
+        controls.pack(fill="x", pady=(0, 18))
+        for label, url in choices:
+            Button(controls, label, lambda link=url: webbrowser.open(link), f).pack(
+                side="left", padx=(0, 8), pady=4,
+            )
+        tk.Label(container, text=(
+            "Open a successful GitHub Actions run, then download the package under "
+            "Artifacts. GitHub sign-in may be required. Mac builds are not notarized."
+        ), font=f.small, bg=BG, fg=MUTED, justify="left",
+                 anchor="nw", wraplength=570).pack(fill="x", pady=(0, 16))
+        links = tk.Frame(container, bg=BG)
+        links.pack(fill="x")
+        Link(links, "View releases", lambda: webbrowser.open(
+            "https://github.com/GitRatio/pahebatcher/releases"), f).pack(side="left")
+        Link(links, "Source and license", lambda: webbrowser.open(
+            "https://github.com/GitRatio/pahebatcher"), f).pack(side="left", padx=20)
+        Button(container, "Close", dlg.destroy, f, primary=True).pack(side="bottom", anchor="e")
 
     # full screen ----------------------------------------------------------
     def set_fullscreen(self, on: bool) -> None:
@@ -717,7 +780,10 @@ class App(tk.Tk):
     def start_download(self, anime: AnimeInfo, episodes: list[EpisodeInfo]) -> None:
         self.backend.current_dash = None
         self._show(self.v_dl)
-        self.v_dl.begin(anime.title, len(episodes), self.backend.context(anime.title).output_dir, episodes)
+        self.v_dl.begin(
+            anime.title, len(episodes), self.backend.context(anime.title).output_dir,
+            episodes, description=anime.description,
+        )
         self.v_dl.future = self.bridge.run(
             self.backend.download(anime, episodes), ok=self.v_dl.finished, err=self.v_dl.failed)
 
