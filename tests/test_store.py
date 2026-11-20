@@ -42,6 +42,12 @@ class TestSegmentStore:
         indices = store.done_indices()
         assert indices == {0, 3, 7}
 
+    def test_done_indices_ignores_empty_segment(self, tmp_path: Path) -> None:
+        store = SegmentStore(tmp_path / "cache", "Test", "session-1", "001")
+        store.write_seg(0, b"")
+        store.write_seg(1, b"complete")
+        assert store.done_indices() == {1}
+
     def test_has_seg_false(self, tmp_path: Path) -> None:
         cache = tmp_path / "cache"
         store = SegmentStore(cache, "Test Anime", "session-1", "001", "jpn")

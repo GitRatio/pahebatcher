@@ -213,7 +213,7 @@ class DownloadView(tk.Frame):
         if not path or not Path(path).exists():
             return
         if sys.platform == "win32":
-            os.startfile(path)  # type: ignore[attr-defined]
+            getattr(os, "startfile")(path)  # noqa: B009 - Windows-only API
         elif sys.platform == "darwin":
             subprocess.Popen(["open", path])
         else:
@@ -724,7 +724,7 @@ def _win_set_icon(win: tk.Tk, ico: Path) -> None:
         import ctypes
         from ctypes import wintypes
 
-        user32, shell32 = ctypes.windll.user32, ctypes.windll.shell32  # type: ignore[attr-defined]
+        user32, shell32 = getattr(ctypes, "windll").user32, getattr(ctypes, "windll").shell32  # noqa: B009
         user32.LoadImageW.restype = wintypes.HANDLE
         try:  # separate taskbar identity so Windows doesn't group us under python.exe
             shell32.SetCurrentProcessExplicitAppUserModelID("pahebatcher.gui")
@@ -762,7 +762,7 @@ def _prepare_process() -> None:
         try:
             import ctypes
 
-            ctypes.windll.shcore.SetProcessDpiAwareness(1)  # type: ignore[attr-defined]
+            getattr(ctypes, "windll").shcore.SetProcessDpiAwareness(1)  # noqa: B009
         except Exception:
             pass
 

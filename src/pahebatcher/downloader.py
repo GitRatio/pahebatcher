@@ -158,7 +158,9 @@ class BatchOrchestrator:
         for p in outdir.iterdir():
             if not p.is_file() or p.suffix not in (".mp4",):
                 continue
-            is_target = p.name.startswith(f"Ep {prefix}") or p.name.startswith(f"Ep_{prefix}")
+            # Match the full episode token, not just a numeric prefix.
+            # Otherwise Ep 01 may accidentally match Ep 010 and similar names.
+            is_target = p.name.startswith((f"Ep {prefix} -", f"Ep_{prefix}_-"))
             if is_target and p.stat().st_size > 0:
                 return p
         return None

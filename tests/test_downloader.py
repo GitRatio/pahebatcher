@@ -32,6 +32,18 @@ class TestBatchOrchestratorFindExisting:
         result = orch._find_existing(ep)
         assert result == f
 
+    def test_does_not_match_longer_episode_prefix(
+        self, tmp_path: Path, app_context: AppContext, sample_anime: AnimeInfo,
+    ) -> None:
+        out = tmp_path / "downloads"
+        out.mkdir()
+        app_context.output_dir = str(out)
+        (out / "Ep 0010 - Episode ten.mp4").write_bytes(b"data")
+        (out / "Ep_0010_-_Episode_ten.mp4").write_bytes(b"data")
+        orch = BatchOrchestrator(app_context, sample_anime, MagicMock(), MagicMock())
+        ep = EpisodeInfo(1, "s1", "T", "F", "jpn", "url")
+        assert orch._find_existing(ep) is None
+
     def test_ignores_empty_file(self, tmp_path: Path, app_context: AppContext, sample_anime: AnimeInfo) -> None:
         out = tmp_path / "downloads"
         out.mkdir()

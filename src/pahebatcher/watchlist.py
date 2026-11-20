@@ -197,10 +197,10 @@ class WatchlistManager:
         p = get_watchlist_path(path)
         p.parent.mkdir(parents=True, exist_ok=True)
         data = [e.to_dict() for e in entries]
-        # Atomic write via tmp rename
+        # Atomic write via replace (works when destination already exists on Windows)
         tmp = p.with_suffix(p.suffix + ".tmp")
         tmp.write_text(json.dumps(data, indent=2), encoding="utf-8")
-        tmp.rename(p)
+        tmp.replace(p)
 
     @staticmethod
     def find_entry(
