@@ -4,6 +4,7 @@ on:
   push:
     tags: ["v*"]
   workflow_dispatch:
+  pull_request:
 
 permissions:
   contents: write
@@ -103,9 +104,85 @@ jobs:
           name: pahebatcher-gui-windows-x64.exe
           path: dist/pahebatcher-gui-windows-x64.exe
 
+  build-gui-unix:
+    needs: test
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: ubuntu-22.04
+            platform: linux
+            arch: x64
+          - os: macos-15-intel
+            platform: macos
+            arch: x64
+          - os: macos-15
+            platform: macos
+            arch: arm64
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+      - name: Install application and builder
+        run: python -m pip install -e ".[browser]" pyinstaller pytest pytest-asyncio
+      - name: Verify tkinter and player unit tests
+        run: |
+          python -c "import tkinter; print('Tk', tkinter.TkVersion)"
+          python -m pytest -q tests/test_player.py
+      - name: Generate macOS application icon
+        if: matrix.platform == 'macos'
+        run: |
+          mkdir -p build/icon.iconset
+          for size in 16 32 128 256 512; do
+            doubled=$((size * 2))
+            sips -z "$size" "$size" src/pahebatcher/gui/assets/icon.png --out "build/icon.iconset/icon_${size}x${size}.png" >/dev/null
+            sips -z "$doubled" "$doubled" src/pahebatcher/gui/assets/icon.png --out "build/icon.iconset/icon_${size}x${size}@2x.png" >/dev/null
+          done
+          iconutil -c icns build/icon.iconset -o build/PaheBatcher.icns
+      - name: Build macOS / Linux desktop bundle
+        run: |
+          extras=()
+          if [[ "${{ matrix.platform }}" == "macos" ]]; then
+            extras=(--osx-bundle-identifier com.gitratio.pahebatcher --icon build/PaheBatcher.icns)
+          fi
+          python -m PyInstaller scripts/pyinstaller_gui_entry.py \
+            --onedir --windowed --clean --noconfirm --name PaheBatcher \
+            --paths src \
+            --add-data "src/pahebatcher/gui/assets:pahebatcher/gui/assets" \
+            --collect-all curl_cffi --collect-all Cryptodome \
+            --collect-all patchright --collect-submodules pahebatcher \
+            "${extras[@]}"
+      - name: Package macOS application
+        if: matrix.platform == 'macos'
+        run: |
+          test -f dist/PaheBatcher.app/Contents/Info.plist
+          ditto -c -k --sequesterRsrc --keepParent \
+            dist/PaheBatcher.app "dist/PaheBatcher-macos-${{ matrix.arch }}.zip"
+      - name: Package Linux application with user installer
+        if: matrix.platform == 'linux'
+        run: |
+          test -x dist/PaheBatcher/PaheBatcher
+          mkdir -p package
+          cp -a dist/PaheBatcher package/PaheBatcher
+          cp scripts/install-linux.sh package/install.sh
+          cp src/pahebatcher/gui/assets/icon.png package/icon.png
+          chmod 755 package/install.sh
+          tar -C package -czf "dist/PaheBatcher-linux-${{ matrix.arch }}.tar.gz" .
+      - uses: actions/upload-artifact@v4
+        with:
+          name: PaheBatcher-${{ matrix.platform }}-${{ matrix.arch }}
+          path: dist/PaheBatcher-${{ matrix.platform }}-${{ matrix.arch }}.*
+          if-no-files-found: error
+
   release:
     if: startsWith(github.ref, 'refs/tags/v')
-    needs: [build, build-gui]
+    needs: [build, build-gui, build-gui-unix]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/download-artifact@v4
