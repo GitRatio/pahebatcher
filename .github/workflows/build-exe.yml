@@ -210,6 +210,17 @@ jobs:
         with:
           path: dist
           merge-multiple: true
+      - name: Point rolling preview tag to the tested main commit
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          if gh api "repos/$GITHUB_REPOSITORY/git/ref/tags/preview" >/dev/null 2>&1; then
+            gh api --method PATCH "repos/$GITHUB_REPOSITORY/git/refs/tags/preview" \
+              -f sha="$GITHUB_SHA" -F force=true
+          else
+            gh api --method POST "repos/$GITHUB_REPOSITORY/git/refs" \
+              -f ref=refs/tags/preview -f sha="$GITHUB_SHA"
+          fi
       - uses: softprops/action-gh-release@v2
         with:
           tag_name: preview
