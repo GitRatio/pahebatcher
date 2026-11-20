@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "pahebatcher"
-version = "3.10.0"
+version = "3.10.1"
 description = "High-performance animepahe batch downloader with parallel HLS engine"
 readme = "README.md"
 license = { text = "MIT" }
@@ -26,7 +26,7 @@ classifiers = [
 ]
 dependencies = [
     "rich>=13.9.0",
-    "aiohttp>=3.10.0",
+    "aiohttp>=3.10.1",
     "pycryptodomex>=3.21.0",
     "curl-cffi>=0.7.0",
 ]

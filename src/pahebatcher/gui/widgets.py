@@ -7,9 +7,9 @@ from collections.abc import Callable
 from tkinter import font as tkfont
 from typing import Any
 
-BG, PANEL, LINE, TEXT = "#000000", "#0b0b0f", "#26262e", "#ececf1"
-MUTED, PINK, BAR, TRACK = "#8a8a96", "#ff3f90", "#d5015a", "#1c1c22"
-OK, WARN, ERR = "#3ddc97", "#ffb020", "#ff5c5c"
+BG, PANEL, LINE, TEXT = "#101018", "#1b1923", "#3b3543", "#f3edf5"
+MUTED, PINK, BAR, TRACK = "#ada5b7", "#ff78b2", "#d92d7c", "#2d2634"
+OK, WARN, ERR = "#55dfa7", "#ffc164", "#ff7986"
 
 STYLE_COLORS = {"brand": PINK, "ok": OK, "warn": WARN, "muted": MUTED, "red": ERR}
 
@@ -24,12 +24,12 @@ class Fonts:
         ui = pick_family(root, ["Segoe UI", "SF Pro Text", "Helvetica Neue", "Ubuntu", "DejaVu Sans"])
         head = pick_family(root, ["Manrope", ui])
         mono = pick_family(root, ["Cascadia Mono", "Consolas", "SF Mono", "Menlo", "DejaVu Sans Mono"])
-        self.ui = (ui, 10)
-        self.small = (ui, 9)
-        self.bold = (ui, 10, "bold")
-        self.title = (head, 18, "bold")
-        self.logo = (head, 22, "bold")
-        self.label = (ui, 8, "bold")
+        self.ui = (ui, 11)
+        self.small = (ui, 10)
+        self.bold = (ui, 11, "bold")
+        self.title = (head, 19, "bold")
+        self.logo = (head, 23, "bold")
+        self.label = (ui, 9, "bold")
         self.mono = (mono, 10)
 
 
@@ -39,7 +39,7 @@ class Button(tk.Label):
     def __init__(self, master: tk.Misc, text: str, command: Callable[[], None], fonts: Fonts,
                  primary: bool = False, **kw: Any) -> None:
         self._primary, self._cmd, self._enabled = primary, command, True
-        super().__init__(master, text=text, font=fonts.bold, padx=16, pady=7, cursor="hand2",
+        super().__init__(master, text=text, font=fonts.bold, padx=15, pady=9, cursor="hand2",
                          highlightthickness=1, **kw)
         self._paint(False)
         self.bind("<Enter>", lambda _e: self._paint(True))
@@ -97,13 +97,14 @@ class Segmented(tk.Frame):
 
     def __init__(self, master: tk.Misc, options: list[tuple[str, Any]], value: Any,
                  on_change: Callable[[Any], None], fonts: Fonts) -> None:
-        super().__init__(master, bg=BG)
+        parent_bg = str(master.cget("bg"))
+        super().__init__(master, bg=parent_bg)
         self._labels: list[tuple[tk.Label, Any]] = []
         self._on_change = on_change
         for i, (text, val) in enumerate(options):
             if i:
-                tk.Label(self, text="·", bg=BG, fg=MUTED, font=fonts.ui).pack(side="left", padx=4)
-            lb = tk.Label(self, text=text, bg=BG, font=fonts.bold, cursor="hand2")
+                tk.Label(self, text="·", bg=parent_bg, fg=MUTED, font=fonts.ui).pack(side="left", padx=4)
+            lb = tk.Label(self, text=text, bg=parent_bg, font=fonts.bold, cursor="hand2")
             lb.pack(side="left")
             lb.bind("<Button-1>", self._handler(val))
             self._labels.append((lb, val))
@@ -122,7 +123,7 @@ class Segmented(tk.Frame):
 
 
 def make_entry(master: tk.Misc, fonts: Fonts, **kw: Any) -> tk.Entry:
-    return tk.Entry(master, font=fonts.ui, bg="#15151b", fg=TEXT, insertbackground=PINK, relief="flat",
+    return tk.Entry(master, font=fonts.ui, bg="#24202b", fg=TEXT, insertbackground=PINK, relief="flat",
                     highlightthickness=1, highlightbackground=LINE, highlightcolor=BAR, bd=6, **kw)
 
 

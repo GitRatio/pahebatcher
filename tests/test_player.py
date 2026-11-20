@@ -47,7 +47,8 @@ def test_player_metadata_and_csp(player: PlayerSession) -> None:
     assert "https://cdn.jsdelivr.net" in headers["Content-Security-Policy"]
     assert "connect-src 'self'" in headers["Content-Security-Policy"]
     assert "video-neutral-skin" in data.decode("utf-8")
-    assert "v3.10.0" in data.decode("utf-8")
+    from pahebatcher.config import VERSION
+    assert f"v{VERSION}" in data.decode("utf-8")
 
 
 def test_range_and_seek(player: PlayerSession) -> None:
@@ -155,3 +156,16 @@ def test_player_csp_avoids_unrestricted_remote_requests(player: PlayerSession) -
     assert "connect-src 'self'" in csp
     assert "media-src 'self'" in csp
     assert "style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net" in csp
+
+
+def test_responsive_player_styles_are_consolidated(player: PlayerSession) -> None:
+    status, _headers, page = request(player, f"/watch/{player.token}/")
+    html = page.decode("utf-8")
+    assert status == 200
+    assert html.count('<style nonce=') == 1
+    assert "grid-template-columns: minmax(0, 1fr)" in html
+    assert "@media (max-width: 1050px)" in html
+    assert "@media (max-width: 390px)" in html
+    assert "video-player:fullscreen" in html
+    assert "video-neutral-skin { aspect-ratio: 16 / 9" in html
+    assert "min-height:180px" not in html

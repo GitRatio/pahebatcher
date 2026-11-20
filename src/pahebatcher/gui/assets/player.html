@@ -9,91 +9,124 @@
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@videojs/cdn@10.5.0/global.css" referrerpolicy="no-referrer">
 <script type="module" src="https://cdn.jsdelivr.net/npm/@videojs/cdn@10.5.0/video-neutral.js" referrerpolicy="no-referrer"></script>
 <style nonce="__PLAYER_NONCE__">
-:root{color-scheme:dark;font-family:Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:#090a10;color:#f3f2f8}
-*{box-sizing:border-box}
-body{margin:0;min-height:100vh;background:radial-gradient(circle at 30% -10%,#322039 0,transparent 35%),#090a10}
-button{font:inherit;cursor:pointer}
-.shell{max-width:1540px;margin:auto;padding:24px clamp(16px,3vw,40px) 48px}
-header{display:flex;gap:18px;align-items:center;justify-content:space-between;padding-bottom:22px;border-bottom:1px solid #302832}
-.brand{display:flex;align-items:center;gap:12px;font-weight:800;letter-spacing:-.035em;font-size:22px}
-.mark{display:grid;place-items:center;width:42px;height:42px;border-radius:15px;background:linear-gradient(140deg,#fe5b9b,#bf185f);box-shadow:0 9px 30px #ff3f9030;font-size:24px}
-.edition{color:#aaa2ae;font-size:13px}
-.pill{padding:8px 13px;border:1px solid #493444;background:#1e1520;color:#ffc6db;border-radius:999px;font-size:12px;font-weight:700}
-.layout{display:grid;grid-template-columns:minmax(0,1fr) 320px;gap:24px;margin-top:26px;align-items:start}
-.stage{min-width:0}
-.player-frame{overflow:hidden;background:#000;border:1px solid #35303b;border-radius:18px;box-shadow:0 28px 80px #0007}
-video{display:block;width:100%;aspect-ratio:16/9;max-height:75vh;background:#000;outline:none}
-.video-error{color:#ffa8bb;background:#3b1621;border-top:1px solid #66303b;padding:12px 18px;font-size:13px}
-.video-error[hidden]{display:none}
-.controls{display:flex;justify-content:space-between;gap:12px;align-items:center;flex-wrap:wrap;margin-top:18px}
-.step-buttons{display:flex;gap:10px}
-.control{border:1px solid #49404e;background:#18151e;color:#f4eaf5;border-radius:11px;padding:10px 16px;font-weight:700}
-.control:hover,.control:focus-visible{border-color:#fe5b9b;color:#ff86b8;outline:none}
-.control:disabled{opacity:.36;cursor:not-allowed}
-.control.primary{border-color:#e02b73;background:#df2d78;color:white}
-.control.primary:hover{background:#f04089;color:white}
-.eyebrow{text-transform:uppercase;letter-spacing:.16em;color:#ff77ad;font-size:11px;font-weight:800;margin-top:28px}
-h1{font-size:clamp(22px,2.4vw,33px);line-height:1.2;letter-spacing:-.04em;margin:10px 0 8px}
-.subtitle{color:#a9a4b0;line-height:1.55;margin:0}
-.meta-row{display:flex;gap:10px;flex-wrap:wrap;margin-top:20px}
-.meta{border:1px solid #39303b;background:#17131b;border-radius:9px;padding:9px 12px;color:#b9b0be;font-size:12px}
-.meta strong{color:#f4eaf5;font-weight:700}
-.sidebar{border:1px solid #38303b;border-radius:16px;background:#15121b;overflow:hidden}
-.sidebar-top{padding:22px;border-bottom:1px solid #37303a}
-.sidebar-top h2{font-size:17px;margin:0 0 7px}
-.sidebar-top p{color:#a7a0ad;font-size:13px;margin:0}
-.queue{display:flex;flex-direction:column;max-height:min(72vh,680px);overflow-y:auto;padding:8px}
-.queue button{text-align:left;display:grid;grid-template-columns:45px 1fr;gap:12px;align-items:center;background:transparent;border:1px solid transparent;color:#e9e4eb;padding:12px 10px;border-radius:11px;min-width:0}
-.queue button:hover,.queue button:focus-visible{background:#261a28;border-color:#604052;outline:none}
-.queue button[aria-current="true"]{background:#341b2b;border-color:#c63676}
-.ep-index{width:42px;height:42px;border-radius:9px;background:#29212e;display:grid;place-items:center;color:#ff85b5;font-size:12px;font-weight:800}
-.queue button[aria-current="true"] .ep-index{background:#d42f78;color:#fff}
-.queue-details{display:flex;flex-direction:column;min-width:0;gap:4px}
-.queue-details strong{font-size:13px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.queue-details small{color:#aaa0ae;font-size:12px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-footer{margin-top:30px;color:#857e8a;font-size:12px;line-height:1.6}
-kbd{border:1px solid #4b4050;padding:2px 5px;border-radius:4px;font:inherit;color:#bca8bf}
-@media(max-width:850px){.layout{grid-template-columns:1fr}.queue{max-height:260px}.edition{display:none}}
-@media(max-width:500px){.shell{padding:16px 12px 32px}.brand{font-size:18px}.pill{padding:7px 8px;font-size:10px}.control{padding:9px 12px}}
-@media(prefers-reduced-motion:no-preference){button{transition:background-color .15s,border-color .15s,color .15s}}
-
-/* GitRatio v3.10 — spacious layout, accessible video controls. */
-:root{font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
-body{background:radial-gradient(ellipse at 25% -10%,#251b32 0%,transparent 43%),#0d0e15}
-.shell{max-width:1660px;padding:36px clamp(20px,4vw,72px) 68px}
-header{padding-bottom:28px}
-.layout{grid-template-columns:minmax(0,1fr) minmax(300px,365px);gap:34px;margin-top:36px}
-.player-frame{border-radius:20px;border-color:#34303c;box-shadow:0 22px 70px #0005}
-video-player,video-neutral-skin{display:block;width:100%;max-width:100%}
-video-neutral-skin{aspect-ratio:16/9;--media-controls-before-start:visible}
-video{width:100%;height:auto;min-height:180px;object-fit:contain;aspect-ratio:16/9;max-height:none}
-.controls{margin-top:22px}
-.control{padding:12px 18px;min-height:44px}
-.eyebrow{margin-top:38px}
-h1{font-size:clamp(27px,2.9vw,42px);line-height:1.15;margin:12px 0 12px}
-.subtitle{font-size:15px}
-.meta-row{margin-top:26px;gap:12px}
-.meta{padding:11px 15px;font-size:13px}
-.synopsis{margin-top:32px;padding:25px 28px;border:1px solid #35313c;border-radius:18px;background:#16151e}
-.synopsis h2{margin:0 0 12px;font-size:18px;letter-spacing:-.02em}
-.synopsis p{margin:0;color:#c0b8c6;font-size:14px;line-height:1.75;white-space:pre-line}
-.sidebar{position:sticky;top:24px;border-radius:18px}
-.sidebar-top{padding:26px}
-.sidebar-top h2{font-size:19px}
-.queue{padding:12px;gap:4px}
-.queue button{padding:14px 12px;gap:14px}
-.queue-details strong{font-size:14px}
-.queue-details small{font-size:12px}
-.player-note{margin-top:18px;color:#aca3b1;font-size:13px;line-height:1.6}
-footer{margin-top:26px}
-@media(max-width:950px){.layout{grid-template-columns:1fr;gap:26px}.sidebar{position:static}.queue{max-height:280px}.edition{display:inline}}
-@media(max-width:500px){.shell{padding:20px 14px 38px}.synopsis{padding:18px}.controls{align-items:stretch}.step-buttons{flex:1}.step-buttons .control{flex:1}.brand{font-size:18px}.edition{display:none}}
+:root {
+  color-scheme: dark;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --bg: #0d0d14;
+  --panel: #17151e;
+  --raised: #201b26;
+  --border: #39313e;
+  --text: #f3edf5;
+  --muted: #b5aab9;
+  --accent: #f45b9d;
+  --accent-strong: #d93279;
+  --focus: #ffa9cc;
+  background: var(--bg);
+  color: var(--text);
+}
+*, *::before, *::after { box-sizing: border-box; }
+html { min-width: 0; scroll-behavior: smooth; }
+body {
+  min-width: 0;
+  margin: 0;
+  min-height: 100vh;
+  background:
+    radial-gradient(ellipse 650px 430px at 16% -9%, #312037 0%, transparent 76%),
+    var(--bg);
+}
+button { font: inherit; cursor: pointer; }
+button:focus-visible { outline: 2px solid var(--focus); outline-offset: 3px; }
+[hidden] { display: none !important; }
+.shell { width: min(100%, 1580px); margin-inline: auto; padding: clamp(18px, 3vw, 44px) clamp(16px, 3.5vw, 56px) 56px; }
+header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 16px 24px;
+  padding-bottom: 24px;
+  border-bottom: 1px solid var(--border);
+}
+.brand { min-width: 0; display: flex; align-items: center; gap: 14px; font-size: clamp(19px, 2.1vw, 24px); font-weight: 800; letter-spacing: -.035em; }
+.brand-name { min-width: 0; }
+.edition { display: block; color: var(--muted); font-size: 12px; font-weight: 600; letter-spacing: .015em; margin-top: 3px; }
+.mark { display: grid; place-items: center; flex: 0 0 46px; width: 46px; height: 46px; border-radius: 14px; font-size: 24px; background: linear-gradient(140deg, #fc69a7, #ab1a62); box-shadow: 0 8px 25px #ff3f9029; }
+.pill { flex: 0 0 auto; padding: 9px 13px; border: 1px solid #57364e; border-radius: 999px; background: #261824; color: #ffc5db; font-size: 11px; font-weight: 750; letter-spacing: .06em; }
+.layout { display: grid; grid-template-columns: minmax(0, 1fr) minmax(280px, 340px); gap: clamp(22px, 2.7vw, 38px); align-items: start; margin-top: 30px; }
+.stage, .sidebar, .player-frame, .queue-details { min-width: 0; }
+.player-frame { width: 100%; overflow: hidden; border: 1px solid #3c3340; background: #000; border-radius: 18px; box-shadow: 0 22px 68px #0006; }
+video-player, video-neutral-skin { display: block; width: 100%; max-width: 100%; }
+video-neutral-skin { aspect-ratio: 16 / 9; --media-controls-before-start: visible; }
+video { display: block; width: 100%; max-width: 100%; height: 100%; object-fit: contain; background: #000; }
+video-player:not(:defined) video { aspect-ratio: 16 / 9; height: auto; }
+video-player:fullscreen { background: #000; display: grid; place-items: center; width: 100vw; height: 100dvh; }
+video-player:fullscreen video-neutral-skin { aspect-ratio: auto; height: 100%; width: 100%; }
+.video-error { color: #ffc8d5; padding: 13px 18px; background: #3e1b29; border-top: 1px solid #6b3448; font-size: 13px; line-height: 1.5; }
+.controls { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; margin-top: 20px; }
+.step-buttons { min-width: 0; display: flex; flex-wrap: wrap; align-items: center; gap: 10px; }
+.control { min-height: 44px; padding: 10px 16px; color: var(--text); background: #1b1922; border: 1px solid #514653; border-radius: 11px; font-weight: 700; white-space: nowrap; }
+.control:hover { border-color: var(--accent); color: #ff9cc6; background: #2b1e2d; }
+.control:disabled { opacity: .45; cursor: not-allowed; }
+.control.primary { color: #fff; background: var(--accent-strong); border-color: var(--accent-strong); }
+.control.primary:hover { color: #fff; background: #eb438c; }
+.eyebrow { margin: 32px 0 9px; color: #ff89ba; font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: .15em; }
+h1 { margin: 0 0 9px; font-size: clamp(26px, 2.7vw, 39px); line-height: 1.17; letter-spacing: -.035em; overflow-wrap: anywhere; }
+.subtitle { margin: 0; color: var(--muted); font-size: 15px; line-height: 1.6; overflow-wrap: anywhere; }
+.meta-row { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 21px; }
+.meta { padding: 10px 13px; border: 1px solid var(--border); border-radius: 10px; background: var(--panel); color: var(--muted); font-size: 12px; }
+.meta strong { margin-left: 4px; color: var(--text); font-weight: 750; }
+.synopsis { margin-top: 27px; padding: 24px 26px; border: 1px solid var(--border); border-radius: 16px; background: var(--panel); }
+.synopsis h2 { margin: 0 0 10px; font-size: 18px; letter-spacing: -.025em; }
+.synopsis p { margin: 0; color: #c9c1cd; font-size: 14px; line-height: 1.75; white-space: pre-line; overflow-wrap: anywhere; }
+.player-note { margin: 16px 0 0; color: #afa5b3; font-size: 12px; line-height: 1.55; }
+.sidebar { position: sticky; top: 22px; overflow: hidden; border: 1px solid var(--border); border-radius: 17px; background: var(--panel); }
+.sidebar-top { padding: 21px 22px; border-bottom: 1px solid var(--border); }
+.sidebar-top h2 { margin: 0 0 6px; font-size: 18px; }
+.sidebar-top p { margin: 0; color: var(--muted); font-size: 12px; }
+.queue { display: flex; flex-direction: column; gap: 4px; padding: 10px; max-height: min(70vh, 680px); overflow-y: auto; overscroll-behavior: contain; }
+.queue button { display: grid; grid-template-columns: 42px minmax(0, 1fr); align-items: center; min-width: 0; padding: 11px; gap: 12px; color: var(--text); background: transparent; border: 1px solid transparent; border-radius: 11px; text-align: left; }
+.queue button:hover, .queue button:focus-visible { background: #2b222f; border-color: #624156; }
+.queue button[aria-current="true"] { background: #382234; border-color: #cc4885; }
+.ep-index { display: grid; place-items: center; width: 42px; height: 42px; border-radius: 9px; background: #302634; color: #ffa0c9; font-size: 12px; font-weight: 800; }
+.queue button[aria-current="true"] .ep-index { color: #fff; background: var(--accent-strong); }
+.queue-details { display: flex; flex-direction: column; gap: 4px; }
+.queue-details strong { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 13px; }
+.queue-details small { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: #b7a9ba; font-size: 12px; }
+footer { margin-top: 24px; color: #a49aac; font-size: 12px; line-height: 1.8; }
+kbd { display: inline-block; min-width: 18px; padding: 1px 5px; border: 1px solid #54465a; border-radius: 5px; color: #e9c4d6; font: inherit; text-align: center; }
+@media (max-width: 1050px) {
+  .layout { grid-template-columns: minmax(0, 1fr); gap: 24px; }
+  .sidebar { position: static; }
+  .queue { max-height: 300px; }
+}
+@media (max-width: 600px) {
+  .shell { padding: 18px 15px 34px; }
+  header { align-items: flex-start; gap: 12px; }
+  .pill { padding: 7px 10px; font-size: 10px; }
+  .layout { margin-top: 20px; }
+  .player-frame { border-radius: 12px; }
+  .controls { gap: 10px; }
+  .control { min-height: 42px; padding-inline: 12px; font-size: 12px; }
+  .eyebrow { margin-top: 26px; }
+  .synopsis { padding: 18px; }
+  .meta { padding: 9px 10px; }
+}
+@media (max-width: 390px) {
+  .brand { font-size: 18px; }
+  .pill { max-width: 100%; }
+  .step-buttons { width: 100%; }
+  .step-buttons .control { flex: 1; }
+  #full { width: 100%; }
+}
+@media (prefers-reduced-motion: no-preference) {
+  .control, .queue button { transition: background-color .16s, border-color .16s, color .16s; }
+}
 </style>
 </head>
 <body>
 <div class="shell">
 <header>
-<div class="brand"><span class="mark" aria-hidden="true">🐰</span><span>PaheBatcher <span class="edition">/ GitRatio Edition · v__APP_VERSION__</span></span></div>
+<div class="brand"><span class="mark" aria-hidden="true">🐰</span><span class="brand-name">PaheBatcher <span class="edition">GitRatio Edition · v__APP_VERSION__</span></span></div>
 <span class="pill">LOCAL · PRIVATE PLAYBACK</span>
 </header>
 <main class="layout">
