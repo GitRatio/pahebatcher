@@ -153,6 +153,7 @@ class _PlayerHandler(BaseHTTPRequestHandler):
                     "episode": item.episode,
                     "title": item.title,
                     "audio": item.audio,
+                    "format": item.path.suffix.lower().lstrip(".").upper(),
                     "src": f"/media/{self.session.token}/{index}",
                 }
                 for index, item in enumerate(self.session.items)
