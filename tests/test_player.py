@@ -193,7 +193,7 @@ def test_full_resolution_mascot_is_served_locally(player: PlayerSession) -> None
     status, headers, png = request(player, image_url)
     assert status == 200
     assert headers["Content-Type"] == "image/png"
-    assert png.startswith(b"\\x89PNG\\r\\n\\x1a\\n")
+    assert png.startswith(bytes([137, 80, 78, 71, 13, 10, 26, 10]))
     assert unpack(">II", png[16:24]) == (650, 650)
     assert request(player, "/mascot/invalid/bunny.png")[0] == 404
     assert request(player, image_url, {"Origin": "https://evil.example"})[0] == 403
