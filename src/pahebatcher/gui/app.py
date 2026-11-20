@@ -760,6 +760,9 @@ class App(tk.Tk):
                            font=f.label, fill="#5ceef6", anchor="nw")
         banner.create_text(890, 13, text="GR", font=(f.logo[0], 65, "bold"),
                            fill="#512641", anchor="nw")
+        if hasattr(self, "_takeover_mascot"):
+            art = banner.create_image(0, -9, anchor="ne", image=self._takeover_mascot)
+            banner.bind("<Configure>", lambda e: banner.coords(art, e.width - 32, -9))
         status = tk.Frame(hdr, bg=BG)
         status.pack(fill="x", pady=(12, 12))
         self.dot_solver = tk.Label(status, text="● Solver", font=f.small, fg=MUTED, bg=BG)
