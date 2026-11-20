@@ -38,7 +38,7 @@ class TestBenchmark:
 
 class TestDocsCoherence:
     def test_readme_mentions_correct_test_count(self) -> None:
-        readme = Path("README.md").read_text()
+        readme = Path("README.md").read_text(encoding="utf-8")
         # Find "make test" description and count actual tests
         result = subprocess.run(
             [sys.executable, "-m", "pytest", "tests/", "--collect-only", "-q"],
@@ -70,7 +70,7 @@ class TestDocsCoherence:
         assert VERSION == __version__
 
     def test_makefile_targets_exist(self) -> None:
-        makefile = Path("Makefile").read_text()
+        makefile = Path("Makefile").read_text(encoding="utf-8")
         for target in ["test", "lint", "typecheck", "clean", "help"]:
             assert f"{target}:" in makefile or f"{target} :" in makefile or target in makefile
 
