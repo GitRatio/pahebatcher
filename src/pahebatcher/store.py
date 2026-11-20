@@ -171,7 +171,7 @@ class SegmentStore:
         return self.dir / f"{idx:06d}.ts"
 
     def has_seg(self, idx: int) -> bool:
-        return self.seg_path(idx).exists()
+        path = self.seg_path(idx)\n        return path.is_file() and path.stat().st_size > 0
 
     def done_indices(self) -> set[int]:
         # An interrupted or failed write may leave an empty segment file.
@@ -181,11 +181,11 @@ class SegmentStore:
     def write_seg(self, idx: int, data: bytes) -> None:
         tmp = self.seg_path(idx).with_suffix(".tmp")
         tmp.write_bytes(data)
-        tmp.rename(self.seg_path(idx))
+        # Replace an existing zero-byte/stale segment on Windows as well as POSIX.\n        tmp.replace(self.seg_path(idx))
 
     def assemble(self, n_segments: int, out: Path) -> bool:
         """Assemble segments to MP4 via contiguous pipe (primary) or concat demuxer (fallback)."""
-        missing = [i for i in range(n_segments) if not self.seg_path(i).exists()]
+        missing = [i for i in range(n_segments) if not self.has_seg(i)]
         if missing:
             return False
 
