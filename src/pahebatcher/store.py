@@ -174,7 +174,9 @@ class SegmentStore:
         return self.seg_path(idx).exists()
 
     def done_indices(self) -> set[int]:
-        return {int(p.stem) for p in self.dir.glob("??????.ts")}
+        # An interrupted or failed write may leave an empty segment file.
+        # Do not treat it as completed during resume.
+        return {int(p.stem) for p in self.dir.glob("??????.ts") if p.stat().st_size > 0}
 
     def write_seg(self, idx: int, data: bytes) -> None:
         tmp = self.seg_path(idx).with_suffix(".tmp")
