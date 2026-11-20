@@ -126,7 +126,7 @@ class _PlayerHandler(BaseHTTPRequestHandler):
             "Content-Security-Policy",
             "default-src 'none'; "
             f"script-src 'nonce-{self.session.nonce}' https://cdn.jsdelivr.net; "
-            f"style-src 'nonce-{self.session.nonce}' https://cdn.jsdelivr.net; "
+            "style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; "
             "connect-src 'self'; media-src 'self'; img-src 'self' data:; "
             "base-uri 'none'; form-action 'none'; frame-ancestors 'none'",
         )
