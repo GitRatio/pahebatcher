@@ -1,0 +1,55 @@
+name: Windows 11 GUI preview
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - ".github/workflows/windows-preview.yml"
+      - "src/**"
+      - "scripts/**"
+      - "pyproject.toml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build-windows-gui:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+      - name: Install build dependencies
+        run: python -m pip install -e ".[browser]" pyinstaller
+      - name: Verify Tkinter
+        run: python -c "import tkinter; print('Tk', tkinter.TkVersion)"
+      - name: Build Windows desktop executable
+        run: >
+          python -m PyInstaller scripts/pyinstaller_gui_entry.py
+          --onefile --windowed --clean --noconfirm
+          --name pahebatcher-gui
+          --icon src/pahebatcher/gui/assets/icon.ico
+          --add-data "src/pahebatcher/gui/assets;pahebatcher/gui/assets"
+          --paths src
+          --collect-all curl_cffi
+          --collect-all Cryptodome
+          --collect-all patchright
+          --collect-submodules pahebatcher
+      - name: Verify output and generate SHA256
+        shell: pwsh
+        run: |
+          $exe = "dist/pahebatcher-gui.exe"
+          if (!(Test-Path $exe)) { throw "GUI build missing" }
+          $hash = (Get-FileHash $exe -Algorithm SHA256).Hash.ToLowerInvariant()
+          "$hash  pahebatcher-gui.exe" | Set-Content -Encoding ascii "dist/pahebatcher-gui.exe.sha256"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: GitRatio-PaheBatcher-Windows11-preview
+          path: |
+            dist/pahebatcher-gui.exe
+            dist/pahebatcher-gui.exe.sha256
+          if-no-files-found: error
+          retention-days: 14
