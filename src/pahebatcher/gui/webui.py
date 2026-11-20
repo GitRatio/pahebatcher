@@ -85,7 +85,7 @@ class TakeoverApi:
                           "ep_str": ep.ep_str, "audio": ep.audio} for ep in anime.episodes],
         }
 
-    def save_settings(self, updates: dict[str, Any]) -> dict[str, bool]:
+    def save_settings(self, updates: object) -> dict[str, bool]:
         if not isinstance(updates, dict) or set(updates) - {"quality", "audio_lang", "max_parallel"}:
             raise ValueError("Unsupported setting.")
         # Validate the entire payload before changing any saved preference.
