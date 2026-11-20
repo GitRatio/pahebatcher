@@ -451,20 +451,35 @@ class SearchView(tk.Frame):
         self.app = app
         self.results: list[dict[str, Any]] = []
         self._token = 0
+        tk.Label(self, text="SEARCH ANIME", font=f.title, fg=TEXT,
+                 bg=BG, anchor="w").pack(fill="x", pady=(0, 7))
+        tk.Label(self, text="Find a series, open its episodes, and download your selection.",
+                 font=f.small, fg=MUTED, bg=BG, anchor="w").pack(
+                     fill="x", pady=(0, 15),
+                 )
         row = tk.Frame(self, bg=BG)
         row.pack(fill="x")
         self.entry = make_entry(row, f)
         self.entry.pack(side="left", fill="x", expand=True, ipady=4)
         self.entry.bind("<Return>", lambda _e: self.search())
-        self.btn = Button(row, "Search", self.search, f, primary=True)
+        self.btn = Button(row, "⌕  Search", self.search, f, primary=True)
         self.btn.pack(side="left", padx=(10, 0))
         self.status = tk.Label(self, text="Search for an anime, then double-click a result.", font=f.small,
                                fg=MUTED, bg=BG, anchor="w")
-        self.status.pack(fill="x", pady=(10, 8))
+        self.status.pack(fill="x", pady=(14, 11))
+        tk.Label(self, text="SEARCH RESULTS", font=f.label, fg=PINK,
+                 bg=BG, anchor="w").pack(fill="x", pady=(0, 8))
         frame, self.lb = make_listbox(self, f)
-        frame.pack(fill="both", expand=True)
+        frame.pack(fill="both", expand=True, ipadx=8, ipady=9)
         self.lb.bind("<Double-Button-1>", lambda _e: self.open())
         self.lb.bind("<Return>", lambda _e: self.open())
+        footer = tk.Frame(self, bg=BG)
+        footer.pack(fill="x", pady=(12, 0))
+        Button(footer, "Open selected series  →", self.open, f, primary=True).pack(
+            side="right",
+        )
+        tk.Label(footer, text="Double-click a result to choose episodes",
+                 fg=MUTED, bg=BG, font=f.small).pack(side="left")
 
         settings = tk.Frame(self, bg=PANEL, highlightthickness=1, highlightbackground=LINE)
         settings.pack(fill="x", pady=(18, 0))
@@ -575,7 +590,7 @@ class SearchView(tk.Frame):
 class App(tk.Tk):
     def __init__(self) -> None:
         super().__init__()
-        self.title(f"PaheBatcher · GitRatio Edition v{VERSION}")
+        self.title(f"GitRatio · PaheBatcher Anime Downloader v{VERSION}")
         self.geometry("1360x880")
         self.minsize(1030, 700)
         self.configure(bg=BG)
@@ -681,6 +696,7 @@ class App(tk.Tk):
                 encoding="ascii",
             ).strip()
             self._takeover_mascot = tk.PhotoImage(data=png_base64, format="png")
+            self.iconphoto(True, self._takeover_mascot)
             tk.Label(mascot_area, image=self._takeover_mascot,
                      bg="#101421", bd=0).pack(anchor="center")
         except (OSError, tk.TclError, ValueError):
