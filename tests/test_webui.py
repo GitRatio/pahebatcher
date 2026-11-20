@@ -28,6 +28,10 @@ def test_desktop_ui_has_correct_screen_contract() -> None:
     assert f"v{VERSION}" in html
     assert "Solo Leveling" not in html  # no fake sample data pretending to be actual results
     assert "__BUNNY__" not in html
+    assert 'id="about-version"' in html
+    assert 'class="about-details"' in html
+    assert "ready.version" in javascript
+    assert "takeover_bunny.b64" not in html
 
 
 def test_bundled_mascot_and_icons_are_valid_images() -> None:
@@ -68,6 +72,9 @@ def test_external_link_restricted_to_gitratio_repository(monkeypatch: pytest.Mon
     monkeypatch.setattr(webui.webbrowser, "open", lambda url: True)
     assert webui.TakeoverApi.open_external(
         "https://github.com/GitRatio/pahebatcher/releases/tag/preview"
+    ) == {"ok": True}
+    assert webui.TakeoverApi.open_external(
+        "https://github.com/abdullahkhfb/pahebatcher"
     ) == {"ok": True}
     for url in ("https://evil.example/", "http://github.com/GitRatio/pahebatcher",
                 "https://github.com/GitRatio/pahebatcher.evil/", "javascript:alert(1)"):
