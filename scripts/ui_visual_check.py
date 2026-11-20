@@ -27,8 +27,19 @@ def main() -> None:
     try:
         with sync_playwright() as driver:
             browser = driver.chromium.launch(headless=True, args=['--no-sandbox'])
-            for width, height in ((1448, 1086), (1100, 820), (820, 950)):
-                page = browser.new_page(viewport={'width': width, 'height': height}, device_scale_factor=1)
+            # High-DPI cases use reduced CSS viewports matching a 1100px window at
+            # 125% and 150% OS scale. DPR alone would not expose layout clipping.
+            cases = (
+                (1448, 1086, 1),
+                (1100, 820, 1),
+                (820, 950, 1),
+                (880, 820, 1.25),
+                (733, 820, 1.5),
+            )
+            for width, height, scale in cases:
+                page = browser.new_page(
+                    viewport={'width': width, 'height': height}, device_scale_factor=scale
+                )
                 errors: list[str] = []
                 page.on('pageerror', lambda exc: errors.append(str(exc)))
                 page.goto(f'http://127.0.0.1:{server.server_port}/desktop.html', wait_until='load')
@@ -50,7 +61,10 @@ def main() -> None:
                   document.querySelector('#selection-summary').textContent =
                      '3 episodes selected · size estimate';
                 }''')
-                page.screenshot(path=str(OUT / f'episodes-{width}x{height}.png'), full_page=True)
+                page.screenshot(
+                    path=str(OUT / f'episodes-{width}x{height}-scale-{scale}.png'),
+                    full_page=True,
+                )
                 cta = page.locator('#download-selected')
                 assert cta.count() == 1 and cta.is_visible(), 'Download action must render'
                 bounds = cta.bounding_box()
@@ -85,6 +99,8 @@ def main() -> None:
               }};
             })();""")
             screen.goto(f'http://127.0.0.1:{server.server_port}/desktop.html', wait_until='load')
+            screen.locator('#query').wait_for()
+            screen.screenshot(path=str(OUT / 'home-1448x1086.png'), full_page=True)
             screen.locator('#query').fill('Example')
             screen.locator('#search-button').click()
             screen.locator('.result-card').first.wait_for()
