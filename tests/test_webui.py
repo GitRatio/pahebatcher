@@ -34,6 +34,12 @@ def test_desktop_ui_has_correct_screen_contract() -> None:
     assert "takeover_bunny.b64" not in html
 
 
+def test_default_python_module_launches_native_gui() -> None:
+    launcher = (ASSETS.parent / "__main__.py").read_text(encoding="utf-8")
+    assert "pahebatcher.gui.webui import main" in launcher
+    assert "pahebatcher.gui.app import main" not in launcher
+
+
 def test_bundled_mascot_and_icons_are_valid_images() -> None:
     png = (ASSETS / "bunny.png").read_bytes()
     assert png[:8] == b"\x89PNG\r\n\x1a\n"
