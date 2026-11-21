@@ -185,7 +185,7 @@
       p.textContent = 'Episode ' + item.episode + ' · ' + item.state + ' · ' + Math.round((item.fraction || 0) * 100) + '%';
       root.append(p);
     }
-    if (data.active && !poll) poll = setInterval(() => refreshStatus().catch(showError), 800);
+    if (data.active && !poll) poll = setInterval(() => refreshStatus().catch(showError), 2000);
     if (!data.active && poll) {clearInterval(poll);poll=null;}
   }
   async function refreshLibrary() {
@@ -210,6 +210,19 @@
     try { const result = await call('play', id); if (!result || !result.ok) throw new Error('Could not open this video.'); }
     catch (err) { showError(err); }
   }
+  async function showReleaseUpdate() {
+    // The Python backend performs one bounded request per launch. This method
+    // only reads the in-memory result; no browser network call or polling.
+    try {
+      const latest = await call('update_status');
+      if (!latest || !latest.available || !/^\\d+\\.\\d+\\.\\d+$/.test(latest.version || '')) return;
+      $('release-update-label').textContent = 'PaheBatcher v' + latest.version + ' is available on GitHub.';
+      $('release-update').hidden = false;
+    } catch (error) {
+      // Offline is normal; updates must never interrupt the downloader.
+      console.debug('Update check unavailable.', error);
+    }
+  }
   async function startup() {
     const ready = await call('bootstrap');
     if (ready && ready.settings) {
@@ -225,6 +238,8 @@
     if (!ready.solver_ok) notice('The site solver is not ready. Check the bundled browser prerequisites.', true);
     await refreshStatus();
     setPage('home');
+    // One delayed, in-memory result read: avoids holding up startup.
+    setTimeout(showReleaseUpdate, 4000);
   }
   function hooks() {
     document.querySelectorAll('[data-nav]').forEach((el) => el.addEventListener('click', () => setPage(el.dataset.nav)));
@@ -245,6 +260,9 @@
     $('go-library').addEventListener('click', () => setPage('library'));
     $('home-view-downloads').addEventListener('click', () => setPage('downloads'));
     $('player-open').addEventListener('click', () => setPage('library'));
+    $('release-update-open').addEventListener('click', () =>
+      call('open_external', 'https://github.com/GitRatio/pahebatcher/releases/tag/preview').catch(showError));
+    $('release-update-dismiss').addEventListener('click', () => { $('release-update').hidden = true; });
     document.querySelectorAll('a[href^="https://"]').forEach((a) => a.addEventListener('click', (e) => {
       e.preventDefault();call('open_external',a.href).catch(showError);
     }));
