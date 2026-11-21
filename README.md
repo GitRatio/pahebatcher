@@ -4,13 +4,13 @@
 
 **Independent, open-source desktop edition** of [abdullahkhfb/pahebatcher](https://github.com/abdullahkhfb/pahebatcher), with the GitRatio Bunny Takeover interface. Download anime episodes in batches, resume interrupted transfers, and play downloaded files locally.
 
-**Current application version:** 3.13.0 · **Platforms:** Windows 11 x64, macOS Intel, macOS Apple Silicon and Linux x64 · **License:** MIT
+**Current application version:** 3.13.1 · **Platforms:** Windows 11 x64, macOS Intel, macOS Apple Silicon and Linux x64 · **License:** MIT
 
 The default desktop interface is built with **pywebview + local HTML/CSS**; the Python download engine and terminal interface remain available. Windows uses WebView2, macOS uses WebKit and Linux uses Qt WebEngine. The classic Tkinter UI remains available separately.
 
-### v3.13.0 preview — published
+### v3.13.1 preview — published
 
-The changes in [PR #9](https://github.com/GitRatio/pahebatcher/pull/9) add a bounded multi-series queue, Unicode-safe Windows GUI output, more accurate partial-download status, and a compact in-app GitHub update notice. The About page displays the installed version and release status; it never downloads or installs an update automatically. Release checks use one small, bounded GitHub API request per app launch, and transfer status refreshes every two seconds instead of 800 milliseconds to lower idle CPU use. These features are included in the published v3.13.0 preview.
+The changes in [PR #9](https://github.com/GitRatio/pahebatcher/pull/9) add a bounded multi-series queue, Unicode-safe Windows GUI output, more accurate partial-download status, and a compact in-app GitHub update notice. The About page displays the installed version and release status; it never downloads or installs an update automatically. Release checks use one small, bounded GitHub API request per app launch, and transfer status refreshes every two seconds instead of 800 milliseconds to lower idle CPU use. These features are included in the published v3.13.1 preview.
 
 **Low-resource approach:** no added update-check dependencies or resident update service, no automatic installer cache, and one active series at a time with bounded episode concurrency. The queue is currently in-memory and will not survive an app restart; restart persistence is a separate future milestone. The app's About page and GitHub release notes describe the current functionality.
 
@@ -19,7 +19,7 @@ The changes in [PR #9](https://github.com/GitRatio/pahebatcher/pull/9) add a bou
 
 **Size and artwork:** The mascot is retained at full resolution and compressed losslessly during packaging. Decorative artwork no longer intercepts navigation clicks. Linux builds are testing removal of non-runtime debug symbols; this saves space without dropping Qt libraries. Compare the downloaded package size with the latest [rolling release](https://github.com/GitRatio/pahebatcher/releases/tag/preview). Runtime acceptance on real devices remains necessary.
 
-## Downloads — v3.13.0 preview
+## Downloads — v3.13.1 preview
 
 | Operating system | Preview package |
 | --- | --- |
