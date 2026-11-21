@@ -231,7 +231,7 @@ jobs:
         with:
           tag_name: preview
           target_commitish: ${{ github.sha }}
-          name: PaheBatcher GitRatio Edition · v3.12.0 Preview (unsigned)
+          name: PaheBatcher GitRatio Edition · v3.13.0 Preview (unsigned)
           body: |
             Rolling development preview built automatically from the tested main branch.
             These downloads are NOT digitally signed or macOS notarized.
