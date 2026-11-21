@@ -179,6 +179,9 @@ jobs:
           for path in sorted(paths, key=lambda p: p.stat().st_size, reverse=True)[:18]:
               print(f"{path.stat().st_size / 1048576:8.1f} MiB  {path}")
           PY
+      - name: Strip non-runtime Linux ELF debug symbols
+        if: matrix.platform == 'linux'
+        run: python scripts/strip_linux_debug.py dist/PaheBatcher
       - name: Package macOS application
         if: matrix.platform == 'macos'
         run: |
@@ -195,6 +198,8 @@ jobs:
           cp src/pahebatcher/gui/assets/icon.png package/icon.png
           chmod 755 package/install.sh
           tar -C package -czf "dist/PaheBatcher-linux-${{ matrix.arch }}.tar.gz" .
+          du -h "dist/PaheBatcher-linux-${{ matrix.arch }}.tar.gz"
+          tar -tvzf "dist/PaheBatcher-linux-${{ matrix.arch }}.tar.gz" | grep -m 3 "link to" || true
       - uses: actions/upload-artifact@v4
         with:
           name: PaheBatcher-${{ matrix.platform }}-${{ matrix.arch }}
@@ -245,11 +250,14 @@ jobs:
         with:
           tag_name: preview
           target_commitish: ${{ github.sha }}
-          name: PaheBatcher GitRatio Edition · v3.13.0 Preview (unsigned)
+          name: PaheBatcher GitRatio Edition · v3.13.1 Preview (unsigned)
           body: |
             Rolling development preview built automatically from the tested main branch.
             These downloads are NOT digitally signed or macOS notarized.
             For Windows SmartScreen or macOS Gatekeeper warnings, review the source or build locally.
+            Includes queued multi-series downloads, Windows Unicode fixes, compact GitHub update notices, and Bunny Takeover navigation overlay repairs.
+            Linux packages are optimized by removing non-runtime ELF debug symbols without removing required shared libraries.
+            Mascot images retain their original resolution and are losslessly compressed for packaging.
             Test playback and download behavior on your own device before treating it as production ready.
             Source code and attribution: https://github.com/GitRatio/pahebatcher
           prerelease: true
