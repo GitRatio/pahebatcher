@@ -32,6 +32,7 @@
     notice('');
     if (page === 'library' || page === 'player') refreshLibrary().catch(showError);
     if (page === 'downloads') refreshStatus().catch(showError);
+    if (page === 'about') renderAboutUpdateStatus().catch(() => {});
   }
   function showError(error) {
     notice(error && error.message ? error.message : String(error), true);
@@ -210,6 +211,17 @@
     try { const result = await call('play', id); if (!result || !result.ok) throw new Error('Could not open this video.'); }
     catch (err) { showError(err); }
   }
+  async function renderAboutUpdateStatus() {
+    const info = await call('update_status');
+    const label = $('about-update-status');
+    if (info && info.available && typeof info.version === 'string') {
+      label.textContent = 'A newer GitHub preview (v' + info.version + ') is available. Open Release notes below to get it manually.';
+    } else if (info && info.checked) {
+      label.textContent = 'No newer version reported, or GitHub was unavailable. Check Release notes for the latest preview.';
+    } else {
+      label.textContent = 'Checking GitHub release metadata once this session. No update files are downloaded.';
+    }
+  }
   async function showReleaseUpdate() {
     // The Python backend performs one bounded request per launch. This method
     // only reads the in-memory result; no browser network call or polling.
@@ -263,6 +275,7 @@
     $('release-update-open').addEventListener('click', () =>
       call('open_external', 'https://github.com/GitRatio/pahebatcher/releases/tag/preview').catch(showError));
     $('release-update-dismiss').addEventListener('click', () => { $('release-update').hidden = true; });
+    $('about-check-updates').addEventListener('click', () => renderAboutUpdateStatus().catch(showError));
     document.querySelectorAll('a[href^="https://"]').forEach((a) => a.addEventListener('click', (e) => {
       e.preventDefault();call('open_external',a.href).catch(showError);
     }));
