@@ -28,18 +28,17 @@ def test_debug_strip_preserves_runtime_symbols(tmp_path: Path) -> None:
     changed, saved = strip_debug.optimize(tmp_path)
     assert changed == 0  # small fixture is intentionally skipped by 1 MiB limit
     assert saved == 0
-    # Build a larger library with genuine debug symbols to test the pipeline.
-    large_source = tmp_path / "large_fixture.c"
-    large_source.write_text(
-        "int exported_answer(void) { return 42; }\n" +
-        "\n".join(f"static int placeholder_{i}(void) {{ return {i}; }}" for i in range(25000)),
-        encoding="utf-8",
-    )
+    if not shutil.which("objcopy"):
+        pytest.skip("objcopy is unavailable")
+    # Use a synthetic debug section instead of compiling 25,000 functions.
     large_lib = tmp_path / "large_fixture.so"
-    subprocess.run(["gcc", "-g", "-O0", "-shared", "-fPIC", str(large_source),
-                    "-o", str(large_lib)], check=True)
-    if large_lib.stat().st_size < 1024 * 1024:
-        pytest.skip("Compiler emitted a smaller fixture than expected")
+    shutil.copy2(output, large_lib)
+    debug_section = tmp_path / "extra_debug.bin"
+    debug_section.write_bytes(bytes([42]) * (2 * 1024 * 1024))
+    subprocess.run(
+        ["objcopy", "--add-section", f".debug_extra={debug_section}", str(large_lib)],
+        check=True,
+    )
     before = large_lib.stat().st_size
     changed, saved = strip_debug.optimize(tmp_path)
     assert changed >= 1 and saved > 0 and large_lib.stat().st_size < before
