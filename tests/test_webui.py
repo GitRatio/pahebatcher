@@ -93,3 +93,75 @@ def test_external_link_restricted_to_gitratio_repository(monkeypatch: pytest.Mon
                 "https://github.com/GitRatio/pahebatcher.evil/", "javascript:alert(1)"):
         with pytest.raises(ValueError):
             webui.TakeoverApi.open_external(url)
+
+def test_multiseries_queue_runs_serially_and_preserves_selected_series(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    import concurrent.futures
+    from types import SimpleNamespace
+
+    from pahebatcher import ffmpeg_setup
+
+    monkeypatch.setattr(ffmpeg_setup, "find_ffmpeg", lambda: "/usr/bin/ffmpeg")
+    api = webui.TakeoverApi.__new__(webui.TakeoverApi)
+    api._lock = threading.RLock()
+    api._ready = lambda: None  # type: ignore[method-assign]
+    api._pending = []
+    api._queue_limit = 20
+    api._job = None
+    api._job_error = ""
+    api._job_result = ""
+    api._job_count = 0
+    api._job_title = ""
+    api._job_total_done = 0
+    ep_a, ep_b = SimpleNamespace(ep_str="1"), SimpleNamespace(ep_str="2")
+    anime_a = SimpleNamespace(title="Series A", episodes=[ep_a])
+    anime_b = SimpleNamespace(title="Series B", episodes=[ep_b])
+    api._anime = anime_a
+    submitted: list[concurrent.futures.Future] = []
+
+    class FakeBackend:
+        current_dash = None
+
+        async def download(self, anime: object, episodes: list[object]) -> dict:
+            return {}
+
+    api.backend = FakeBackend()  # type: ignore[assignment]
+
+    def submit(coro: object) -> concurrent.futures.Future:
+        coro.close()  # type: ignore[attr-defined]
+        future: concurrent.futures.Future = concurrent.futures.Future()
+        submitted.append(future)
+        return future
+
+    api._submit = submit  # type: ignore[method-assign]
+    assert api.download([0])["started"]
+    api._anime = anime_b
+    assert api.download([0])["started"]
+    assert len(submitted) == 1
+    assert api.status()["queued"] == [{"title": "Series B", "episodes": 1}]
+    submitted[0].set_result({"1": Path("a.mp4")})
+    assert len(submitted) == 2
+    assert api._job_title == "Series B"
+    assert not api._pending
+    submitted[1].set_result({"2": None})
+    result = api.status()
+    assert not result["active"]
+    assert result["completed_episodes"] == 1
+    assert result["fraction"] < 1
+    assert "Partial download" in result["message"]
+
+
+def test_multiseries_queue_rejects_invalid_selection_without_mutation(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    api = webui.TakeoverApi.__new__(webui.TakeoverApi)
+    api._lock = threading.RLock()
+    api._ready = lambda: None  # type: ignore[method-assign]
+    api._pending = []
+    api._queue_limit = 20
+    api._anime = None
+    for indices in ([0, 0], [-1], ["0"], list(range(501)), []):
+        with pytest.raises(ValueError):
+            api.download(indices)  # type: ignore[arg-type]
+    assert api._pending == []
