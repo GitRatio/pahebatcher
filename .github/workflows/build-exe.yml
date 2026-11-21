@@ -179,9 +179,9 @@ jobs:
           for path in sorted(paths, key=lambda p: p.stat().st_size, reverse=True)[:18]:
               print(f"{path.stat().st_size / 1048576:8.1f} MiB  {path}")
           PY
-      - name: Deduplicate byte-identical Linux runtime libraries
+      - name: Strip non-runtime Linux ELF debug symbols
         if: matrix.platform == 'linux'
-        run: python scripts/deduplicate_bundle.py dist/PaheBatcher
+        run: python scripts/strip_linux_debug.py dist/PaheBatcher
       - name: Package macOS application
         if: matrix.platform == 'macos'
         run: |
