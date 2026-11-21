@@ -9,6 +9,7 @@ from __future__ import annotations
 
 import asyncio
 import concurrent.futures
+import os
 import threading
 import webbrowser
 from pathlib import Path
@@ -16,7 +17,7 @@ from typing import Any
 from urllib.parse import urlsplit
 
 from pahebatcher.config import VERSION
-from pahebatcher.gui.app import GuiDashboard
+from pahebatcher.gui.app import GuiDashboard, _prepare_process
 from pahebatcher.gui.bridge import Backend, load_settings, save_settings
 from pahebatcher.gui.player import SUPPORTED_EXTENSIONS, PlaybackItem, PlayerSession
 
@@ -37,6 +38,11 @@ class TakeoverApi:
         self._job_result = ""
         self._job_title = ""
         self._job_count = 0
+        self._pending: list[tuple[Any, list[Any]]] = []
+        self._queue_limit = 20
+        self._job_total_done = 0
+        self._release_info: dict[str, object] = {"checked": False, "available": False}
+        self._release_check_started = False
         self._players: list[PlayerSession] = []
         self._library_paths: dict[str, Path] = {}
         self._lock = threading.RLock()
@@ -48,12 +54,33 @@ class TakeoverApi:
         self._boot_future.result(timeout=90)
 
     def bootstrap(self) -> dict[str, Any]:
+        self._check_release_once()
         self._ready()
         return {
             "version": VERSION,
             "solver_ok": self._submit(self.backend.ping()).result(timeout=25),
             "settings": self._settings(),
         }
+
+    def _check_release_once(self) -> None:
+        """One daemon request per application session, never blocks the UI."""
+        with self._lock:
+            if self._release_check_started:
+                return
+            self._release_check_started = True
+
+        def check() -> None:
+            from pahebatcher.update_check import lookup_update
+
+            data = lookup_update()
+            with self._lock:
+                self._release_info = data
+
+        threading.Thread(target=check, name="pb-update-once", daemon=True).start()
+
+    def update_status(self) -> dict[str, object]:
+        with self._lock:
+            return dict(self._release_info)
 
     def _settings(self) -> dict[str, Any]:
         return {
@@ -120,7 +147,8 @@ class TakeoverApi:
         return str(selected)
 
     def download(self, indices: list[int]) -> dict[str, Any]:
-        if not indices or len(indices) > 500:
+        """Queue a series snapshot; run only one series at a time."""
+        if not 1 <= len(indices) <= 500:
             raise ValueError("Select between 1 and 500 episodes.")
         if any(type(index) is not int or index < 0 for index in indices):
             raise ValueError("Invalid episode selection.")
@@ -136,36 +164,55 @@ class TakeoverApi:
             anime = self._anime
             if anime is None or any(index >= len(anime.episodes) for index in indices):
                 raise ValueError("Please open a series and select its episodes first.")
-            if self._job is not None and not self._job.done():
-                return {"started": False, "error": "A download is already running."}
-            self._job_error = ""
-            self._job_result = ""
-            self._job_title = anime.title
-            self._job_count = len(indices)
-            self.backend.current_dash = None
+            if len(self._pending) >= self._queue_limit:
+                return {"started": False, "error": "Queue is full (20 waiting series)."}
             selected = [anime.episodes[index] for index in indices]
+            # Keep the selected anime and its episodes together even when a
+            # subsequent search replaces self._anime.
+            self._pending.append((anime, selected))
+            waiting = len(self._pending)
+            self._start_next_locked()
+            return {"started": True, "queued": waiting > 1 or
+                    (self._job is not None and self._job_title != anime.title),
+                    "pending": len(self._pending)}
 
-            import pahebatcher.downloader as dl
+    def _start_next_locked(self) -> None:
+        if (self._job is not None and not self._job.done()) or not self._pending:
+            return
+        anime, selected = self._pending.pop(0)
+        self._job_error = ""
+        self._job_result = ""
+        self._job_title = anime.title
+        self._job_count = len(selected)
+        self.backend.current_dash = None
+        import pahebatcher.downloader as dl
 
-            def dashboard_factory(total_eps: int, console: Any = None,
-                                  title: str = "") -> GuiDashboard:
-                dash = GuiDashboard(total_eps, title=title)
-                self.backend.current_dash = dash
-                return dash
+        def dashboard_factory(total_eps: int, console: Any = None,
+                              title: str = "") -> GuiDashboard:
+            dash = GuiDashboard(total_eps, title=title)
+            self.backend.current_dash = dash
+            return dash
 
-            dl.Dashboard = dashboard_factory  # type: ignore[assignment,misc,attr-defined,unused-ignore]
-            self._job = self._submit(self.backend.download(anime, selected))
-            self._job.add_done_callback(self._download_done)
-        return {"started": True}
+        dl.Dashboard = dashboard_factory  # type: ignore[assignment,misc,attr-defined,unused-ignore]
+        self._job = self._submit(self.backend.download(anime, selected))
+        self._job.add_done_callback(self._download_done)
 
     def _download_done(self, future: concurrent.futures.Future[Any]) -> None:
         with self._lock:
             try:
                 results = future.result()
                 done = sum(1 for path in results.values() if path is not None)
-                self._job_result = f"Finished: {done} of {self._job_count} episodes downloaded."
+                failed = self._job_count - done
+                self._job_total_done += done
+                self._job_result = (
+                    f"Finished: {done} of {self._job_count} episodes downloaded."
+                    if not failed else
+                    f"Partial download: {done} complete, {failed} failed."
+                )
             except (Exception, concurrent.futures.CancelledError) as exc:
                 self._job_error = "Download cancelled." if future.cancelled() else str(exc)[:500]
+            if self._pending:
+                self._start_next_locked()
 
     def status(self) -> dict[str, Any]:
         with self._lock:
@@ -184,16 +231,21 @@ class TakeoverApi:
                              for key, ep in list(dash._eps.items())[:150]]
                 except (AttributeError, RuntimeError, ValueError):
                     pass
-            if not active and job and not self._job_error and self._job_result:
-                fraction = 1.0
+            if not active and job:
+                fraction = (1.0 if not self._job_error and
+                            self._job_result.startswith("Finished:") else min(fraction, 0.99))
             msg = self._job_error or self._job_result or (
-                f"Downloading {self._job_count} episode(s)…" if active else "No active download"
+                f"Downloading {self._job_count} episode(s)..." if active else "No active download"
             )
             return {"title": self._job_title, "active": active, "fraction": fraction,
-                    "items": items, "message": msg}
+                    "items": items, "message": msg,
+                    "queued": [{"title": anime.title, "episodes": len(eps)}
+                               for anime, eps in self._pending],
+                    "completed_episodes": self._job_total_done}
 
     def cancel(self) -> dict[str, bool]:
         with self._lock:
+            self._pending.clear()
             if self._job is not None and not self._job.done():
                 self._job.cancel()
         return {"ok": True}
@@ -261,6 +313,7 @@ class TakeoverApi:
 
     def shutdown(self) -> None:
         try:
+            self._pending.clear()
             if self._job is not None and not self._job.done():
                 self._job.cancel()
             self._submit(self.backend.close()).result(timeout=8)
@@ -281,6 +334,9 @@ def main() -> None:
             'The new desktop UI needs pywebview. Install using: pip install "pahebatcher[gui,browser]"'
         ) from exc
 
+    # GUI executables may have no Unicode-safe console attached.
+    os.environ.setdefault("PYTHONIOENCODING", "utf-8:replace")
+    _prepare_process()
     api = TakeoverApi()
     assets = Path(__file__).resolve().parent / "assets"
     page = assets / "desktop.html"
