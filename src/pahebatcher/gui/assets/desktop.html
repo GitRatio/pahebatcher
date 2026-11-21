@@ -28,6 +28,16 @@
 }
 @media(max-width:760px){#mobile-download-dock{left:0;padding:9px 12px}}
 
+/* Decorative artwork must not steal mouse/touch events from navigation.
+   Keep menu buttons above the mascot even when the window is short. */
+.nav{position:relative;z-index:3;flex-shrink:0}
+.nav button{position:relative;z-index:3}
+.rail-art,.rail-art::before,.rail-art img,.hero::before,.hero::after,.hero img,.player-stage img,.about-identity img{pointer-events:none}
+.rail-art{z-index:0;min-height:0;flex:1 1 auto}
+.rail-art img{max-height:100%;object-fit:contain}
+.rail-footer{flex-shrink:0}
+@media(max-width:760px){.nav{z-index:3}}
+
 /* About panel and asset rendering: preserve the native bitmap aspect ratio. */
 .rail-art img,.hero img,.player-stage img,.about-identity img{image-rendering:auto;object-fit:contain}
 .about-panel{max-width:1060px}
