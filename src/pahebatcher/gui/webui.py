@@ -208,8 +208,9 @@ class TakeoverApi:
                              for key, ep in list(dash._eps.items())[:150]]
                 except (AttributeError, RuntimeError, ValueError):
                     pass
-            if not active and job and not self._job_error and self._job_result.startswith("Finished:"):
-                fraction = 1.0
+            if not active and job:
+                fraction = (1.0 if not self._job_error and
+                            self._job_result.startswith("Finished:") else min(fraction, 0.99))
             msg = self._job_error or self._job_result or (
                 f"Downloading {self._job_count} episode(s)..." if active else "No active download"
             )
