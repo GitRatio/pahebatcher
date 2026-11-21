@@ -41,6 +41,8 @@ class TakeoverApi:
         self._pending: list[tuple[Any, list[Any]]] = []
         self._queue_limit = 20
         self._job_total_done = 0
+        self._release_info: dict[str, object] = {"checked": False, "available": False}
+        self._release_check_started = False
         self._players: list[PlayerSession] = []
         self._library_paths: dict[str, Path] = {}
         self._lock = threading.RLock()
@@ -52,12 +54,33 @@ class TakeoverApi:
         self._boot_future.result(timeout=90)
 
     def bootstrap(self) -> dict[str, Any]:
+        self._check_release_once()
         self._ready()
         return {
             "version": VERSION,
             "solver_ok": self._submit(self.backend.ping()).result(timeout=25),
             "settings": self._settings(),
         }
+
+    def _check_release_once(self) -> None:
+        """One daemon request per application session, never blocks the UI."""
+        with self._lock:
+            if self._release_check_started:
+                return
+            self._release_check_started = True
+
+        def check() -> None:
+            from pahebatcher.update_check import lookup_update
+
+            data = lookup_update()
+            with self._lock:
+                self._release_info = data
+
+        threading.Thread(target=check, name="pb-update-once", daemon=True).start()
+
+    def update_status(self) -> dict[str, object]:
+        with self._lock:
+            return dict(self._release_info)
 
     def _settings(self) -> dict[str, Any]:
         return {
@@ -125,7 +148,7 @@ class TakeoverApi:
 
     def download(self, indices: list[int]) -> dict[str, Any]:
         """Queue a series snapshot; run only one series at a time."""
-        if not isinstance(indices, list) or not 1 <= len(indices) <= 500:
+        if not 1 <= len(indices) <= 500:
             raise ValueError("Select between 1 and 500 episodes.")
         if any(type(index) is not int or index < 0 for index in indices):
             raise ValueError("Invalid episode selection.")
@@ -311,7 +334,10 @@ def main() -> None:
             'The new desktop UI needs pywebview. Install using: pip install "pahebatcher[gui,browser]"'
         ) from exc
 
-    # On Windows GUI builds Rich and child tools must never inherit a cp1252\n    # output stream that rejects Unicode status characters.\n    os.environ.setdefault("PYTHONIOENCODING", "utf-8:replace")\n    _prepare_process()\n    api = TakeoverApi()
+    # GUI executables may have no Unicode-safe console attached.
+    os.environ.setdefault("PYTHONIOENCODING", "utf-8:replace")
+    _prepare_process()
+    api = TakeoverApi()
     assets = Path(__file__).resolve().parent / "assets"
     page = assets / "desktop.html"
     if not page.is_file():
