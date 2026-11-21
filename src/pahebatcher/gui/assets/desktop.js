@@ -2,7 +2,7 @@
 (() => {
   'use strict';
   const $ = (id) => document.getElementById(id);
-  const state = { anime: null, episodes: [], selected: new Set(), library: [], page: 'home', busy: false };
+  const state = { anime: null, episodes: [], selected: new Set(), library: [], page: 'home', submitting: false };
   let poll = null;
 
   function notice(message, isError = false) {
@@ -116,8 +116,8 @@
     const quality = Number($('quality').value || 720);
     const estimateMb = n * ({360: 50, 720: 90, 1080: 150}[quality] || 90);
     $('selection-summary').textContent = n ? n + ' episodes selected · ~' + fmtBytes(estimateMb * 1024 * 1024) + ' estimated' : 'Select episodes to enable download';
-    $('download-selected').disabled = n === 0 || state.busy;
-    $('mobile-download-selected').disabled = n === 0 || state.busy;
+    $('download-selected').disabled = n === 0 || state.submitting;
+    $('mobile-download-selected').disabled = n === 0 || state.submitting;
     $('download-selected').textContent = n ? '↓ Download ' + n + ' episode' + (n === 1 ? '' : 's') : '↓ Download';
     $('mobile-download-selected').textContent = $('download-selected').textContent;
   }
@@ -153,14 +153,17 @@
     updateSelection();
   }
   async function downloadSelected() {
-    if (!state.anime || !state.selected.size || state.busy) return;
-    state.busy = true; updateSelection(); notice('');
+    if (!state.anime || !state.selected.size || state.submitting) return;
+    state.submitting = true; updateSelection(); notice('');
     try {
       await updatePrefFromDownload();
       const result = await call('download', [...state.selected].sort((a,b) => a-b));
       if (!result || !result.started) throw new Error(result && result.error || 'Could not start download.');
+      state.selected.clear();
+      notice(result.pending ? 'Series queued for download.' : 'Download started. You can add another series.');
       setPage('downloads'); await refreshStatus();
-    } catch (err) { state.busy = false; updateSelection(); showError(err); }
+    } catch (err) { showError(err); }
+    finally { state.submitting = false; updateSelection(); }
   }
   async function refreshStatus() {
     const data = await call('status');
@@ -168,11 +171,15 @@
     $('download-percent').textContent = Math.round((data.fraction || 0) * 100) + '%';
     $('download-progress').style.width = Math.round((data.fraction || 0) * 100) + '%';
     $('download-details').textContent = data.message || 'No active download';
-    $('home-status').textContent = data.active ? (data.title + ' · ' + Math.round((data.fraction || 0) * 100) + '%') : (data.message || 'No active downloads');
+    $('home-status').textContent = data.active ? (data.title + ' · ' + Math.round((data.fraction || 0) * 100) + '% · ' + (data.queued || []).length + ' waiting') : (data.message || 'No active downloads');
     $('cancel').disabled = !data.active;
-    state.busy = Boolean(data.active);
     updateSelection();
     const root = $('download-items'); root.replaceChildren();
+    for (const item of data.queued || []) {
+      const p = document.createElement('p');
+      p.textContent = 'Queued: ' + item.title + ' · ' + item.episodes + ' episodes';
+      root.append(p);
+    }
     for (const item of data.items || []) {
       const p = document.createElement('p');
       p.textContent = 'Episode ' + item.episode + ' · ' + item.state + ' · ' + Math.round((item.fraction || 0) * 100) + '%';
