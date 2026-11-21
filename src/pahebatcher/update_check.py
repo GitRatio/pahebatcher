@@ -13,14 +13,15 @@ from pahebatcher.config import VERSION
 
 RELEASE_API = "https://api.github.com/repos/GitRatio/pahebatcher/releases/tags/preview"
 RELEASE_PAGE = "https://github.com/GitRatio/pahebatcher/releases/tag/preview"
-_VERSION = re.compile(r"(?<![0-9])v?(\\d+)\\.(\\d+)\\.(\\d+)(?![0-9])")
+_VERSION = re.compile(r"(?<![0-9])v?(\d+)\.(\d+)\.(\d+)(?![0-9])")
 
 
 def version_tuple(value: str) -> tuple[int, int, int] | None:
     match = _VERSION.search(value)
     if match is None:
         return None
-    return tuple(int(part) for part in match.groups())  # type: ignore[return-value]
+    major, minor, patch = match.groups()
+    return int(major), int(minor), int(patch)
 
 
 def lookup_update(current_version: str = VERSION) -> dict[str, object]:
