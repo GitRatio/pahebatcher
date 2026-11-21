@@ -22,7 +22,7 @@ def chunk(kind: bytes, body: bytes) -> bytes:
 def test_png_is_lossless_and_no_larger(tmp_path: Path) -> None:
     # Repeated true-color pixels, intentionally stored with little compression.
     width, height = 64, 64
-    raw = (b"\\x00" + b"\\x45\\x78\\xAB" * width) * height
+    raw = (bytes([0]) + bytes([0x45, 0x78, 0xAB]) * width) * height
     ihdr = struct.pack(">IIBBBBB", width, height, 8, 2, 0, 0, 0)
     original = (optimizer.SIGNATURE + chunk(b"IHDR", ihdr) +
                 chunk(b"IDAT", zlib.compress(raw, 0)) + chunk(b"IEND", b""))
