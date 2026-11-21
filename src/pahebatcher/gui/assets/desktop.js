@@ -215,7 +215,7 @@
     // only reads the in-memory result; no browser network call or polling.
     try {
       const latest = await call('update_status');
-      if (!latest || !latest.available || !/^\\d+\\.\\d+\\.\\d+$/.test(latest.version || '')) return;
+      if (!latest || !latest.available || !/^\d+\.\d+\.\d+$/.test(latest.version || '')) return;
       $('release-update-label').textContent = 'PaheBatcher v' + latest.version + ' is available on GitHub.';
       $('release-update').hidden = false;
     } catch (error) {
