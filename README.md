@@ -4,11 +4,11 @@
 
 **Independent, open-source desktop edition** of [abdullahkhfb/pahebatcher](https://github.com/abdullahkhfb/pahebatcher), with the GitRatio Bunny Takeover interface. Download anime episodes in batches, resume interrupted transfers, and play downloaded files locally.
 
-**Current application version:** 3.12.0 · **Platforms:** Windows 11 x64, macOS Intel, macOS Apple Silicon and Linux x64 · **License:** MIT
+**Current application version:** 3.13.0 · **Platforms:** Windows 11 x64, macOS Intel, macOS Apple Silicon and Linux x64 · **License:** MIT
 
 The default desktop interface is built with **pywebview + local HTML/CSS**; the Python download engine and terminal interface remain available. Windows uses WebView2, macOS uses WebKit and Linux uses Qt WebEngine. The classic Tkinter UI remains available separately.
 
-### Development status — next preview (not yet released)
+### v3.13.0 development status — pending tested preview publication
 
 The changes in [PR #9](https://github.com/GitRatio/pahebatcher/pull/9) add a bounded multi-series queue, Unicode-safe Windows GUI output, more accurate partial-download status, and a compact in-app GitHub update notice. The About page displays the installed version and release status; it never downloads or installs an update automatically. Release checks use one small, bounded GitHub API request per app launch, and transfer status refreshes every two seconds instead of 800 milliseconds to lower idle CPU use. **These features are development changes until the PR is merged and a fresh preview build is published.**
 
@@ -17,7 +17,7 @@ The changes in [PR #9](https://github.com/GitRatio/pahebatcher/pull/9) add a bou
 
 > **Bunny Takeover** is the theme of this fork, not a transfer of ownership. The original authors retain attribution and license rights. GitRatio is not affiliated with or endorsed by the upstream maintainer. See [fork notes](FORK_NOTES.md) and [LICENSE](LICENSE).
 
-## Downloads — v3.12.0 preview
+## Downloads — v3.13.0 preview (pending build)
 
 | Operating system | Preview package |
 | --- | --- |
