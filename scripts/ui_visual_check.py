@@ -74,6 +74,20 @@ def main() -> None:
                 visible = action.bounding_box()
                 assert visible is not None and visible['y'] + visible['height'] <= height + 1, 'Download CTA clipped below viewport'
                 assert page.evaluate('document.documentElement.scrollWidth <= innerWidth + 1'), 'Horizontal overflow'
+                # The mascot used to overlap the lower menu at short heights.
+                # Check actual hit targets, not just visible CSS rectangles.
+                if width > 760:
+                    for item in page.locator('.nav button').all():
+                        rect = item.bounding_box()
+                        assert rect is not None
+                        center_x = rect['x'] + rect['width'] / 2
+                        center_y = rect['y'] + rect['height'] / 2
+                        if 0 <= center_y <= height:
+                            target = page.evaluate(
+                                '({x,y}) => document.elementFromPoint(x,y)?.closest(".nav button")?.dataset.nav',
+                                {'x': center_x, 'y': center_y},
+                            )
+                            assert target == item.get_attribute('data-nav'), 'Artwork covers navigation'
                 assert not errors, f'Browser JavaScript errors: {errors}'
                 print(f'PASS {width}x{height} — Download CTA bounds {bounds}')
                 page.close()
@@ -101,6 +115,11 @@ def main() -> None:
             screen.goto(f'http://127.0.0.1:{server.server_port}/desktop.html', wait_until='load')
             screen.locator('#query').wait_for()
             screen.screenshot(path=str(OUT / 'home-1448x1086.png'), full_page=True)
+            # Verify every visible navigation destination remains clickable with
+            # the decorative bunny artwork enabled (including bottom menu items).
+            for destination in ('downloads', 'library', 'settings', 'about', 'home'):
+                screen.locator('.nav button[data-nav="' + destination + '"]').click()
+                screen.locator('#page-' + destination + '.current').wait_for()
             screen.locator('#query').fill('Example')
             screen.locator('#search-button').click()
             screen.locator('.result-card').first.wait_for()
