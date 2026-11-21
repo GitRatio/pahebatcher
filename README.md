@@ -8,16 +8,18 @@
 
 The default desktop interface is built with **pywebview + local HTML/CSS**; the Python download engine and terminal interface remain available. Windows uses WebView2, macOS uses WebKit and Linux uses Qt WebEngine. The classic Tkinter UI remains available separately.
 
-### v3.13.0 development status — pending tested preview publication
+### v3.13.0 preview — published
 
-The changes in [PR #9](https://github.com/GitRatio/pahebatcher/pull/9) add a bounded multi-series queue, Unicode-safe Windows GUI output, more accurate partial-download status, and a compact in-app GitHub update notice. The About page displays the installed version and release status; it never downloads or installs an update automatically. Release checks use one small, bounded GitHub API request per app launch, and transfer status refreshes every two seconds instead of 800 milliseconds to lower idle CPU use. **These features are development changes until the PR is merged and a fresh preview build is published.**
+The changes in [PR #9](https://github.com/GitRatio/pahebatcher/pull/9) add a bounded multi-series queue, Unicode-safe Windows GUI output, more accurate partial-download status, and a compact in-app GitHub update notice. The About page displays the installed version and release status; it never downloads or installs an update automatically. Release checks use one small, bounded GitHub API request per app launch, and transfer status refreshes every two seconds instead of 800 milliseconds to lower idle CPU use. These features are included in the published v3.13.0 preview.
 
-**Low-resource approach:** no added update-check dependencies or resident update service, no automatic installer cache, and one active series at a time with bounded episode concurrency. The queue is currently in-memory and will not survive an app restart; restart persistence is a separate future milestone. The repository About text and topics, when edited on GitHub, should accurately reflect the published build rather than unreleased features.
+**Low-resource approach:** no added update-check dependencies or resident update service, no automatic installer cache, and one active series at a time with bounded episode concurrency. The queue is currently in-memory and will not survive an app restart; restart persistence is a separate future milestone. The app's About page and GitHub release notes describe the current functionality.
 
 
 > **Bunny Takeover** is the theme of this fork, not a transfer of ownership. The original authors retain attribution and license rights. GitRatio is not affiliated with or endorsed by the upstream maintainer. See [fork notes](FORK_NOTES.md) and [LICENSE](LICENSE).
 
-## Downloads — v3.13.0 preview (pending build)
+**Size and artwork:** The mascot is retained at full resolution and compressed losslessly during packaging. Decorative artwork no longer intercepts navigation clicks. Linux builds are testing removal of non-runtime debug symbols; this saves space without dropping Qt libraries. Compare the downloaded package size with the latest [rolling release](https://github.com/GitRatio/pahebatcher/releases/tag/preview). Runtime acceptance on real devices remains necessary.
+
+## Downloads — v3.13.0 preview
 
 | Operating system | Preview package |
 | --- | --- |
