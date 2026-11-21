@@ -198,6 +198,8 @@ jobs:
           cp src/pahebatcher/gui/assets/icon.png package/icon.png
           chmod 755 package/install.sh
           tar -C package -czf "dist/PaheBatcher-linux-${{ matrix.arch }}.tar.gz" .
+          du -h "dist/PaheBatcher-linux-${{ matrix.arch }}.tar.gz"
+          tar -tvzf "dist/PaheBatcher-linux-${{ matrix.arch }}.tar.gz" | grep -m 3 "link to" || true
       - uses: actions/upload-artifact@v4
         with:
           name: PaheBatcher-${{ matrix.platform }}-${{ matrix.arch }}
