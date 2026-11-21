@@ -255,6 +255,9 @@ jobs:
             Rolling development preview built automatically from the tested main branch.
             These downloads are NOT digitally signed or macOS notarized.
             For Windows SmartScreen or macOS Gatekeeper warnings, review the source or build locally.
+            Includes queued multi-series downloads, Windows Unicode fixes, compact GitHub update notices, and Bunny Takeover navigation overlay repairs.
+            Linux packages are optimized by removing non-runtime ELF debug symbols without removing required shared libraries.
+            Mascot images retain their original resolution and are losslessly compressed for packaging.
             Test playback and download behavior on your own device before treating it as production ready.
             Source code and attribution: https://github.com/GitRatio/pahebatcher
           prerelease: true
