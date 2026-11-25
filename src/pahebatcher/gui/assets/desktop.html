@@ -57,6 +57,17 @@
 .release-update{display:flex;align-items:center;flex-wrap:wrap;gap:10px;padding:10px 14px;margin-bottom:15px;border:1px solid var(--cyan);border-radius:11px;background:#152b39;color:var(--text);font-size:13px}
 .release-update span{flex:1;min-width:185px}
 .release-update .btn{min-height:34px;padding:6px 11px;font-size:12px}
+
+.about-panel{padding:clamp(16px,3vw,28px)}
+.about-identity{padding:18px;border:1px solid #56516e;border-radius:14px;background:#191c2b}
+.about-identity img{filter:none;width:100px;height:100px}
+.about-panel h2:not(.about-identity h2){font-size:17px;margin:24px 0 10px}
+.about-links a{display:inline-flex;align-items:center;padding:9px 12px;border:1px solid #56516e;border-radius:8px;text-decoration:none}
+.about-links a:focus-visible,.about-panel button:focus-visible,.about-panel .btn:focus-visible{outline:2px solid var(--cyan);outline-offset:3px}
+.about-panel .tile-grid{gap:10px}
+.about-panel .tile-grid a{white-space:normal;text-align:left;line-height:1.5}
+@media(max-width:480px){.about-identity{padding:12px;flex-wrap:wrap}.about-identity img{width:72px;height:72px}}
+
 </style></head><body>
 <div class="frame"><aside class="rail"><div class="graffiti-logo">GR</div><nav class="nav" aria-label="Main navigation">
 <button data-nav="home" class="active"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="m3 11 9-8 9 8v10h-6v-7H9v7H3z"/></svg>Home</button>
@@ -85,7 +96,7 @@
 <section id="page-library" class="page"><div class="title-row"><h1 class="page-title">▦ My library</h1><button class="btn" id="refresh-library">Refresh ↻</button></div><div id="library-grid" class="tile-grid"><div class="card empty">Saved files will appear here.</div></div></section>
 <section id="page-settings" class="page"><h1 class="page-title">⚙ Settings</h1><div class="card panel"><div class="setting-item"><label for="settings-quality">Preferred quality</label><select id="settings-quality"><option value="360">360p</option><option value="720">720p</option><option value="1080">1080p</option></select></div><div class="setting-item"><label for="settings-audio">Preferred audio</label><select id="settings-audio"><option value="jpn">SUB (Japanese)</option><option value="eng">DUB (English)</option></select></div><div class="setting-item"><label for="settings-parallel">Concurrent episodes</label><select id="settings-parallel"><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option></select></div><p>Preference changes apply to new downloads. The bunny graffiti theme is the active appearance.</p><button class="btn btn-pink" id="settings-save">Save preferences</button></div></section>
 <section id="page-about" class="page">
-<h1 class="page-title">ⓘ About PaheBatcher</h1>
+<h1 class="page-title"><svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><path d="M12 11v6m0-10v1"/></svg> About PaheBatcher</h1>
 <div class="card panel about-panel">
   <div class="about-identity">
     <img src="bunny.png" alt="GitRatio Bunny Takeover mascot" width="650" height="650" decoding="async">
@@ -104,14 +115,16 @@
   <h2>Version and updates</h2>
   <p id="about-update-status" class="muted">Installed version shown above. GitHub release checks are optional and never install anything automatically.</p>
   <button id="about-check-updates" class="btn" type="button">Check update status</button>
-  <h2>Get the desktop app</h2>
+  <h2>Desktop downloads</h2>
   <div class="tile-grid">
-    <a class="btn" href="https://github.com/GitRatio/pahebatcher/releases/download/preview/pahebatcher-gui-windows-x64.exe">↓ Windows 11 · x64 EXE</a>
-    <a class="btn" href="https://github.com/GitRatio/pahebatcher/releases/download/preview/PaheBatcher-macos-arm64.zip">↓ macOS · Apple Silicon ZIP</a>
-    <a class="btn" href="https://github.com/GitRatio/pahebatcher/releases/download/preview/PaheBatcher-macos-x64.zip">↓ macOS · Intel ZIP</a>
-    <a class="btn" href="https://github.com/GitRatio/pahebatcher/releases/download/preview/PaheBatcher-linux-x64.tar.gz">↓ Linux · x64 TAR.GZ</a>
+    <a class="btn" href="https://github.com/GitRatio/pahebatcher/releases/download/preview/pahebatcher-gui-windows-x64.exe">Windows 11 · x64 EXE</a>
+    <a class="btn" href="https://github.com/GitRatio/pahebatcher/releases/download/preview/PaheBatcher-macos-arm64.zip">macOS · Apple Silicon ZIP</a>
+    <a class="btn" href="https://github.com/GitRatio/pahebatcher/releases/download/preview/PaheBatcher-macos-x64.zip">macOS · Intel ZIP</a>
+    <a class="btn" href="https://github.com/GitRatio/pahebatcher/releases/download/preview/PaheBatcher-linux-x64.tar.gz">Linux · x64 TAR.GZ</a>
   </div>
   <p class="settings-note">Preview builds are unsigned; macOS builds are not notarized. Check the release page for the current build before installing.</p>
+  <h2>Project &amp; credits</h2>
+  <p class="muted">GitRatio maintains the desktop edition. Original project contributors retain their attribution under the MIT license.</p>
   <div class="about-links">
     <a href="https://github.com/GitRatio/pahebatcher">Source code</a>
     <a href="https://github.com/GitRatio/pahebatcher/blob/main/LICENSE">MIT license</a>
