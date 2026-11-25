@@ -102,6 +102,10 @@ jobs:
           --collect-all patchright
           --collect-submodules pahebatcher
           --collect-all webview
+      - name: Report Windows executable size
+        run: |
+          python -c "from pathlib import Path; p=Path('dist/pahebatcher-gui.exe'); n=p.stat().st_size; print(f'Windows GUI: {n:,} bytes ({n/1048576:.2f} MiB)')"
+          python -c "from pathlib import Path; import os; n=Path('dist/pahebatcher-gui.exe').stat().st_size; f=open(os.environ['GITHUB_STEP_SUMMARY'],'a',encoding='utf-8'); f.write(f'### Windows GUI size: {n/1048576:.2f} MiB\\n'); f.close()"
       - name: Rename
         run: mv dist/pahebatcher-gui.exe dist/pahebatcher-gui-windows-x64.exe
       - uses: actions/upload-artifact@v4
