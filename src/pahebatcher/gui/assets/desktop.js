@@ -4,6 +4,8 @@
   const $ = (id) => document.getElementById(id);
   const state = { anime: null, episodes: [], selected: new Set(), library: [], page: 'home', submitting: false };
   let poll = null;
+  let statusPending = null;
+  let lastStatusItems = null;
 
   function notice(message, isError = false) {
     const node = $('notice');
@@ -167,6 +169,11 @@
     finally { state.submitting = false; updateSelection(); }
   }
   async function refreshStatus() {
+    if (statusPending) return statusPending;
+    statusPending = renderStatus();
+    try { await statusPending; } finally { statusPending = null; }
+  }
+  async function renderStatus() {
     const data = await call('status');
     $('download-title').textContent = data.title || 'No active download';
     $('download-percent').textContent = Math.round((data.fraction || 0) * 100) + '%';
@@ -175,7 +182,10 @@
     $('home-status').textContent = data.active ? (data.title + ' · ' + Math.round((data.fraction || 0) * 100) + '% · ' + (data.queued || []).length + ' waiting') : (data.message || 'No active downloads');
     $('cancel').disabled = !data.active;
     updateSelection();
-    const root = $('download-items'); root.replaceChildren();
+    const root = $('download-items');
+    const signature = JSON.stringify([data.queued || [], data.items || []]);
+    if (signature !== lastStatusItems) {
+    root.replaceChildren();
     for (const item of data.queued || []) {
       const p = document.createElement('p');
       p.textContent = 'Queued: ' + item.title + ' · ' + item.episodes + ' episodes';
@@ -185,6 +195,8 @@
       const p = document.createElement('p');
       p.textContent = 'Episode ' + item.episode + ' · ' + item.state + ' · ' + Math.round((item.fraction || 0) * 100) + '%';
       root.append(p);
+    }
+    lastStatusItems = signature;
     }
     if (data.active && !poll) poll = setInterval(() => refreshStatus().catch(showError), 2000);
     if (!data.active && poll) {clearInterval(poll);poll=null;}
