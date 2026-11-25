@@ -45,6 +45,7 @@ class TakeoverApi:
         self._release_check_started = False
         self._players: list[PlayerSession] = []
         self._library_paths: dict[str, Path] = {}
+        self._conversion_lock = threading.Lock()
         self._lock = threading.RLock()
 
     def _submit(self, coro: Any) -> concurrent.futures.Future[Any]:
@@ -77,6 +78,26 @@ class TakeoverApi:
                 self._release_info = data
 
         threading.Thread(target=check, name="pb-update-once", daemon=True).start()
+
+    @staticmethod
+    def network_status() -> dict[str, object]:
+        """Inspect local configuration only; never contact an unknown proxy."""
+        import shutil
+        import sys
+        from urllib.request import getproxies
+
+        proxies = getproxies()
+        warp = bool(shutil.which("warp-cli") or shutil.which("warp-cli.exe"))
+        if sys.platform == "win32":
+            for key in ("ProgramFiles", "ProgramW6432", "ProgramFiles(x86)"):
+                root = os.environ.get(key)
+                if root and (Path(root) / "Cloudflare" / "Cloudflare WARP" / "warp-cli.exe").is_file():
+                    warp = True
+        return {
+            "warp_detected": warp,
+            "system_proxy_configured": any(bool(proxies.get(k)) for k in ("http", "https", "all")),
+            "routing_verified": False,
+        }
 
     def update_status(self) -> dict[str, object]:
         with self._lock:
@@ -253,12 +274,18 @@ class TakeoverApi:
     def library(self) -> list[dict[str, Any]]:
         directory = Path(str(self.cfg.get("output_dir"))).expanduser().resolve()
         if not directory.is_dir():
+            with self._lock:
+                self._library_paths.clear()
             return []
         files: list[Path] = []
         for candidate in directory.rglob("*"):
             if len(files) >= 200:
                 break
-            if candidate.is_file() and candidate.suffix.lower() in SUPPORTED_EXTENSIONS:
+            if (
+                candidate.is_file()
+                and candidate.suffix.lower() in SUPPORTED_EXTENSIONS | {".mkv", ".avi", ".ts"}
+                and not candidate.name.startswith(".pahebatcher-")
+            ):
                 path = candidate.resolve()
                 if path.is_relative_to(directory):
                     files.append(path)
@@ -266,7 +293,36 @@ class TakeoverApi:
         with self._lock:
             self._library_paths = {str(index): path for index, path in enumerate(files)}
         return [{"id": str(index), "name": path.name, "size": path.stat().st_size,
-                 "series": path.parent.name} for index, path in enumerate(files)]
+                 "series": path.parent.name, "playable": path.suffix.lower() in SUPPORTED_EXTENSIONS}
+                for index, path in enumerate(files)]
+
+    def convert_media(self, id_: object, format_: object, transcode: object = False) -> dict[str, Any]:
+        """Remux one explicitly selected library item without replacing originals."""
+        from pahebatcher.media_convert import FORMATS, convert, remux
+
+        if not isinstance(id_, str) or not id_.isascii() or not id_.isdecimal():
+            raise ValueError("Choose a saved video from Library.")
+        if not isinstance(format_, str) or format_ not in FORMATS:
+            raise ValueError("Unsupported output format.")
+        if not isinstance(transcode, bool):
+            raise ValueError("Invalid conversion mode.")
+        if not self._conversion_lock.acquire(blocking=False):
+            raise RuntimeError("A conversion is already running.")
+        try:
+            with self._lock:
+                path = self._library_paths.get(id_)
+            root = Path(str(self.cfg.get("output_dir"))).expanduser().resolve()
+            if path is None or not path.is_file() or not path.resolve().is_relative_to(root):
+                raise ValueError("Video is no longer available in your downloads folder.")
+            path = path.resolve()
+            destination = path.with_name(path.stem + ".converted." + format_)
+            if transcode:
+                convert(path, destination, transcode=True)
+            else:
+                remux(path, destination)
+            return {"ok": True, "name": destination.name}
+        finally:
+            self._conversion_lock.release()
 
     def play(self, id_: str) -> dict[str, bool]:
         if not id_.isascii() or not id_.isdecimal():

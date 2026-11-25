@@ -4,6 +4,8 @@
   const $ = (id) => document.getElementById(id);
   const state = { anime: null, episodes: [], selected: new Set(), library: [], page: 'home', submitting: false };
   let poll = null;
+  let statusPending = null;
+  let lastStatusItems = null;
 
   function notice(message, isError = false) {
     const node = $('notice');
@@ -167,6 +169,11 @@
     finally { state.submitting = false; updateSelection(); }
   }
   async function refreshStatus() {
+    if (statusPending) return statusPending;
+    statusPending = renderStatus();
+    try { await statusPending; } finally { statusPending = null; }
+  }
+  async function renderStatus() {
     const data = await call('status');
     $('download-title').textContent = data.title || 'No active download';
     $('download-percent').textContent = Math.round((data.fraction || 0) * 100) + '%';
@@ -175,7 +182,10 @@
     $('home-status').textContent = data.active ? (data.title + ' · ' + Math.round((data.fraction || 0) * 100) + '% · ' + (data.queued || []).length + ' waiting') : (data.message || 'No active downloads');
     $('cancel').disabled = !data.active;
     updateSelection();
-    const root = $('download-items'); root.replaceChildren();
+    const root = $('download-items');
+    const signature = JSON.stringify([data.queued || [], data.items || []]);
+    if (signature !== lastStatusItems) {
+    root.replaceChildren();
     for (const item of data.queued || []) {
       const p = document.createElement('p');
       p.textContent = 'Queued: ' + item.title + ' · ' + item.episodes + ' episodes';
@@ -185,6 +195,8 @@
       const p = document.createElement('p');
       p.textContent = 'Episode ' + item.episode + ' · ' + item.state + ' · ' + Math.round((item.fraction || 0) * 100) + '%';
       root.append(p);
+    }
+    lastStatusItems = signature;
     }
     if (data.active && !poll) poll = setInterval(() => refreshStatus().catch(showError), 2000);
     if (!data.active && poll) {clearInterval(poll);poll=null;}
@@ -199,11 +211,36 @@
     }
     state.library.forEach((item) => {
       const card = document.createElement('div'); card.className = 'card library-item';
-      const art = document.createElement('div'); art.className = 'poster'; art.textContent = '▷ MP4';
+      const art = document.createElement('div'); art.className = 'poster'; art.textContent = '▷ ' + item.name.split('.').pop().toUpperCase();
       const label = document.createElement('strong'); label.textContent = item.name;
       const info = document.createElement('p'); info.className = 'muted'; info.textContent = fmtBytes(item.size) + ' · ' + item.series;
       const play = document.createElement('button'); play.className = 'btn btn-pink'; play.textContent = '▷ Play'; play.addEventListener('click', () => openVideo(item.id));
-      card.append(art,label,info,play); root.append(card);
+      const format = document.createElement('select');
+      format.setAttribute('aria-label', 'Output format for ' + item.name);
+      for (const ext of ['mp4','mkv','webm']) {
+        const opt = document.createElement('option'); opt.value = ext; opt.textContent = ext.toUpperCase(); format.append(opt);
+      }
+      const mode = document.createElement('select');
+      mode.setAttribute('aria-label', 'Conversion mode for ' + item.name);
+      for (const [value, label] of [['copy','Lossless remux'],['encode','Transcode (limited threads)']]) {
+        const opt = document.createElement('option'); opt.value = value; opt.textContent = label; mode.append(opt);
+      }
+      const convert = document.createElement('button'); convert.className = 'btn'; convert.textContent = 'Convert copy';
+      convert.addEventListener('click', async () => {
+        if (state.converting) return;
+        state.converting = true; convert.disabled = true;
+        convert.textContent = 'Converting…';
+        try {
+          const result = await call('convert_media', item.id, format.value, mode.value === 'encode');
+          if (!result || !result.ok) throw new Error('Conversion failed.');
+          await refreshLibrary(); notice('Saved ' + result.name + '. Original preserved.');
+        } catch (e) { showError(e); }
+        finally { state.converting = false; convert.disabled = false; convert.textContent = 'Remux copy'; }
+      });
+      card.append(art,label,info);
+      if (item.playable !== false) card.append(play);
+      card.append(format,mode,convert); root.append(card);
+      if (item.playable === false) return;
       const row = document.createElement('button'); row.className = 'btn'; row.style.cssText = 'width:100%;margin:5px 0;justify-content:flex-start;overflow:hidden;text-overflow:ellipsis'; row.textContent = '▷ ' + item.name; row.addEventListener('click', () => openVideo(item.id)); playlist.append(row);
     });
   }
@@ -266,6 +303,20 @@
     $('audio').addEventListener('change', updatePrefFromDownload);
     $('parallel').addEventListener('change', updatePrefFromDownload);
     $('settings-save').addEventListener('click', savePrefs);
+    $('network-check').addEventListener('click', async () => {
+      const button = $('network-check');
+      button.disabled = true;
+      $('network-status').textContent = 'Checking local configuration…';
+      try {
+        const info = await call('network_status');
+        $('network-warp').textContent = info.warp_detected ? 'Client detected' : 'Client not detected';
+        $('network-proxy').textContent = info.system_proxy_configured ? 'Configured' : 'Not detected';
+        $('network-status').textContent = 'Local check complete. Active routing has not been verified.';
+      } catch (e) {
+        $('network-status').textContent = 'Local network check failed.';
+        showError(e);
+      } finally { button.disabled = false; }
+    });
     $('cancel').addEventListener('click', async () => { try{await call('cancel');await refreshStatus();}catch(e){showError(e);} });
     $('change-folder').addEventListener('click', async () => {try{ const folder=await call('choose_folder');if(folder){$('save-path').value=folder;notice('Download folder updated.');}}catch(e){showError(e);} });
     $('refresh-library').addEventListener('click', () => refreshLibrary().catch(showError));

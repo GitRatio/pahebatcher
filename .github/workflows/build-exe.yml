@@ -58,7 +58,7 @@ jobs:
           ${{ matrix.icon }}
           --paths src
           --collect-all curl_cffi
-          --collect-all Cryptodome
+          --collect-binaries Cryptodome --exclude-module Cryptodome.SelfTest
           --collect-all patchright
           --collect-submodules pahebatcher
           --collect-all webview
@@ -98,10 +98,18 @@ jobs:
           --add-data "src/pahebatcher/gui/assets;pahebatcher/gui/assets"
           --paths src
           --collect-all curl_cffi
-          --collect-all Cryptodome
+          --collect-binaries Cryptodome --exclude-module Cryptodome.SelfTest
           --collect-all patchright
           --collect-submodules pahebatcher
           --collect-all webview
+      - name: Verify frozen archive excludes cryptography self-tests
+        run: |
+          pyi-archive_viewer -l -r dist/pahebatcher-gui.exe > build/frozen-inventory.txt
+          python -c "from pathlib import Path; s=Path('build/frozen-inventory.txt').read_text(encoding='utf-8',errors='replace'); assert 'Cryptodome.SelfTest' not in s, 'Cryptography self-tests bundled'"
+      - name: Report Windows executable size
+        run: |
+          python -c "from pathlib import Path; p=Path('dist/pahebatcher-gui.exe'); n=p.stat().st_size; print(f'Windows GUI: {n:,} bytes ({n/1048576:.2f} MiB)')"
+          python -c "from pathlib import Path; import os; n=Path('dist/pahebatcher-gui.exe').stat().st_size; f=open(os.environ['GITHUB_STEP_SUMMARY'],'a',encoding='utf-8'); f.write(f'### Windows GUI size: {n/1048576:.2f} MiB\\n'); f.close()"
       - name: Rename
         run: mv dist/pahebatcher-gui.exe dist/pahebatcher-gui-windows-x64.exe
       - uses: actions/upload-artifact@v4
@@ -165,7 +173,7 @@ jobs:
             --onedir --windowed --clean --noconfirm --name PaheBatcher \
             --paths src \
             --add-data "src/pahebatcher/gui/assets:pahebatcher/gui/assets" \
-            --collect-all curl_cffi --collect-all Cryptodome \
+            --collect-all curl_cffi --collect-binaries Cryptodome --exclude-module Cryptodome.SelfTest \
             --collect-all patchright --collect-submodules pahebatcher \
             --collect-all webview \
             "${extras[@]}"
@@ -182,6 +190,12 @@ jobs:
       - name: Strip non-runtime Linux ELF debug symbols
         if: matrix.platform == 'linux'
         run: python scripts/strip_linux_debug.py dist/PaheBatcher
+      - name: Deduplicate identical Linux Qt libraries
+        if: matrix.platform == 'linux'
+        run: |
+          python scripts/package_inventory.py dist/PaheBatcher
+          python scripts/dedupe_linux_bundle.py dist/PaheBatcher
+          python scripts/package_inventory.py dist/PaheBatcher
       - name: Package macOS application
         if: matrix.platform == 'macos'
         run: |

@@ -165,3 +165,45 @@ def test_multiseries_queue_rejects_invalid_selection_without_mutation(
         with pytest.raises(ValueError):
             api.download(indices)  # type: ignore[arg-type]
     assert api._pending == []
+
+
+def test_network_status_is_local_and_redacted(monkeypatch: pytest.MonkeyPatch) -> None:
+    import shutil
+    import sys
+    import urllib.request
+
+    monkeypatch.setattr(sys, "platform", "linux")
+    monkeypatch.setattr(shutil, "which", lambda name: "/usr/bin/warp-cli")
+    monkeypatch.setattr(urllib.request, "getproxies", lambda: {"https": "http://user:secret@example.org:8080"})
+    assert webui.TakeoverApi.network_status() == {
+        "warp_detected": True,
+        "system_proxy_configured": True,
+        "routing_verified": False,
+    }
+
+
+def test_convert_media_bridge_preserves_original(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    from pahebatcher import media_convert
+
+    api = webui.TakeoverApi.__new__(webui.TakeoverApi)
+    api.cfg = FakeConfig()  # type: ignore[assignment]
+    api.cfg.set("output_dir", str(tmp_path))
+    api._lock = threading.RLock()
+    api._conversion_lock = threading.Lock()
+    source = tmp_path / "episode.mp4"
+    source.write_bytes(b"original")
+    api._library_paths = {"0": source}
+
+    def fake_remux(src: Path, dst: Path) -> Path:
+        assert src == source.resolve()
+        dst.write_bytes(b"converted")
+        return dst
+
+    monkeypatch.setattr(media_convert, "remux", fake_remux)
+    assert api.convert_media("0", "mkv") == {"ok": True, "name": "episode.converted.mkv"}
+    assert source.read_bytes() == b"original"
+    with pytest.raises(ValueError):
+        api.convert_media("0", "../mp4")
+    with pytest.raises(ValueError):
+        api.convert_media("99", "mp4")
+    assert not api._conversion_lock.locked()
