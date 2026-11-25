@@ -45,6 +45,7 @@ class TakeoverApi:
         self._release_check_started = False
         self._players: list[PlayerSession] = []
         self._library_paths: dict[str, Path] = {}
+        self._conversion_lock = threading.Lock()
         self._lock = threading.RLock()
 
     def _submit(self, coro: Any) -> concurrent.futures.Future[Any]:
@@ -273,12 +274,14 @@ class TakeoverApi:
     def library(self) -> list[dict[str, Any]]:
         directory = Path(str(self.cfg.get("output_dir"))).expanduser().resolve()
         if not directory.is_dir():
+            with self._lock:
+                self._library_paths.clear()
             return []
         files: list[Path] = []
         for candidate in directory.rglob("*"):
             if len(files) >= 200:
                 break
-            if candidate.is_file() and candidate.suffix.lower() in SUPPORTED_EXTENSIONS:
+            if candidate.is_file() and candidate.suffix.lower() in SUPPORTED_EXTENSIONS | {'.mkv', '.avi', '.ts'} and not candidate.name.startswith('.pahebatcher-'):
                 path = candidate.resolve()
                 if path.is_relative_to(directory):
                     files.append(path)
@@ -286,7 +289,31 @@ class TakeoverApi:
         with self._lock:
             self._library_paths = {str(index): path for index, path in enumerate(files)}
         return [{"id": str(index), "name": path.name, "size": path.stat().st_size,
-                 "series": path.parent.name} for index, path in enumerate(files)]
+                 "series": path.parent.name, "playable": path.suffix.lower() in SUPPORTED_EXTENSIONS}
+                for index, path in enumerate(files)]
+
+    def convert_media(self, id_: str, format_: str) -> dict[str, Any]:
+        """Remux one explicitly selected library item without replacing originals."""
+        from pahebatcher.media_convert import FORMATS, remux
+
+        if not isinstance(id_, str) or not id_.isascii() or not id_.isdecimal():
+            raise ValueError("Choose a saved video from Library.")
+        if not isinstance(format_, str) or format_ not in FORMATS:
+            raise ValueError("Unsupported output format.")
+        if not self._conversion_lock.acquire(blocking=False):
+            raise RuntimeError("A conversion is already running.")
+        try:
+            with self._lock:
+                path = self._library_paths.get(id_)
+            root = Path(str(self.cfg.get("output_dir"))).expanduser().resolve()
+            if path is None or not path.is_file() or not path.resolve().is_relative_to(root):
+                raise ValueError("Video is no longer available in your downloads folder.")
+            path = path.resolve()
+            destination = path.with_name(path.stem + ".converted." + format_)
+            remux(path, destination)
+            return {"ok": True, "name": destination.name}
+        finally:
+            self._conversion_lock.release()
 
     def play(self, id_: str) -> dict[str, bool]:
         if not id_.isascii() or not id_.isdecimal():
