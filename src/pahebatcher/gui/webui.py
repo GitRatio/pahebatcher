@@ -78,6 +78,26 @@ class TakeoverApi:
 
         threading.Thread(target=check, name="pb-update-once", daemon=True).start()
 
+    @staticmethod
+    def network_status() -> dict[str, object]:
+        """Inspect local configuration only; never contact an unknown proxy."""
+        import shutil
+        import sys
+        from urllib.request import getproxies
+
+        proxies = getproxies()
+        warp = bool(shutil.which("warp-cli") or shutil.which("warp-cli.exe"))
+        if sys.platform == "win32":
+            for key in ("ProgramFiles", "ProgramW6432", "ProgramFiles(x86)"):
+                root = os.environ.get(key)
+                if root and (Path(root) / "Cloudflare" / "Cloudflare WARP" / "warp-cli.exe").is_file():
+                    warp = True
+        return {
+            "warp_detected": warp,
+            "system_proxy_configured": any(bool(proxies.get(k)) for k in ("http", "https", "all")),
+            "routing_verified": False,
+        }
+
     def update_status(self) -> dict[str, object]:
         with self._lock:
             return dict(self._release_info)
