@@ -296,14 +296,16 @@ class TakeoverApi:
                  "series": path.parent.name, "playable": path.suffix.lower() in SUPPORTED_EXTENSIONS}
                 for index, path in enumerate(files)]
 
-    def convert_media(self, id_: object, format_: object) -> dict[str, Any]:
+    def convert_media(self, id_: object, format_: object, transcode: object = False) -> dict[str, Any]:
         """Remux one explicitly selected library item without replacing originals."""
-        from pahebatcher.media_convert import FORMATS, remux
+        from pahebatcher.media_convert import FORMATS, convert, remux
 
         if not isinstance(id_, str) or not id_.isascii() or not id_.isdecimal():
             raise ValueError("Choose a saved video from Library.")
         if not isinstance(format_, str) or format_ not in FORMATS:
             raise ValueError("Unsupported output format.")
+        if not isinstance(transcode, bool):
+            raise ValueError("Invalid conversion mode.")
         if not self._conversion_lock.acquire(blocking=False):
             raise RuntimeError("A conversion is already running.")
         try:
@@ -314,7 +316,10 @@ class TakeoverApi:
                 raise ValueError("Video is no longer available in your downloads folder.")
             path = path.resolve()
             destination = path.with_name(path.stem + ".converted." + format_)
-            remux(path, destination)
+            if transcode:
+                convert(path, destination, transcode=True)
+            else:
+                remux(path, destination)
             return {"ok": True, "name": destination.name}
         finally:
             self._conversion_lock.release()
