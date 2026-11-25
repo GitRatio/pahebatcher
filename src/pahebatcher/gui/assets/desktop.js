@@ -199,11 +199,31 @@
     }
     state.library.forEach((item) => {
       const card = document.createElement('div'); card.className = 'card library-item';
-      const art = document.createElement('div'); art.className = 'poster'; art.textContent = '▷ MP4';
+      const art = document.createElement('div'); art.className = 'poster'; art.textContent = '▷ ' + item.name.split('.').pop().toUpperCase();
       const label = document.createElement('strong'); label.textContent = item.name;
       const info = document.createElement('p'); info.className = 'muted'; info.textContent = fmtBytes(item.size) + ' · ' + item.series;
       const play = document.createElement('button'); play.className = 'btn btn-pink'; play.textContent = '▷ Play'; play.addEventListener('click', () => openVideo(item.id));
-      card.append(art,label,info,play); root.append(card);
+      const format = document.createElement('select');
+      format.setAttribute('aria-label', 'Output format for ' + item.name);
+      for (const ext of ['mp4','mkv','webm']) {
+        const opt = document.createElement('option'); opt.value = ext; opt.textContent = ext.toUpperCase(); format.append(opt);
+      }
+      const convert = document.createElement('button'); convert.className = 'btn'; convert.textContent = 'Remux copy';
+      convert.addEventListener('click', async () => {
+        if (state.converting) return;
+        state.converting = true; convert.disabled = true;
+        convert.textContent = 'Converting…';
+        try {
+          const result = await call('convert_media', item.id, format.value);
+          if (!result || !result.ok) throw new Error('Conversion failed.');
+          await refreshLibrary(); notice('Saved ' + result.name + '. Original preserved.');
+        } catch (e) { showError(e); }
+        finally { state.converting = false; convert.disabled = false; convert.textContent = 'Remux copy'; }
+      });
+      card.append(art,label,info);
+      if (item.playable !== false) card.append(play);
+      card.append(format,convert); root.append(card);
+      if (item.playable === false) return;
       const row = document.createElement('button'); row.className = 'btn'; row.style.cssText = 'width:100%;margin:5px 0;justify-content:flex-start;overflow:hidden;text-overflow:ellipsis'; row.textContent = '▷ ' + item.name; row.addEventListener('click', () => openVideo(item.id)); playlist.append(row);
     });
   }
