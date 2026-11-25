@@ -266,6 +266,20 @@
     $('audio').addEventListener('change', updatePrefFromDownload);
     $('parallel').addEventListener('change', updatePrefFromDownload);
     $('settings-save').addEventListener('click', savePrefs);
+    $('network-check').addEventListener('click', async () => {
+      const button = $('network-check');
+      button.disabled = true;
+      $('network-status').textContent = 'Checking local configuration…';
+      try {
+        const info = await call('network_status');
+        $('network-warp').textContent = info.warp_detected ? 'Client detected' : 'Client not detected';
+        $('network-proxy').textContent = info.system_proxy_configured ? 'Configured' : 'Not detected';
+        $('network-status').textContent = 'Local check complete. Active routing has not been verified.';
+      } catch (e) {
+        $('network-status').textContent = 'Local network check failed.';
+        showError(e);
+      } finally { button.disabled = false; }
+    });
     $('cancel').addEventListener('click', async () => { try{await call('cancel');await refreshStatus();}catch(e){showError(e);} });
     $('change-folder').addEventListener('click', async () => {try{ const folder=await call('choose_folder');if(folder){$('save-path').value=folder;notice('Download folder updated.');}}catch(e){showError(e);} });
     $('refresh-library').addEventListener('click', () => refreshLibrary().catch(showError));
