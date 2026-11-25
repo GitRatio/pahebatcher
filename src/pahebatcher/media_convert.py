@@ -49,7 +49,9 @@ def convert(source: Path, destination: Path, *, transcode: bool = False) -> Path
             timeout=1800, creationflags=NO_WINDOW, check=False,
         )
         if result.returncode or temporary.stat().st_size == 0:
-            raise RuntimeError("Conversion failed; check encoder availability and target container track compatibility.")
+            raise RuntimeError(
+                "Conversion failed; check encoder availability and target container track compatibility."
+            )
         # Hard-link publication is atomic and refuses to overwrite an existing file.
         os.link(temporary, destination)
         return destination
