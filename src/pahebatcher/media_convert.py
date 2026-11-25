@@ -15,6 +15,11 @@ INPUTS = frozenset({".mp4", ".mkv", ".webm", ".mov", ".m4v", ".avi", ".ts"})
 
 def remux(source: Path, destination: Path) -> Path:
     """Copy streams without quality loss; fail safely on incompatible codecs."""
+    return convert(source, destination)
+
+
+def convert(source: Path, destination: Path, *, transcode: bool = False) -> Path:
+    """Optionally encode audio/video with bounded threads; preserve other tracks or fail."""
     source = source.resolve(strict=True)
     destination = destination.resolve()
     if not source.is_file() or source.suffix.lower() not in INPUTS:
@@ -26,6 +31,12 @@ def remux(source: Path, destination: Path) -> Path:
     executable = find_ffmpeg()
     if executable is None:
         raise RuntimeError("Install FFmpeg before converting media.")
+    codecs = ["-c", "copy"]
+    if transcode:
+        video, audio = ("libvpx-vp9", "libopus") if destination.suffix.lower() == ".webm" else (
+            "libx264", "aac",
+        )
+        codecs += ["-c:v", video, "-c:a", audio, "-threads:v", "2", "-threads:a", "1"]
     fd, name = tempfile.mkstemp(prefix=".pahebatcher-", suffix=destination.suffix, dir=destination.parent)
     os.close(fd)
     temporary = Path(name)
@@ -33,12 +44,12 @@ def remux(source: Path, destination: Path) -> Path:
         result = subprocess.run(
             [executable, "-nostdin", "-hide_banner", "-loglevel", "error", "-y",
              "-protocol_whitelist", "file", "-i", str(source), "-map", "0",
-             "-c", "copy", str(temporary)],
+             *codecs, str(temporary)],
             stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL,
             timeout=1800, creationflags=NO_WINDOW, check=False,
         )
         if result.returncode or temporary.stat().st_size == 0:
-            raise RuntimeError("Remux failed; the target container may not support all source tracks.")
+            raise RuntimeError("Conversion failed; check encoder availability and target container track compatibility.")
         # Hard-link publication is atomic and refuses to overwrite an existing file.
         os.link(temporary, destination)
         return destination
