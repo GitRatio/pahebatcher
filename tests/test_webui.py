@@ -165,3 +165,18 @@ def test_multiseries_queue_rejects_invalid_selection_without_mutation(
         with pytest.raises(ValueError):
             api.download(indices)  # type: ignore[arg-type]
     assert api._pending == []
+
+
+def test_network_status_is_local_and_redacted(monkeypatch: pytest.MonkeyPatch) -> None:
+    import shutil
+    import sys
+    import urllib.request
+
+    monkeypatch.setattr(sys, "platform", "linux")
+    monkeypatch.setattr(shutil, "which", lambda name: "/usr/bin/warp-cli")
+    monkeypatch.setattr(urllib.request, "getproxies", lambda: {"https": "http://user:secret@example.org:8080"})
+    assert webui.TakeoverApi.network_status() == {
+        "warp_detected": True,
+        "system_proxy_configured": True,
+        "routing_verified": False,
+    }
