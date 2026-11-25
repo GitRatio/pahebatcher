@@ -102,6 +102,10 @@ jobs:
           --collect-all patchright
           --collect-submodules pahebatcher
           --collect-all webview
+      - name: Verify frozen archive excludes cryptography self-tests
+        run: |
+          pyi-archive_viewer -l -r dist/pahebatcher-gui.exe > build/frozen-inventory.txt
+          python -c "from pathlib import Path; s=Path('build/frozen-inventory.txt').read_text(encoding='utf-8',errors='replace'); assert 'Cryptodome.SelfTest' not in s, 'Cryptography self-tests bundled'"
       - name: Report Windows executable size
         run: |
           python -c "from pathlib import Path; p=Path('dist/pahebatcher-gui.exe'); n=p.stat().st_size; print(f'Windows GUI: {n:,} bytes ({n/1048576:.2f} MiB)')"
