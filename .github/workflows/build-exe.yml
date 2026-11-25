@@ -186,6 +186,12 @@ jobs:
       - name: Strip non-runtime Linux ELF debug symbols
         if: matrix.platform == 'linux'
         run: python scripts/strip_linux_debug.py dist/PaheBatcher
+      - name: Deduplicate identical Linux Qt libraries
+        if: matrix.platform == 'linux'
+        run: |
+          python scripts/package_inventory.py dist/PaheBatcher
+          python scripts/dedupe_linux_bundle.py dist/PaheBatcher
+          python scripts/package_inventory.py dist/PaheBatcher
       - name: Package macOS application
         if: matrix.platform == 'macos'
         run: |
