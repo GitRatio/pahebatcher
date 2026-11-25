@@ -58,7 +58,7 @@ jobs:
           ${{ matrix.icon }}
           --paths src
           --collect-all curl_cffi
-          --collect-all Cryptodome
+          --collect-binaries Cryptodome --exclude-module Cryptodome.SelfTest
           --collect-all patchright
           --collect-submodules pahebatcher
           --collect-all webview
@@ -98,7 +98,7 @@ jobs:
           --add-data "src/pahebatcher/gui/assets;pahebatcher/gui/assets"
           --paths src
           --collect-all curl_cffi
-          --collect-all Cryptodome
+          --collect-binaries Cryptodome --exclude-module Cryptodome.SelfTest
           --collect-all patchright
           --collect-submodules pahebatcher
           --collect-all webview
@@ -169,7 +169,7 @@ jobs:
             --onedir --windowed --clean --noconfirm --name PaheBatcher \
             --paths src \
             --add-data "src/pahebatcher/gui/assets:pahebatcher/gui/assets" \
-            --collect-all curl_cffi --collect-all Cryptodome \
+            --collect-all curl_cffi --collect-binaries Cryptodome --exclude-module Cryptodome.SelfTest \
             --collect-all patchright --collect-submodules pahebatcher \
             --collect-all webview \
             "${extras[@]}"
