@@ -281,7 +281,11 @@ class TakeoverApi:
         for candidate in directory.rglob("*"):
             if len(files) >= 200:
                 break
-            if candidate.is_file() and candidate.suffix.lower() in SUPPORTED_EXTENSIONS | {'.mkv', '.avi', '.ts'} and not candidate.name.startswith('.pahebatcher-'):
+            if (
+                candidate.is_file()
+                and candidate.suffix.lower() in SUPPORTED_EXTENSIONS | {".mkv", ".avi", ".ts"}
+                and not candidate.name.startswith(".pahebatcher-")
+            ):
                 path = candidate.resolve()
                 if path.is_relative_to(directory):
                     files.append(path)
@@ -292,7 +296,7 @@ class TakeoverApi:
                  "series": path.parent.name, "playable": path.suffix.lower() in SUPPORTED_EXTENSIONS}
                 for index, path in enumerate(files)]
 
-    def convert_media(self, id_: str, format_: str) -> dict[str, Any]:
+    def convert_media(self, id_: object, format_: object) -> dict[str, Any]:
         """Remux one explicitly selected library item without replacing originals."""
         from pahebatcher.media_convert import FORMATS, remux
 
